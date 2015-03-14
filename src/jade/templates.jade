@@ -1,0 +1,16 @@
+script#card-list(type="text/ng-template")
+    div.item.item-divider(ng-if="card.title") {{card.title}}
+    div.item(ng-repeat="item in info.data[card.data].data") {{item.text}}
+
+script#card-glance(type="text/ng-template")
+    div.item.item-avatar(ng-if="card.header")
+        picture(item="info.data[card.avatar]", ng-if="card.avatar")
+        text(item="info.data[card.header]", ng-if="card.header")
+
+    div.item.item-image(ng-if="card.image")
+        picture(item="info.data[card.image]")
+
+    div.item.assertive(ng-repeat="type in card.footerTexts", ng-if="card.footerTexts")
+        text(item="info.data[type]", ng-if="info.data[type].type === 'text'")
+
+    action(item="info.data[type]", ng-if="card.footerActions && info.data[type].type === 'action'", ng-repeat="type in card.footerActions")
