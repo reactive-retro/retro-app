@@ -1,4 +1,4 @@
 reactive-retro
 ==============
 
-A game.
+The Ionic app that runs the game.
