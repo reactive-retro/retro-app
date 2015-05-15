@@ -3,26 +3,26 @@ html
     head
         meta(charset="utf-8")
         meta(name="viewport", content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width")
-        title qson
+        title Reactive Retro
         link(href="css/ionic.app.css",rel="stylesheet")
         script(src="js/lib.js")
         script(src="cordova.js")
         script(src="js/app.js")
 
-    body(ng-app="qson")
-        ion-pane(ng-controller="AppController")
-            ion-header-bar(class="bar-stable")
-                h1.title qson
-                div.buttons
-                    button.button(ng-click="scanCode()", ng-if="!showSpinner")
-                        i.icon.ion-ios-camera
-                    button.button(disabled, ng-if="showSpinner")
-                        ion-spinner
+    body(ng-app="retro", ng-controller="MenuController")
+        ion-side-menus(enable-menu-with-back-views="false")
+            ion-side-menu-content(drag-content="false")
+                ion-nav-bar.bar-royal
+                    ion-nav-back-button
+                    ion-nav-buttons(side="left")
+                        button.button.button-icon.icon.ion-navicon(menu-toggle="left", ng-if="!hideMenu")
+                ion-nav-view
 
-            ion-content
-                div.background-text(ng-if="!info.display || !info.data")
-                    | Invalid data.
-                    | <br><br>
-                    | Scan new source.
-
-                div.list.card(ng-repeat="card in info.display", ng-include="'card-'+card.cardType")
+            ion-side-menu(side="left")
+                header.bar.bar-header.bar-assertive
+                    h1.title Menu
+                ion-content.has-header
+                    ion-list
+                        ion-item(menu-close, ng-repeat="place in menu", ui-sref="{{place.state}}")
+                            i(ng-class="place.icon")
+                            span &nbsp;{{place.name}}

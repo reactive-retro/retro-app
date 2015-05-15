@@ -20,14 +20,15 @@ var paths = {
 };
 
 var lib = [
-    './www/lib/ionic/js/ionic.bundle.js',
-    './www/lib/ngCordova/dist/ng-cordova.js'
+    './www/lib/ionic/release/js/ionic.bundle.js',
+    './www/lib/ngCordova/dist/ng-cordova.js',
+    './www/lib/ng-cordova-oauth/ng-cordova-oauth.js'
 ];
 
 gulp.task('default', ['sass', 'lib', 'html', 'build', 'watch']);
 
 gulp.task('sass', function(done) {
-    gulp.src('./scss/ionic.app.scss')
+    gulp.src('./src/scss/ionic.app.scss')
         .pipe(sass())
         .pipe(gulp.dest('./www/css/'))
         .pipe(minifyCss({

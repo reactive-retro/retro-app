@@ -1,0 +1,50 @@
+script(type="text/ng-template", id="inventory")
+    ion-view(view-title="Inventory")
+        ion-pane
+            ion-tabs
+                ion-tab(title="Armor", icon-on="ion-tshirt", icon-off="ion-tshirt-outline", href="#/inventory/armor")
+                    ion-nav-view(name="armor-tab")
+
+                ion-tab(title="Weapons", icon-on="ion-ios-color-wand", icon-off="ion-ios-color-wand-outline", href="#/inventory/weapons")
+                    ion-nav-view(name="weapons-tab")
+
+                ion-tab(title="Items", icon-on="ion-ios-briefcase", icon-off="ion-ios-briefcase-outline", href="#/inventory/items")
+                    ion-nav-view(name="items-tab")
+
+script(type="text/ng-template", id="inventory-tab-armor")
+    ion-content
+        h3.subdued.header-bar-margin.text-center.vertical-center(ng-if="filteredArmor.length === 0") You have no armor.
+        div.card(
+            ng-include="'inventory-item'",
+            ng-repeat="item in filteredArmor = (player.inventory | filter:{type:'armor'})"
+        )
+
+script(type="text/ng-template", id="inventory-tab-weapons")
+    ion-content
+        h3.subdued.header-bar-margin.text-center.vertical-center(ng-if="filteredWeapons.length === 0") You have no weapons.
+        div.card(
+            ng-include="'inventory-item'",
+            ng-repeat="item in filteredWeapons = (player.inventory | filter:{type:'weapon'})"
+        )
+
+script(type="text/ng-template", id="inventory-tab-items")
+    ion-content
+        h3.subdued.header-bar-margin.text-center.vertical-center(ng-if="filteredItems.length === 0") You have no items.
+        div.card(
+            ng-include="'inventory-item'",
+            ng-repeat="item in filteredItems = (player.inventory | filter:{type:'item'})"
+        )
+
+script(type="text/ng-template", id="inventory-item")
+    div.item.item-divider
+        h2 {{item.name}}
+    div.item.item-body
+        div.row
+            div.col(ng-if="item.stats.str")
+                color-text(pre-text="STR", value="{{item.stats.str}}")
+            div.col(ng-if="item.stats.agi")
+                color-text(pre-text="AGI", value="{{item.stats.agi}}")
+            div.col(ng-if="item.stats.int")
+                color-text(pre-text="INT", value="{{item.stats.int}}")
+            div.col(ng-if="item.stats.luk")
+                color-text(pre-text="LUK", value="{{item.stats.luk}}")

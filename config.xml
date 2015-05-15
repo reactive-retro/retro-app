@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="com.ionicframework.qson804452" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>qson</name>
+<widget id="com.ionicframework.reactive-retro804452" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+  <name>Reactive Retro</name>
   <description>
-        An Ionic Framework and Cordova project.
+        An ARG RPG.
     </description>
-  <author email="hi@ionicframework" href="http://ionicframework.com/">
-      Ionic Framework Team
-    </author>
+  <author email="hi@reactiveretro.com" href="http://reactiveretro.com/">
+      Reactive Retro Team
+  </author>
   <content src="index.html"/>
   <access origin="*"/>
-  <access origin="tel:*" launch-external="yes"/>
-  <access origin="mailto:*" launch-external="yes"/>
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>

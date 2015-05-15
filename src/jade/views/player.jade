@@ -1,0 +1,71 @@
+script(type="text/ng-template", id="player")
+    ion-view(view-title="Player")
+        ion-content
+            div.card
+                div.item.item-divider
+                    h2
+                        span {{player.name}}
+                        i.icon.ion-arrow-swap.float-right(ui-sref="changeclass")
+
+                    p Level {{player.professionLevels[player.stats.profession].level}} {{player.stats.profession}}
+
+                div.item.item-body
+                    div.row
+                        div.col
+                            div.stat-bar-container
+                                div.stat-bar.hp(style="width: {{player.stats.hp.cur/player.stats.hp.max*100}}%")
+                        div.col
+                            div.stat-bar-container
+                                div.stat-bar.mp(style="width: {{player.stats.mp.cur/player.stats.mp.max*100}}%")
+                        div.col
+                            div.stat-bar-container
+                                div.stat-bar.xp(style="width: {{player.stats.xp.cur/player.stats.xp.max*100}}%")
+
+                    div.row
+                        div.col(ng-if="player.stats.str")
+                            color-text(pre-text="STR", value="{{player.stats.str}}")
+                        div.col(ng-if="player.stats.agi")
+                            color-text(pre-text="AGI", value="{{player.stats.agi}}")
+                        div.col(ng-if="player.stats.int")
+                            color-text(pre-text="INT", value="{{player.stats.int}}")
+                        div.col(ng-if="player.stats.luk")
+                            color-text(pre-text="LUK", value="{{player.stats.luk}}")
+
+                    div.row
+                        div.col
+                            span.energized(href) Gold {{player.stats.gold}}
+
+            div.card
+                div.item.item-divider
+                    h2
+                        span {{player.equipment.weapon.name}}
+                        i.icon.ion-arrow-swap.float-right
+                    p Weapon
+
+                div.item.item-body
+                    div.row
+                        div.col(ng-if="player.equipment.weapon.stats.str")
+                            color-text(pre-text="STR", value="{{player.equipment.weapon.stats.str}}")
+                        div.col(ng-if="player.equipment.weapon.stats.agi")
+                            color-text(pre-text="AGI", value="{{player.equipment.weapon.stats.agi}}")
+                        div.col(ng-if="player.equipment.weapon.stats.int")
+                            color-text(pre-text="INT", value="{{player.equipment.weapon.stats.int}}")
+                        div.col(ng-if="player.equipment.weapon.stats.luk")
+                            color-text(pre-text="LUK", value="{{player.equipment.weapon.stats.luk}}")
+
+            div.card
+                div.item.item-divider
+                    h2
+                        span {{player.equipment.armor.name}}
+                        i.icon.ion-arrow-swap.float-right
+                    p Armor
+                div.item.item-body
+                    div.row
+                        div.col(ng-if="player.equipment.armor.stats.str")
+                            color-text(pre-text="STR", value="{{player.equipment.armor.stats.str}}")
+                        div.col(ng-if="player.equipment.armor.stats.agi")
+                            color-text(pre-text="AGI", value="{{player.equipment.armor.stats.agi}}")
+                        div.col(ng-if="player.equipment.armor.stats.int")
+                            color-text(pre-text="INT", value="{{player.equipment.armor.stats.int}}")
+                        div.col(ng-if="player.equipment.armor.stats.luk")
+                            color-text(pre-text="LUK", value="{{player.equipment.armor.stats.luk}}")

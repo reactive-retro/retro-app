@@ -1,7 +1,7 @@
 {
-  "name": "qson",
+  "name": "reactive-retro",
   "version": "1.0.0",
-  "description": "qson: An Ionic project",
+  "description": "reactive-retro: An Ionic project",
   "dependencies": {
     "gulp": "^3.5.6",
     "gulp-babel": "^4.0.0",
