@@ -7,7 +7,7 @@ angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]).r
         }
 
         if (window.StatusBar) {
-            StatusBar.styleDefault();
+            window.StatusBar.styleDefault();
         }
     });
 }]).config(["$ionicConfigProvider", "$urlRouterProvider", "$stateProvider", function ($ionicConfigProvider, $urlRouterProvider, $stateProvider) {
@@ -84,9 +84,11 @@ angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]).r
         profession: "Fighter"
     };
 }).service("Player", function () {
-    var clamp = function (min, cur, max) {
-        return Math.max(min, Math.min(max, cur));
-    };
+    //var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
+
+    var x = 1,
+        y = 2;
+    console.log(x, y);
 
     var player = {
         name: "Seiyria",
@@ -242,7 +244,7 @@ angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]).r
                 }
 
                 $cordovaOauth.facebook(OAUTH_KEYS.facebook, ["email"]).then(function (result) {
-                    $localStorage.facebookToken = result.access_token;
+                    $localStorage.facebookToken = result.access_token; //jshint ignore:line
                     $scope.auth.facebook.login();
                 }, function (error) {
                     window.alert("error " + error);

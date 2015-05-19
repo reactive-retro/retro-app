@@ -1,87 +1,86 @@
 angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth', 'ngStorage'])
 
-    .run(['$ionicPlatform', ($ionicPlatform) => {
+    .run(($ionicPlatform) => {
         $ionicPlatform.ready(() => {
             if(window.cordova && window.cordova.plugins.Keyboard) {
                 window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
             }
 
             if(window.StatusBar) {
-                StatusBar.styleDefault();
+                window.StatusBar.styleDefault();
             }
         });
-    }])
+    })
 
-    .config(['$ionicConfigProvider', '$urlRouterProvider', '$stateProvider',
-        ($ionicConfigProvider, $urlRouterProvider, $stateProvider) => {
+    .config(($ionicConfigProvider, $urlRouterProvider, $stateProvider) => {
 
-            $ionicConfigProvider.views.swipeBackEnabled(false);
+        $ionicConfigProvider.views.swipeBackEnabled(false);
 
-            $urlRouterProvider.otherwise('/');
+        $urlRouterProvider.otherwise('/');
 
-            $stateProvider
-                .state('home', {
-                    url: '/',
-                    templateUrl: 'index',
-                    controller: 'HomeController'
-                })
-                .state('create', {
-                    url: '/create',
-                    templateUrl: 'createchar',
-                    controller: 'CreateCharacterController'
-                })
-                .state('player', {
-                    url: '/player',
-                    templateUrl: 'player',
-                    controller: 'PlayerController'
-                })
-                .state('changeclass', {
-                    url: '/changeclass',
-                    templateUrl: 'changeclass',
-                    controller: 'ClassChangeController'
-                })
-                .state('inventory', {
-                    url: '/inventory',
-                    templateUrl: 'inventory',
-                    controller: 'InventoryController'
-                })
-                .state('inventory.armor', {
-                    url: '/armor',
-                    views: {
-                        'armor-tab': {
-                            templateUrl: 'inventory-tab-armor'
-                        }
+        $stateProvider
+            .state('home', {
+                url: '/',
+                templateUrl: 'index',
+                controller: 'HomeController'
+            })
+            .state('create', {
+                url: '/create',
+                templateUrl: 'createchar',
+                controller: 'CreateCharacterController'
+            })
+            .state('player', {
+                url: '/player',
+                templateUrl: 'player',
+                controller: 'PlayerController'
+            })
+            .state('changeclass', {
+                url: '/changeclass',
+                templateUrl: 'changeclass',
+                controller: 'ClassChangeController'
+            })
+            .state('inventory', {
+                url: '/inventory',
+                templateUrl: 'inventory',
+                controller: 'InventoryController'
+            })
+            .state('inventory.armor', {
+                url: '/armor',
+                views: {
+                    'armor-tab': {
+                        templateUrl: 'inventory-tab-armor'
                     }
-                })
-                .state('inventory.weapons', {
-                    url: '/weapons',
-                    views: {
-                        'weapons-tab': {
-                            templateUrl: 'inventory-tab-weapons'
-                        }
+                }
+            })
+            .state('inventory.weapons', {
+                url: '/weapons',
+                views: {
+                    'weapons-tab': {
+                        templateUrl: 'inventory-tab-weapons'
                     }
-                })
-                .state('inventory.items', {
-                    url: '/items',
-                    views: {
-                        'items-tab': {
-                            templateUrl: 'inventory-tab-items'
-                        }
+                }
+            })
+            .state('inventory.items', {
+                url: '/items',
+                views: {
+                    'items-tab': {
+                        templateUrl: 'inventory-tab-items'
                     }
-                })
-                .state('options', {
-                    url: '/options',
-                    templateUrl: 'options'
-                })
-                .state('explore', {
-                    url: '/explore',
-                    templateUrl: 'explore'
-                });
-    }])
+                }
+            })
+            .state('options', {
+                url: '/options',
+                templateUrl: 'options'
+            })
+            .state('explore', {
+                url: '/explore',
+                templateUrl: 'explore'
+            });
+    })
 
-    .service('socketCluster', ['$window', ($window) => $window.socketCluster])
+    .service('socketCluster', ($window) => $window.socketCluster)
 
-    .service('socket', ['socketCluster', (socketCluster) => socketCluster.connect({hostname: '192.168.1.11', port: 8000})])
+    .service('socket', (socketCluster) => socketCluster.connect({hostname: '192.168.1.11', port: 8000}))
 
     .directive('colorText', () => {
         return {
@@ -103,7 +102,10 @@ angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth', 'ngStorage'])
     })
 
     .service('Player', () => {
-        var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
+        //var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
+
+        var x=1, y=2;
+        console.log(x, y);
 
         var player = {
             name: 'Seiyria',
@@ -220,8 +222,7 @@ angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth', 'ngStorage'])
         return player;
     })
 
-    .controller('MenuController', [
-        '$scope', '$state',
+    .controller('MenuController',
         ($scope, $state) => {
             $scope.menu = [
                 { icon: 'ion-person', name: 'Player', state: 'player' },
@@ -238,10 +239,9 @@ angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth', 'ngStorage'])
                 $scope.$root.hideMenu = toState.name === 'home' || toState.name === 'create';
             });
         }
-    ])
+    )
 
-    .controller('HomeController', [
-        '$scope', '$http', '$state', '$localStorage', '$ionicHistory', '$cordovaOauth', 'NewHero', 'OAUTH_KEYS',
+    .controller('HomeController',
         ($scope, $http, $state, $localStorage, $ionicHistory, $cordovaOauth, NewHero, OAUTH_KEYS) => {
 
             $scope.skipAuth = () => {
@@ -280,7 +280,7 @@ angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth', 'ngStorage'])
                         }
 
                         $cordovaOauth.facebook(OAUTH_KEYS.facebook, ['email']).then((result) => {
-                            $localStorage.facebookToken = result.access_token;
+                            $localStorage.facebookToken = result.access_token; //jshint ignore:line
                             $scope.auth.facebook.login();
                         }, (error) => {
                             window.alert('error ' + error);
@@ -299,10 +299,9 @@ angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth', 'ngStorage'])
             $scope.tryAuth = () => {
                 $state.go('create');
             };
-    }])
+    })
 
-    .controller('CreateCharacterController', [
-        '$scope', 'NewHero', 'CLASSES', 'socket',
+    .controller('CreateCharacterController',
         ($scope, NewHero, CLASSES, socket) => {
             $scope.NewHero = NewHero;
             $scope.baseProfessions = ['Cleric', 'Mage', 'Fighter'];
@@ -312,28 +311,25 @@ angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth', 'ngStorage'])
                 window.alert('socket', socket);
                 //console.log(socket.getState());
                 socket.emit('login', NewHero);
-            }
+            };
         }
-    ])
+    )
 
-    .controller('PlayerController', [
-        '$scope', 'Player',
+    .controller('PlayerController',
         ($scope, Player) => {
             $scope.player = Player;
-    }])
+    })
 
-    .controller('ClassChangeController', [
-        '$scope', 'Player', 'CLASSES',
+    .controller('ClassChangeController',
         ($scope, Player, CLASSES) => {
             $scope.player = Player;
             $scope.CLASSES = CLASSES;
         }
-    ])
+    )
 
-    .controller('InventoryController', [
-        '$scope', 'Player',
+    .controller('InventoryController',
         ($scope, Player) => {
             $scope.player = Player;
         }
-    ])
+    )
 ;

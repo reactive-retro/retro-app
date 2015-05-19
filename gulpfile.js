@@ -5,11 +5,12 @@ var gutil = require('gulp-util');
 var concat = require('gulp-concat');
 var sass = require('gulp-sass');
 var minifyCss = require('gulp-minify-css');
-var jshint = require('gulp-jshint');
 var babel = require('gulp-babel');
 var rename = require('gulp-rename');
-var concat = require('gulp-concat');
 var jade = require('gulp-jade');
+var jshint = require('gulp-jshint');
+var jscs = require('gulp-jscs');
+var ngAnnotate = require('gulp-ng-annotate');
 
 var sh = require('shelljs');
 
@@ -46,7 +47,7 @@ gulp.task('sass', function(done) {
 gulp.task('watch', function() {
     gulp.watch(paths.sass, ['sass']);
     gulp.watch(paths.jade, ['html']);
-    gulp.watch(paths.js, ['style', 'build']);
+    gulp.watch(paths.js, ['build']);
 });
 
 gulp.task('lib', function() {
@@ -64,15 +65,16 @@ gulp.task('html', function() {
 
 gulp.task('build', function() {
     gulp.src(paths.js)
+        .pipe(jshint('.jshintrc'))
+        .pipe(jshint.reporter('default'))
+        .pipe(jscs({
+            fix: true,
+            esnext: true
+        }))
         .pipe(babel())
+        .pipe(ngAnnotate())
         .pipe(concat('app.js'))
         .pipe(gulp.dest('./www/js'));
-});
-
-gulp.task('style', function() {
-    gulp.src(paths.js)
-        .pipe(jshint({esnext: true}))
-        .pipe(jshint.reporter('default'));
 });
 
 gulp.task('install', ['git-check'], function() {
