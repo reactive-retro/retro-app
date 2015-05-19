@@ -20,9 +20,13 @@ var paths = {
 };
 
 var lib = [
+    './www/lib/lodash/lodash.js',
     './www/lib/ionic/release/js/ionic.bundle.js',
+    './www/lib/ngstorage/ngStorage.js',
+    './www/lib/socketcluster-client/socketcluster.js',
     './www/lib/ngCordova/dist/ng-cordova.js',
-    './www/lib/ng-cordova-oauth/ng-cordova-oauth.js'
+    './www/lib/ng-cordova-oauth/ng-cordova-oauth.js',
+    './www/lib/jsSHA/src/sha1.js'
 ];
 
 gulp.task('default', ['sass', 'lib', 'html', 'build', 'watch']);

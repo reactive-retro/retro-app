@@ -1,9 +1,9 @@
-angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth'])
+angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth', 'ngStorage'])
 
     .run(['$ionicPlatform', ($ionicPlatform) => {
         $ionicPlatform.ready(() => {
             if(window.cordova && window.cordova.plugins.Keyboard) {
-                cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+                window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
             }
 
             if(window.StatusBar) {
@@ -24,6 +24,11 @@ angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth'])
                     url: '/',
                     templateUrl: 'index',
                     controller: 'HomeController'
+                })
+                .state('create', {
+                    url: '/create',
+                    templateUrl: 'createchar',
+                    controller: 'CreateCharacterController'
                 })
                 .state('player', {
                     url: '/player',
@@ -74,6 +79,10 @@ angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth'])
                 });
     }])
 
+    .service('socketCluster', ['$window', ($window) => $window.socketCluster])
+
+    .service('socket', ['socketCluster', (socketCluster) => socketCluster.connect({hostname: '192.168.1.11', port: 8000})])
+
     .directive('colorText', () => {
         return {
             restrict: 'E',
@@ -84,6 +93,12 @@ angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth'])
                 scope.preText = attrs.preText;
                 attrs.$observe('value', (val) => scope.value = val);
             }
+        };
+    })
+
+    .service('NewHero', () => {
+        return {
+            profession: 'Fighter'
         };
     })
 
@@ -220,14 +235,14 @@ angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth'])
             };
 
             $scope.$root.$on('$stateChangeSuccess', (event, toState) => {
-                $scope.$root.hideMenu = toState.name === 'home';
+                $scope.$root.hideMenu = toState.name === 'home' || toState.name === 'create';
             });
         }
     ])
 
     .controller('HomeController', [
-        '$scope', '$state', '$ionicPlatform', '$ionicHistory', '$cordovaOauth', 'OAUTH_KEYS',
-        ($scope, $state, $ionicPlatform, $ionicHistory, $cordovaOauth, OAUTH_KEYS) => {
+        '$scope', '$http', '$state', '$localStorage', '$ionicHistory', '$cordovaOauth', 'NewHero', 'OAUTH_KEYS',
+        ($scope, $http, $state, $localStorage, $ionicHistory, $cordovaOauth, NewHero, OAUTH_KEYS) => {
 
             $scope.skipAuth = () => {
                 $ionicHistory.nextViewOptions({
@@ -237,19 +252,69 @@ angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth'])
             };
 
             $scope.auth = {
-                google: () => {
-                    $cordovaOauth.google(OAUTH_KEYS.google, ["email"]).then(function(result) {
-                        window.alert("Response Object -> " + JSON.stringify(result));
-                    }, function(error) {
-                        window.alert("Error -> " + error);
+                /*google: {
+                    creds: () => {
+                        $cordovaOauth.google(OAUTH_KEYS.google, ['email']).then(function(result) {
+                            window.alert("Response Object -> " + JSON.stringify(result));
+                            $scope.auth.google.login();
+                        }, function(error) {
+                            window.alert("Error -> " + error);
+                        });
+                    },
+                    login: () => {
+
+                    }
+                },*/
+                /*reddit: () => {
+                    $cordovaOauth.reddit(OAUTH_KEYS.reddit, 'code', ['identity']).then((result) => {
+                        window.alert('response ' + JSON.stringify(result));
+                    }, (error) => {
+                        window.alert('error ' + error);
                     });
+                },*/
+                facebook: {
+                    creds: () => {
+                        if($localStorage.facebookToken) {
+                            $scope.auth.facebook.login();
+                            return;
+                        }
+
+                        $cordovaOauth.facebook(OAUTH_KEYS.facebook, ['email']).then((result) => {
+                            $localStorage.facebookToken = result.access_token;
+                            $scope.auth.facebook.login();
+                        }, (error) => {
+                            window.alert('error ' + error);
+                        });
+                    },
+                    login: () => {
+                        $http.get(`https://graph.facebook.com/me?fields=id&access_token=${$localStorage.facebookToken}`)
+                            .then(res => {
+                                NewHero.facebookId = $localStorage.facebookId = res.data.id;
+                                $scope.tryAuth();
+                            });
+                    }
                 }
             };
 
-            $ionicPlatform.ready(() => {
-
-            });
+            $scope.tryAuth = () => {
+                $state.go('create');
+            };
     }])
+
+    .controller('CreateCharacterController', [
+        '$scope', 'NewHero', 'CLASSES', 'socket',
+        ($scope, NewHero, CLASSES, socket) => {
+            $scope.NewHero = NewHero;
+            $scope.baseProfessions = ['Cleric', 'Mage', 'Fighter'];
+            $scope.CLASSES = CLASSES;
+
+            $scope.create = () => {
+                window.alert('socket', socket);
+                //console.log(socket.getState());
+                socket.emit('login', NewHero);
+            }
+        }
+    ])
 
     .controller('PlayerController', [
         '$scope', 'Player',

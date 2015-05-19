@@ -1,0 +1,15 @@
+script(type="text/ng-template", id="createchar")
+    ion-view(view-title="New Hero")
+        ion-content(ng-controller="CreateCharacterController")
+            div.list
+                label.item.item-input
+                    span.input-label Hero Name
+                    input(type="text", placeholder="Hero Name", ng-model="NewHero.name")
+                label.item.item-input.item-select
+                    span.input-label Profession
+                    select(type="text", placeholder="Profession", ng-model="NewHero.profession", ng-options="val for val in baseProfessions")
+
+                label.item-input
+                    span {{CLASSES[NewHero.profession]}}
+
+                button.button.button-block.button-calm(ng-click="create()") Finish
