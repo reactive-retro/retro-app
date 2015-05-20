@@ -1,5 +1,14 @@
 "use strict";
 
+angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]);
+"use strict";
+
+angular.module("retro").constant("DEV_CFG", {
+    url: "localhost",
+    port: 8080
+});
+"use strict";
+
 angular.module("retro").run(["$ionicPlatform", function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
         if (window.cordova && window.cordova.plugins.Keyboard) {
@@ -70,15 +79,6 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
 }]);
 "use strict";
 
-angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]);
-"use strict";
-
-angular.module("retro").constant("DEV_CFG", {
-    url: "localhost",
-    port: 8080
-});
-"use strict";
-
 angular.module("retro").constant("CLASSES", {
     Cleric: "Clerics specialize in healing their companions.",
     Fighter: "Fighters specialize in making their enemies hurt via physical means.",
@@ -99,14 +99,13 @@ angular.module("retro").controller("ClassChangeController", ["$scope", "Player",
 }]);
 "use strict";
 
-angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "socket", function ($scope, NewHero, CLASSES, socket) {
+angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "AuthFlow", function ($scope, NewHero, CLASSES, AuthFlow) {
     $scope.NewHero = NewHero;
     $scope.baseProfessions = ["Cleric", "Mage", "Fighter"];
     $scope.CLASSES = CLASSES;
 
     $scope.create = function () {
-        //console.log(socket.getState());
-        socket.emit("login", NewHero);
+        AuthFlow.login(NewHero);
     };
 }]);
 "use strict";
@@ -120,10 +119,6 @@ angular.module("retro").controller("HomeController", ["$scope", "$http", "$state
     };
 
     $scope.auth = Auth;
-
-    $scope.tryAuth = function () {
-        $state.go("create");
-    };
 }]);
 "use strict";
 
@@ -164,18 +159,19 @@ angular.module("retro").directive("colorText", function () {
 });
 "use strict";
 
-angular.module("retro").service("Auth", ["$localStorage", "$cordovaOauth", "OAUTH_KEYS", "NewHero", function ($localStorage, $cordovaOauth, OAUTH_KEYS, NewHero) {
-    return {
+angular.module("retro").service("Auth", ["$http", "$localStorage", "$cordovaOauth", "OAUTH_KEYS", "NewHero", "AuthFlow", function ($http, $localStorage, $cordovaOauth, OAUTH_KEYS, NewHero, AuthFlow) {
+
+    var auth = {
         facebook: {
             creds: function () {
                 if ($localStorage.facebookToken) {
-                    $scope.auth.facebook.login();
+                    auth.facebook.login();
                     return;
                 }
 
                 $cordovaOauth.facebook(OAUTH_KEYS.facebook, ["email"]).then(function (result) {
                     $localStorage.facebookToken = result.access_token; //jshint ignore:line
-                    $scope.auth.facebook.login();
+                    auth.facebook.login();
                 }, function (error) {
                     window.alert("error " + error);
                 });
@@ -183,9 +179,23 @@ angular.module("retro").service("Auth", ["$localStorage", "$cordovaOauth", "OAUT
             login: function () {
                 $http.get("https://graph.facebook.com/me?fields=id&access_token=" + $localStorage.facebookToken).then(function (res) {
                     NewHero.facebookId = $localStorage.facebookId = res.data.id;
-                    $scope.tryAuth();
+                    AuthFlow.tryAuth();
                 });
             }
+        }
+    };
+
+    return auth;
+}]);
+"use strict";
+
+angular.module("retro").service("AuthFlow", ["$state", "socket", function ($state, socket) {
+    return {
+        tryAuth: function () {
+            $state.go("create");
+        },
+        login: function (NewHero) {
+            socket.emit("login", NewHero);
         }
     };
 }]);

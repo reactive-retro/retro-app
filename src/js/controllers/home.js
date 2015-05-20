@@ -8,9 +8,5 @@ angular.module('retro').controller('HomeController',
         };
 
         $scope.auth = Auth;
-
-        $scope.tryAuth = () => {
-            $state.go('create');
-        };
     }
 );
