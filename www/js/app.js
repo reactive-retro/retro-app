@@ -1,6 +1,6 @@
 "use strict";
 
-angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]).run(["$ionicPlatform", function ($ionicPlatform) {
+angular.module("retro").run(["$ionicPlatform", function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
         if (window.cordova && window.cordova.plugins.Keyboard) {
             window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -10,7 +10,10 @@ angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]).r
             window.StatusBar.styleDefault();
         }
     });
-}]).config(["$ionicConfigProvider", "$urlRouterProvider", "$stateProvider", function ($ionicConfigProvider, $urlRouterProvider, $stateProvider) {
+}]);
+"use strict";
+
+angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$stateProvider", function ($ionicConfigProvider, $urlRouterProvider, $stateProvider) {
 
     $ionicConfigProvider.views.swipeBackEnabled(false);
 
@@ -64,11 +67,90 @@ angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]).r
         url: "/explore",
         templateUrl: "explore"
     });
-}]).service("socketCluster", ["$window", function ($window) {
-    return $window.socketCluster;
-}]).service("socket", ["socketCluster", function (socketCluster) {
-    return socketCluster.connect({ hostname: "192.168.1.11", port: 8000 });
-}]).directive("colorText", function () {
+}]);
+"use strict";
+
+angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]);
+"use strict";
+
+angular.module("retro").constant("DEV_CFG", {
+    url: "localhost",
+    port: 8080
+});
+"use strict";
+
+angular.module("retro").constant("CLASSES", {
+    Cleric: "Clerics specialize in healing their companions.",
+    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
+    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!"
+});
+"use strict";
+
+angular.module("retro").constant("OAUTH_KEYS", {
+    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
+    reddit: "CKzP2LKr74VwYw",
+    facebook: "102489756752863"
+});
+"use strict";
+
+angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", function ($scope, Player, CLASSES) {
+    $scope.player = Player;
+    $scope.CLASSES = CLASSES;
+}]);
+"use strict";
+
+angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "socket", function ($scope, NewHero, CLASSES, socket) {
+    $scope.NewHero = NewHero;
+    $scope.baseProfessions = ["Cleric", "Mage", "Fighter"];
+    $scope.CLASSES = CLASSES;
+
+    $scope.create = function () {
+        //console.log(socket.getState());
+        socket.emit("login", NewHero);
+    };
+}]);
+"use strict";
+
+angular.module("retro").controller("HomeController", ["$scope", "$http", "$state", "$ionicHistory", "Auth", function ($scope, $http, $state, $ionicHistory, Auth) {
+    $scope.skipAuth = function () {
+        $ionicHistory.nextViewOptions({
+            disableBack: true
+        });
+        $state.go("player");
+    };
+
+    $scope.auth = Auth;
+
+    $scope.tryAuth = function () {
+        $state.go("create");
+    };
+}]);
+"use strict";
+
+angular.module("retro").controller("InventoryController", ["$scope", "Player", function ($scope, Player) {
+    $scope.player = Player;
+}]);
+"use strict";
+
+angular.module("retro").controller("MenuController", ["$scope", "$state", function ($scope, $state) {
+    $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore" }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-gear-b", name: "Options", state: "options" }];
+
+    $scope.travel = function (state) {
+        $state.go(state);
+    };
+
+    $scope.$root.$on("$stateChangeSuccess", function (event, toState) {
+        $scope.$root.hideMenu = toState.name === "home" || toState.name === "create";
+    });
+}]);
+"use strict";
+
+angular.module("retro").controller("PlayerController", ["$scope", "Player", function ($scope, Player) {
+    $scope.player = Player;
+}]);
+"use strict";
+
+angular.module("retro").directive("colorText", function () {
     return {
         restrict: "E",
         template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            ",
@@ -79,16 +161,45 @@ angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]).r
             });
         }
     };
-}).service("NewHero", function () {
+});
+"use strict";
+
+angular.module("retro").service("Auth", ["$localStorage", "$cordovaOauth", "OAUTH_KEYS", "NewHero", function ($localStorage, $cordovaOauth, OAUTH_KEYS, NewHero) {
+    return {
+        facebook: {
+            creds: function () {
+                if ($localStorage.facebookToken) {
+                    $scope.auth.facebook.login();
+                    return;
+                }
+
+                $cordovaOauth.facebook(OAUTH_KEYS.facebook, ["email"]).then(function (result) {
+                    $localStorage.facebookToken = result.access_token; //jshint ignore:line
+                    $scope.auth.facebook.login();
+                }, function (error) {
+                    window.alert("error " + error);
+                });
+            },
+            login: function () {
+                $http.get("https://graph.facebook.com/me?fields=id&access_token=" + $localStorage.facebookToken).then(function (res) {
+                    NewHero.facebookId = $localStorage.facebookId = res.data.id;
+                    $scope.tryAuth();
+                });
+            }
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("NewHero", function () {
     return {
         profession: "Fighter"
     };
-}).service("Player", function () {
-    //var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
+});
+"use strict";
 
-    var x = 1,
-        y = 2;
-    console.log(x, y);
+angular.module("retro").service("Player", function () {
+    //var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
 
     var player = {
         name: "Seiyria",
@@ -197,100 +308,11 @@ angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]).r
     };
 
     return player;
-}).controller("MenuController", ["$scope", "$state", function ($scope, $state) {
-    $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore" }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-gear-b", name: "Options", state: "options" }];
+});
+"use strict";
 
-    $scope.travel = function (state) {
-        $state.go(state);
-    };
-
-    $scope.$root.$on("$stateChangeSuccess", function (event, toState) {
-        $scope.$root.hideMenu = toState.name === "home" || toState.name === "create";
-    });
-}]).controller("HomeController", ["$scope", "$http", "$state", "$localStorage", "$ionicHistory", "$cordovaOauth", "NewHero", "OAUTH_KEYS", function ($scope, $http, $state, $localStorage, $ionicHistory, $cordovaOauth, NewHero, OAUTH_KEYS) {
-
-    $scope.skipAuth = function () {
-        $ionicHistory.nextViewOptions({
-            disableBack: true
-        });
-        $state.go("player");
-    };
-
-    $scope.auth = {
-        /*google: {
-            creds: () => {
-                $cordovaOauth.google(OAUTH_KEYS.google, ['email']).then(function(result) {
-                    window.alert("Response Object -> " + JSON.stringify(result));
-                    $scope.auth.google.login();
-                }, function(error) {
-                    window.alert("Error -> " + error);
-                });
-            },
-            login: () => {
-             }
-        },*/
-        /*reddit: () => {
-            $cordovaOauth.reddit(OAUTH_KEYS.reddit, 'code', ['identity']).then((result) => {
-                window.alert('response ' + JSON.stringify(result));
-            }, (error) => {
-                window.alert('error ' + error);
-            });
-        },*/
-        facebook: {
-            creds: function () {
-                if ($localStorage.facebookToken) {
-                    $scope.auth.facebook.login();
-                    return;
-                }
-
-                $cordovaOauth.facebook(OAUTH_KEYS.facebook, ["email"]).then(function (result) {
-                    $localStorage.facebookToken = result.access_token; //jshint ignore:line
-                    $scope.auth.facebook.login();
-                }, function (error) {
-                    window.alert("error " + error);
-                });
-            },
-            login: function () {
-                $http.get("https://graph.facebook.com/me?fields=id&access_token=" + $localStorage.facebookToken).then(function (res) {
-                    NewHero.facebookId = $localStorage.facebookId = res.data.id;
-                    $scope.tryAuth();
-                });
-            }
-        }
-    };
-
-    $scope.tryAuth = function () {
-        $state.go("create");
-    };
-}]).controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "socket", function ($scope, NewHero, CLASSES, socket) {
-    $scope.NewHero = NewHero;
-    $scope.baseProfessions = ["Cleric", "Mage", "Fighter"];
-    $scope.CLASSES = CLASSES;
-
-    $scope.create = function () {
-        window.alert("socket", socket);
-        //console.log(socket.getState());
-        socket.emit("login", NewHero);
-    };
-}]).controller("PlayerController", ["$scope", "Player", function ($scope, Player) {
-    $scope.player = Player;
-}]).controller("ClassChangeController", ["$scope", "Player", "CLASSES", function ($scope, Player, CLASSES) {
-    $scope.player = Player;
-    $scope.CLASSES = CLASSES;
-}]).controller("InventoryController", ["$scope", "Player", function ($scope, Player) {
-    $scope.player = Player;
+angular.module("retro").service("socketCluster", ["$window", function ($window) {
+    return $window.socketCluster;
+}]).service("socket", ["DEV_CFG", "socketCluster", function (DEV_CFG, socketCluster) {
+    return socketCluster.connect({ hostname: DEV_CFG.url, port: DEV_CFG.port });
 }]);
-"use strict";
-
-angular.module("retro").constant("CLASSES", {
-    Cleric: "Clerics specialize in healing their companions.",
-    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
-    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!"
-});
-"use strict";
-
-angular.module("retro").constant("OAUTH_KEYS", {
-    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
-    reddit: "CKzP2LKr74VwYw",
-    facebook: "102489756752863"
-});

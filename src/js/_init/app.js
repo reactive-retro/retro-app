@@ -1,0 +1,1 @@
+angular.module('retro', ['ionic', 'ngCordova', 'ngCordovaOauth', 'ngStorage']);

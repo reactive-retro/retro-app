@@ -10,7 +10,7 @@
     "ionic": "1.0.0",
     "jsSHA": "*",
     "ngstorage": "~0.3.4",
-    "socketcluster-client": "https://github.com/TopCloud/socketcluster-client.git#~0.9.33",
+    "socketcluster-client": "https://github.com/TopCloud/socketcluster-client.git#master",
     "lodash": "~3.8.0"
   },
   "resolutions": {
