@@ -17,7 +17,7 @@ var sh = require('shelljs');
 var paths = {
     sass: ['./src/scss/**/*.scss'],
     jade: ['./src/jade/**/*.jade'],
-    js:   ['./src/js/**/*.js']
+    js:   ['./src/js/_init/app.js', './src/js/**/!(app)*.js']
 };
 
 var lib = [
@@ -63,14 +63,28 @@ gulp.task('html', function() {
         .pipe(gulp.dest('./www/'));
 });
 
-gulp.task('build', function() {
-    gulp.src(paths.js)
+gulp.task('jshint', function() {
+    return gulp.src(paths.js)
         .pipe(jshint('.jshintrc'))
         .pipe(jshint.reporter('default'))
+        .on('error', function(data) {
+            gutil.log('jshint', data.message);
+        });
+});
+
+gulp.task('jscs', function() {
+    return gulp.src(paths.js)
         .pipe(jscs({
             fix: true,
             esnext: true
         }))
+        .on('error', function(data) {
+            gutil.log('jshint', data.message);
+        });
+});
+
+gulp.task('build', ['jshint', 'jscs'], function() {
+    gulp.src(paths.js)
         .pipe(babel())
         .pipe(ngAnnotate())
         .pipe(concat('app.js'))
