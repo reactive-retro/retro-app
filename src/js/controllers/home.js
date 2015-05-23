@@ -1,12 +1,5 @@
 angular.module('retro').controller('HomeController',
-    ($scope, $http, $state, $ionicHistory, Auth) => {
-        $scope.skipAuth = () => {
-            $ionicHistory.nextViewOptions({
-                disableBack: true
-            });
-            $state.go('player');
-        };
-
+    ($scope, $http, $state, Auth) => {
         $scope.auth = Auth;
     }
 );
