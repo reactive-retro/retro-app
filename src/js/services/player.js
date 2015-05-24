@@ -9,8 +9,8 @@ angular.module('retro').service('Player', () => {
                 level: 1
             }
         },
+        profession: 'Fighter',
         stats: {
-            profession: 'Fighter',
             str: 10,
             agi: 10,
             int: 10,
@@ -47,10 +47,6 @@ angular.module('retro').service('Player', () => {
                 stats: {
                     agi: 2
                 }
-            },
-            item: {
-                type: 'item',
-                name: 'Health Potion'
             }
         },
         inventory: [

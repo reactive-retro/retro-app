@@ -7,7 +7,7 @@ script(type="text/ng-template", id="player")
                         span {{player.name}}
                         i.icon.ion-arrow-swap.float-right(ui-sref="changeclass")
 
-                    p Level {{player.professionLevels[player.stats.profession].level}} {{player.stats.profession}}
+                    p Level {{player.professionLevels[player.profession].level}} {{player.profession}}
 
                 div.item.item-body
                     div.row
