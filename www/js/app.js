@@ -101,8 +101,8 @@ angular.module("retro").controller("ClassChangeController", ["$scope", "Player",
 
 angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "AuthFlow", function ($scope, NewHero, CLASSES, AuthFlow) {
     $scope.NewHero = NewHero;
-    $scope.baseProfessions = ["Cleric", "Mage", "Fighter"];
     $scope.CLASSES = CLASSES;
+    $scope.baseProfessions = ["Cleric", "Mage", "Fighter"];
 
     $scope.create = function () {
         AuthFlow.login(NewHero);
@@ -110,14 +110,7 @@ angular.module("retro").controller("CreateCharacterController", ["$scope", "NewH
 }]);
 "use strict";
 
-angular.module("retro").controller("HomeController", ["$scope", "$http", "$state", "$ionicHistory", "Auth", function ($scope, $http, $state, $ionicHistory, Auth) {
-    $scope.skipAuth = function () {
-        $ionicHistory.nextViewOptions({
-            disableBack: true
-        });
-        $state.go("player");
-    };
-
+angular.module("retro").controller("HomeController", ["$scope", "$http", "$state", "Auth", function ($scope, $http, $state, Auth) {
     $scope.auth = Auth;
 }]);
 "use strict";
@@ -161,7 +154,17 @@ angular.module("retro").directive("colorText", function () {
 
 angular.module("retro").service("Auth", ["$http", "$localStorage", "$cordovaOauth", "OAUTH_KEYS", "NewHero", "AuthFlow", function ($http, $localStorage, $cordovaOauth, OAUTH_KEYS, NewHero, AuthFlow) {
 
+    $localStorage.facebookToken = 123;
+    $localStorage.facebookId = 122;
+    NewHero.facebookId = 122;
+
     var auth = {
+        _cleanup: function () {
+            _.each(["facebookId", function (key) {
+                delete $localStorage[key];
+                delete NewHero[key];
+            }]);
+        },
         facebook: {
             creds: function () {
                 if ($localStorage.facebookToken) {
@@ -177,10 +180,18 @@ angular.module("retro").service("Auth", ["$http", "$localStorage", "$cordovaOaut
                 });
             },
             login: function () {
-                $http.get("https://graph.facebook.com/me?fields=id&access_token=" + $localStorage.facebookToken).then(function (res) {
-                    NewHero.facebookId = $localStorage.facebookId = res.data.id;
+                var fail = function () {
+                    $http.get("https://graph.facebook.com/me?fields=id&access_token=" + $localStorage.facebookToken).then(function (res) {
+                        NewHero.facebookId = $localStorage.facebookId = res.data.id;
+                        AuthFlow.tryAuth();
+                    });
+                };
+
+                if ($localStorage.facebookId) {
                     AuthFlow.tryAuth();
-                });
+                } else {
+                    fail();
+                }
             }
         }
     };
@@ -189,15 +200,45 @@ angular.module("retro").service("Auth", ["$http", "$localStorage", "$cordovaOaut
 }]);
 "use strict";
 
-angular.module("retro").service("AuthFlow", ["$state", "socket", function ($state, socket) {
-    return {
+angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToast", "$localStorage", "$state", "socket", function ($q, $ionicHistory, $cordovaToast, $localStorage, $state, socket) {
+    var flow = {
+        toPlayer: function () {
+            $ionicHistory.nextViewOptions({
+                disableBack: true
+            });
+            $state.go("player");
+        },
         tryAuth: function () {
-            $state.go("create");
+            var fail = function () {
+                return $state.go("create");
+            };
+
+            if ($localStorage.facebookId) {
+                flow.login($localStorage).then(null, fail);
+            } else {
+                fail();
+            }
         },
         login: function (NewHero) {
-            socket.emit("login", NewHero);
+            var defer = $q.defer();
+
+            socket.emit("login", NewHero, function (err, success) {
+                if (err) {
+                    defer.reject();
+                } else {
+                    defer.resolve();
+                    flow.toPlayer();
+                }
+
+                var msgObj = err ? err : success;
+                $cordovaToast.showLongBottom(msgObj.msg);
+                console.log(JSON.stringify(err), JSON.stringify(success));
+            });
+
+            return defer.promise;
         }
     };
+    return flow;
 }]);
 "use strict";
 
@@ -219,8 +260,8 @@ angular.module("retro").service("Player", function () {
                 level: 1
             }
         },
+        profession: "Fighter",
         stats: {
-            profession: "Fighter",
             str: 10,
             agi: 10,
             int: 10,
@@ -259,10 +300,6 @@ angular.module("retro").service("Player", function () {
                 stats: {
                     agi: 2
                 }
-            },
-            item: {
-                type: "item",
-                name: "Health Potion"
             }
         },
         inventory: [{

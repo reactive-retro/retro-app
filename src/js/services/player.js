@@ -31,7 +31,6 @@ angular.module('retro').service('Player', () => {
             }
         },
         equipment: {
-            equip: (item) => this[item.type] = item,
             weapon: {
                 type: 'weapon',
                 name: 'Knife',

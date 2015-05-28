@@ -1,4 +1,4 @@
-angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $localStorage, $state, socket) => {
+angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $localStorage, $state, Player, socket) => {
     var flow = {
         toPlayer: () => {
             $ionicHistory.nextViewOptions({
@@ -23,12 +23,12 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
                     defer.reject();
                 } else {
                     defer.resolve();
+                    Player = success.player;
                     flow.toPlayer();
                 }
 
                 var msgObj = err ? err : success;
                 $cordovaToast.showLongBottom(msgObj.msg);
-                console.log(JSON.stringify(err), JSON.stringify(success));
             });
 
             return defer.promise;
