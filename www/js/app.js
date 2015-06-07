@@ -229,8 +229,6 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
 
             var defer = $q.defer();
 
-            console.log(JSON.stringify(NewHero));
-
             socket.emit("login", NewHero, function (err, success) {
                 if (err) {
                     defer.reject();
