@@ -10,25 +10,29 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
             var fail = () => $state.go('create');
 
             if($localStorage.facebookId) {
-                flow.login($localStorage).then(null, fail);
+                flow.login($localStorage, true).then(null, fail);
             } else {
                 fail();
             }
         },
-        login: (NewHero) => {
+        login: (NewHero, swallow = false) => {
             var defer = $q.defer();
+
+            console.log(JSON.stringify(NewHero));
 
             socket.emit('login', NewHero, (err, success) => {
                 if(err) {
                     defer.reject();
                 } else {
                     defer.resolve();
-                    Player = success.player;
+                    Player.set(success.player);
                     flow.toPlayer();
                 }
 
-                var msgObj = err ? err : success;
-                $cordovaToast.showLongBottom(msgObj.msg);
+                if(!swallow) {
+                    var msgObj = err ? err : success;
+                    $cordovaToast.showLongBottom(msgObj.msg);
+                }
             });
 
             return defer.promise;

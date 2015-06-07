@@ -1,15 +1,11 @@
 angular.module('retro').service('Auth', ($http, $localStorage, $cordovaOauth, OAUTH_KEYS, NewHero, AuthFlow) => {
 
-    $localStorage.facebookToken = 123;
-    $localStorage.facebookId = 122;
-    NewHero.facebookId = 122;
-
     var auth = {
         _cleanup: () => {
-            _.each(['facebookId', (key) => {
+            _.each(['facebookId'], (key) => {
                 delete $localStorage[key];
                 delete NewHero[key];
-            }]);
+            });
         },
         facebook: {
             creds: () => {
@@ -22,7 +18,7 @@ angular.module('retro').service('Auth', ($http, $localStorage, $cordovaOauth, OA
                     $localStorage.facebookToken = result.access_token; //jshint ignore:line
                     auth.facebook.login();
                 }, (error) => {
-                    window.alert('error ' + error);
+                    console.log('FACEBOOK', error);
                 });
             },
             login: () => {

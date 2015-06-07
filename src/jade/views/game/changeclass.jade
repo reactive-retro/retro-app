@@ -1,11 +1,12 @@
 script(type="text/ng-template", id="changeclass")
     ion-view(view-title="Change Class")
         ion-content
-            div.card(ng-repeat="class in player.unlockedProfessions")
+            div.card(ng-repeat="prof in player.unlockedProfessions")
                 div.item.item-divider
                     h2
-                        span {{class}}
-                        i.icon.ion-arrow-swap.float-right
+                        span {{prof}} (level {{player.professionLevels[prof]}})
+                        i.icon.ion-arrow-swap.float-right(ng-click="ClassChangeFlow.change(prof)", ng-if="prof !== player.profession")
+                        i.icon.ion-star.float-right(ng-if="prof === player.profession")
                 div.item.item-body
                     div.row
-                        div.col {{CLASSES[class]}}
+                        div.col {{CLASSES[prof]}}

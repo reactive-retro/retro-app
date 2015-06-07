@@ -7,7 +7,7 @@ script(type="text/ng-template", id="player")
                         span {{player.name}}
                         i.icon.ion-arrow-swap.float-right(ui-sref="changeclass")
 
-                    p Level {{player.professionLevels[player.profession].level}} {{player.profession}}
+                    p Level {{player.professionLevels[player.profession]}} {{player.profession}}
 
                 div.item.item-body
                     div.row
@@ -22,14 +22,14 @@ script(type="text/ng-template", id="player")
                                 div.stat-bar.xp(style="width: {{player.stats.xp.cur/player.stats.xp.max*100}}%")
 
                     div.row
-                        div.col(ng-if="player.stats.str")
-                            color-text(pre-text="STR", value="{{player.stats.str}}")
-                        div.col(ng-if="player.stats.agi")
-                            color-text(pre-text="AGI", value="{{player.stats.agi}}")
-                        div.col(ng-if="player.stats.int")
-                            color-text(pre-text="INT", value="{{player.stats.int}}")
-                        div.col(ng-if="player.stats.luk")
-                            color-text(pre-text="LUK", value="{{player.stats.luk}}")
+                        div.col(ng-if="player.calc.stat('str')")
+                            color-text(pre-text="STR", value="{{player.calc.stat('str')}}")
+                        div.col(ng-if="player.calc.stat('agi')")
+                            color-text(pre-text="AGI", value="{{player.calc.stat('agi')}}")
+                        div.col(ng-if="player.calc.stat('int')")
+                            color-text(pre-text="INT", value="{{player.calc.stat('int')}}")
+                        div.col(ng-if="player.calc.stat('luk')")
+                            color-text(pre-text="LUK", value="{{player.calc.stat('luk')}}")
 
                     div.row
                         div.col

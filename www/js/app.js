@@ -4,7 +4,7 @@ angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]);
 "use strict";
 
 angular.module("retro").constant("DEV_CFG", {
-    url: "localhost",
+    url: "127.0.0.1",
     port: 8080
 });
 "use strict";
@@ -93,19 +93,25 @@ angular.module("retro").constant("OAUTH_KEYS", {
 });
 "use strict";
 
-angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", function ($scope, Player, CLASSES) {
-    $scope.player = Player;
+angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
+    $scope.player = Player.get();
     $scope.CLASSES = CLASSES;
+    $scope.ClassChangeFlow = ClassChangeFlow;
+
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
 }]);
 "use strict";
 
-angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "AuthFlow", function ($scope, NewHero, CLASSES, AuthFlow) {
+angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "AuthFlow", "$localStorage", function ($scope, NewHero, CLASSES, AuthFlow, $localStorage) {
     $scope.NewHero = NewHero;
     $scope.CLASSES = CLASSES;
     $scope.baseProfessions = ["Cleric", "Mage", "Fighter"];
 
     $scope.create = function () {
-        AuthFlow.login(NewHero);
+        var hero = _.merge(NewHero, $localStorage);
+        AuthFlow.login(hero);
     };
 }]);
 "use strict";
@@ -134,7 +140,10 @@ angular.module("retro").controller("MenuController", ["$scope", "$state", functi
 "use strict";
 
 angular.module("retro").controller("PlayerController", ["$scope", "Player", function ($scope, Player) {
-    $scope.player = Player;
+    $scope.player = Player.get();
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
 }]);
 "use strict";
 
@@ -154,16 +163,12 @@ angular.module("retro").directive("colorText", function () {
 
 angular.module("retro").service("Auth", ["$http", "$localStorage", "$cordovaOauth", "OAUTH_KEYS", "NewHero", "AuthFlow", function ($http, $localStorage, $cordovaOauth, OAUTH_KEYS, NewHero, AuthFlow) {
 
-    $localStorage.facebookToken = 123;
-    $localStorage.facebookId = 122;
-    NewHero.facebookId = 122;
-
     var auth = {
         _cleanup: function () {
-            _.each(["facebookId", function (key) {
+            _.each(["facebookId"], function (key) {
                 delete $localStorage[key];
                 delete NewHero[key];
-            }]);
+            });
         },
         facebook: {
             creds: function () {
@@ -176,7 +181,7 @@ angular.module("retro").service("Auth", ["$http", "$localStorage", "$cordovaOaut
                     $localStorage.facebookToken = result.access_token; //jshint ignore:line
                     auth.facebook.login();
                 }, function (error) {
-                    window.alert("error " + error);
+                    console.log("FACEBOOK", error);
                 });
             },
             login: function () {
@@ -200,7 +205,7 @@ angular.module("retro").service("Auth", ["$http", "$localStorage", "$cordovaOaut
 }]);
 "use strict";
 
-angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToast", "$localStorage", "$state", "socket", function ($q, $ionicHistory, $cordovaToast, $localStorage, $state, socket) {
+angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToast", "$localStorage", "$state", "Player", "socket", function ($q, $ionicHistory, $cordovaToast, $localStorage, $state, Player, socket) {
     var flow = {
         toPlayer: function () {
             $ionicHistory.nextViewOptions({
@@ -214,31 +219,58 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
             };
 
             if ($localStorage.facebookId) {
-                flow.login($localStorage).then(null, fail);
+                flow.login($localStorage, true).then(null, fail);
             } else {
                 fail();
             }
         },
         login: function (NewHero) {
+            var swallow = arguments[1] === undefined ? false : arguments[1];
+
             var defer = $q.defer();
+
+            console.log(JSON.stringify(NewHero));
 
             socket.emit("login", NewHero, function (err, success) {
                 if (err) {
                     defer.reject();
                 } else {
                     defer.resolve();
+                    Player.set(success.player);
                     flow.toPlayer();
                 }
 
-                var msgObj = err ? err : success;
-                $cordovaToast.showLongBottom(msgObj.msg);
-                console.log(JSON.stringify(err), JSON.stringify(success));
+                if (!swallow) {
+                    var msgObj = err ? err : success;
+                    $cordovaToast.showLongBottom(msgObj.msg);
+                }
             });
 
             return defer.promise;
         }
     };
     return flow;
+}]);
+"use strict";
+
+angular.module("retro").service("ClassChangeFlow", ["$cordovaToast", "$state", "Player", "socket", function ($cordovaToast, $state, Player, socket) {
+    return {
+        change: function (newProfession) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, newProfession: newProfession };
+            socket.emit("classchange", opts, function (err, success) {
+                var msgObj = err ? err : success;
+                $cordovaToast.showLongBottom(msgObj.msg);
+
+                if (success) {
+                    Player.set(success.player);
+                    $state.go("player");
+                }
+            });
+        }
+    };
 }]);
 "use strict";
 
@@ -249,16 +281,16 @@ angular.module("retro").service("NewHero", function () {
 });
 "use strict";
 
-angular.module("retro").service("Player", function () {
+angular.module("retro").service("Player", ["$q", function ($q) {
     //var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
+
+    var defer = $q.defer();
 
     var player = {
         name: "Seiyria",
         unlockedProfessions: ["Cleric", "Fighter", "Mage"],
         professionLevels: {
-            Fighter: {
-                level: 1
-            }
+            Fighter: 1
         },
         profession: "Fighter",
         stats: {
@@ -282,9 +314,6 @@ angular.module("retro").service("Player", function () {
             }
         },
         equipment: {
-            equip: function (item) {
-                return undefined[item.type] = item;
-            },
             weapon: {
                 type: "weapon",
                 name: "Knife",
@@ -354,8 +383,31 @@ angular.module("retro").service("Player", function () {
         }]
     };
 
-    return player;
-});
+    var functions = {
+        calc: {
+            stat: function (stat) {
+                return _.reduce(player.equipment, function (prev, item) {
+                    return prev + (item.stats[stat] || 0);
+                }, 0);
+            }
+        }
+    };
+
+    return {
+        observer: defer.promise,
+        apply: function () {
+            defer.notify(player);
+        },
+        set: function (newPlayer) {
+            player = newPlayer;
+            _.merge(player, functions);
+            defer.notify(player);
+        },
+        get: function () {
+            return player;
+        }
+    };
+}]);
 "use strict";
 
 angular.module("retro").service("socketCluster", ["$window", function ($window) {
