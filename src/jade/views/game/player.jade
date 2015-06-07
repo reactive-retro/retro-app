@@ -39,7 +39,7 @@ script(type="text/ng-template", id="player")
                 div.item.item-divider
                     h2
                         span {{player.equipment.weapon.name}}
-                        i.icon.ion-arrow-swap.float-right
+                        i.icon.ion-arrow-swap.float-right(ng-click="go('inventory.weapons')")
                     p Weapon
 
                 div.item.item-body
@@ -58,7 +58,7 @@ script(type="text/ng-template", id="player")
                 div.item.item-divider
                     h2
                         span {{player.equipment.armor.name}}
-                        i.icon.ion-arrow-swap.float-right
+                        i.icon.ion-arrow-swap.float-right(ng-click="go('inventory.armor')")
                     p Armor
                 div.item.item-body
                     div.row
