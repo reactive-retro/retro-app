@@ -52,6 +52,7 @@ script(type="text/ng-template", id="player")
                             color-text(pre-text="INT", value="{{player.equipment.weapon.stats.int}}")
                         div.col(ng-if="player.equipment.weapon.stats.luk")
                             color-text(pre-text="LUK", value="{{player.equipment.weapon.stats.luk}}")
+                        div.col(ng-if="isEmpty(player.equipment.weapon.stats)") No stats.
 
             div.card
                 div.item.item-divider
@@ -69,3 +70,4 @@ script(type="text/ng-template", id="player")
                             color-text(pre-text="INT", value="{{player.equipment.armor.stats.int}}")
                         div.col(ng-if="player.equipment.armor.stats.luk")
                             color-text(pre-text="LUK", value="{{player.equipment.armor.stats.luk}}")
+                        div.col(ng-if="isEmpty(player.equipment.armor.stats)") No stats.

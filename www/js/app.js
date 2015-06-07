@@ -79,20 +79,6 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
 }]);
 "use strict";
 
-angular.module("retro").constant("CLASSES", {
-    Cleric: "Clerics specialize in healing their companions.",
-    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
-    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!"
-});
-"use strict";
-
-angular.module("retro").constant("OAUTH_KEYS", {
-    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
-    reddit: "CKzP2LKr74VwYw",
-    facebook: "102489756752863"
-});
-"use strict";
-
 angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
     $scope.player = Player.get();
     $scope.CLASSES = CLASSES;
@@ -121,8 +107,14 @@ angular.module("retro").controller("HomeController", ["$scope", "$http", "$state
 }]);
 "use strict";
 
-angular.module("retro").controller("InventoryController", ["$scope", "Player", function ($scope, Player) {
-    $scope.player = Player;
+angular.module("retro").controller("InventoryController", ["$scope", "Player", "EquipFlow", function ($scope, Player, EquipFlow) {
+    $scope.player = Player.get();
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
+    $scope.isEmpty = _.isEmpty;
+
+    $scope.EquipFlow = EquipFlow;
 }]);
 "use strict";
 
@@ -144,7 +136,24 @@ angular.module("retro").controller("PlayerController", ["$scope", "Player", func
     Player.observer.then(null, null, function (player) {
         return $scope.player = player;
     });
+    $scope.isEmpty = _.isEmpty;
+
+    $scope.go = function (to) {};
 }]);
+"use strict";
+
+angular.module("retro").constant("CLASSES", {
+    Cleric: "Clerics specialize in healing their companions.",
+    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
+    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!"
+});
+"use strict";
+
+angular.module("retro").constant("OAUTH_KEYS", {
+    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
+    reddit: "CKzP2LKr74VwYw",
+    facebook: "102489756752863"
+});
 "use strict";
 
 angular.module("retro").directive("colorText", function () {
@@ -259,6 +268,27 @@ angular.module("retro").service("ClassChangeFlow", ["$cordovaToast", "$state", "
 
             var opts = { name: player.name, newProfession: newProfession };
             socket.emit("classchange", opts, function (err, success) {
+                var msgObj = err ? err : success;
+                $cordovaToast.showLongBottom(msgObj.msg);
+
+                if (success) {
+                    Player.set(success.player);
+                    $state.go("player");
+                }
+            });
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("EquipFlow", ["$cordovaToast", "$state", "Player", "socket", function ($cordovaToast, $state, Player, socket) {
+    return {
+        equip: function (newItem) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, itemId: newItem.itemId };
+            socket.emit("equip", opts, function (err, success) {
                 var msgObj = err ? err : success;
                 $cordovaToast.showLongBottom(msgObj.msg);
 

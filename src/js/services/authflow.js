@@ -17,7 +17,7 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
         },
         login: (NewHero, swallow = false) => {
             var defer = $q.defer();
-            
+
             socket.emit('login', NewHero, (err, success) => {
                 if(err) {
                     defer.reject();

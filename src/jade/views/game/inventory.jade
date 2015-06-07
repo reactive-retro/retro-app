@@ -37,7 +37,9 @@ script(type="text/ng-template", id="inventory-tab-items")
 
 script(type="text/ng-template", id="inventory-item")
     div.item.item-divider
-        h2 {{item.name}}
+        h2
+            span {{item.name}}
+            i.icon.ion-arrow-swap.float-right(ng-click="EquipFlow.equip(item)")
     div.item.item-body
         div.row
             div.col(ng-if="item.stats.str")
@@ -48,3 +50,4 @@ script(type="text/ng-template", id="inventory-item")
                 color-text(pre-text="INT", value="{{item.stats.int}}")
             div.col(ng-if="item.stats.luk")
                 color-text(pre-text="LUK", value="{{item.stats.luk}}")
+            div.col(ng-if="isEmpty(item.stats)") No stats.
