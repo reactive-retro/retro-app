@@ -23,12 +23,10 @@
   "debug": true,
   "globals": {
     "angular": false,
+    "google": false,
     "require": false,
-    "bootbox": false,
+    "navigator": false,
     "module": false,
-    "Favico": false,
-    "Highcharts": false,
-    "d3": false,
     "_": false,
     "$": false
   }

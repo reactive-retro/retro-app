@@ -17,7 +17,8 @@ var sh = require('shelljs');
 var paths = {
     sass: ['./src/scss/**/*.scss'],
     jade: ['./src/jade/**/*.jade'],
-    js:   ['./src/js/_init/app.js', './src/js/**/!(app)*.js']
+    jsB:  ['./src/js/_init/app.js', './src/js/**/!(app)*.js'],
+    js:   ['./src/js/**/*.js']
 };
 
 var lib = [
@@ -84,7 +85,7 @@ gulp.task('jscs', function() {
 });
 
 gulp.task('build', ['jshint', 'jscs'], function() {
-    gulp.src(paths.js)
+    gulp.src(paths.jsB)
         .pipe(babel())
         .pipe(ngAnnotate())
         .pipe(concat('app.js'))

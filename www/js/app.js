@@ -74,7 +74,8 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
         templateUrl: "options"
     }).state("explore", {
         url: "/explore",
-        templateUrl: "explore"
+        templateUrl: "explore",
+        controller: "ExploreController"
     });
 }]);
 "use strict";
@@ -91,6 +92,134 @@ angular.module("retro").constant("OAUTH_KEYS", {
     reddit: "CKzP2LKr74VwYw",
     facebook: "102489756752863"
 });
+"use strict";
+
+angular.module("retro").constant("MAP_STYLE", [{
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{
+        visibility: "on"
+    }, {
+        color: "#aee2e0"
+    }]
+}, {
+    featureType: "landscape",
+    elementType: "geometry.fill",
+    stylers: [{
+        color: "#abce83"
+    }]
+}, {
+    featureType: "poi",
+    elementType: "geometry.fill",
+    stylers: [{
+        color: "#769E72"
+    }]
+}, {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{
+        color: "#7B8758"
+    }]
+}, {
+    featureType: "poi",
+    elementType: "labels.text.stroke",
+    stylers: [{
+        color: "#EBF4A4"
+    }]
+}, {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{
+        visibility: "simplified"
+    }, {
+        color: "#8dab68"
+    }]
+}, {
+    featureType: "road",
+    elementType: "geometry.fill",
+    stylers: [{
+        visibility: "simplified"
+    }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{
+        color: "#5B5B3F"
+    }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.stroke",
+    stylers: [{
+        color: "#ABCE83"
+    }]
+}, {
+    featureType: "road",
+    elementType: "labels.icon",
+    stylers: [{
+        visibility: "off"
+    }]
+}, {
+    featureType: "road.local",
+    elementType: "geometry",
+    stylers: [{
+        color: "#A4C67D"
+    }]
+}, {
+    featureType: "road.arterial",
+    elementType: "geometry",
+    stylers: [{
+        color: "#9BBF72"
+    }]
+}, {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{
+        color: "#EBF4A4"
+    }]
+}, {
+    featureType: "transit",
+    stylers: [{
+        visibility: "off"
+    }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{
+        visibility: "on"
+    }, {
+        color: "#87ae79"
+    }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.fill",
+    stylers: [{
+        color: "#7f2200"
+    }, {
+        visibility: "off"
+    }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.stroke",
+    stylers: [{
+        color: "#ffffff"
+    }, {
+        visibility: "on"
+    }, {
+        weight: 4.1
+    }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.fill",
+    stylers: [{
+        color: "#495421"
+    }]
+}, {
+    featureType: "administrative.neighborhood",
+    elementType: "labels",
+    stylers: [{
+        visibility: "off"
+    }]
+}]);
 "use strict";
 
 angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
@@ -116,7 +245,32 @@ angular.module("retro").controller("CreateCharacterController", ["$scope", "NewH
 }]);
 "use strict";
 
-angular.module("retro").controller("HomeController", ["$scope", "$http", "$state", "Auth", function ($scope, $http, $state, Auth) {
+angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "LocationWatcher", function ($scope, $ionicLoading, LocationWatcher) {
+
+    // http://stackoverflow.com/questions/365826/calculate-distance-between-2-gps-coordinates
+
+    $scope.mapCreated = function (map) {
+        $scope.map = map;
+        $scope.centerOn(LocationWatcher.current());
+        $scope.findMe();
+    };
+
+    $scope.findMe = function () {
+        LocationWatcher.watch.then(null, null, function (coords) {
+            $scope.centerOn(coords);
+        });
+    };
+
+    $scope.centerOn = function (coords) {
+        if (!$scope.map) {
+            return;
+        }
+        $scope.map.setCenter(new google.maps.LatLng(coords.latitude, coords.longitude));
+    };
+}]);
+"use strict";
+
+angular.module("retro").controller("HomeController", ["$scope", "$http", "$state", "LocationWatcher", "Auth", function ($scope, $http, $state, LocationWatcher, Auth) {
     $scope.auth = Auth;
 }]);
 "use strict";
@@ -170,6 +324,47 @@ angular.module("retro").directive("colorText", function () {
         }
     };
 });
+"use strict";
+
+angular.module("retro").directive("map", ["MAP_STYLE", function (MAP_STYLE) {
+    return {
+        restrict: "E",
+        scope: {
+            onCreate: "&"
+        },
+        link: function ($scope, $element) {
+            var init = function () {
+                var mapOptions = {
+                    center: new google.maps.LatLng(32.3078, -64.7505),
+                    zoom: 16,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    draggable: false,
+                    minZoom: 13,
+                    maxZoom: 19,
+                    styles: MAP_STYLE,
+                    mapTypeControlOptions: { mapTypeIds: [] },
+                    overviewMapControl: false,
+                    streetViewControl: false
+                };
+
+                var map = new google.maps.Map($element[0], mapOptions);
+
+                $scope.onCreate({ map: map });
+
+                google.maps.event.addDomListener($element[0], "mousedown", function (e) {
+                    e.preventDefault();
+                    return false;
+                });
+            };
+
+            if (document.readyState === "complete") {
+                init();
+            } else {
+                google.maps.event.addDomListener(window, "load", init);
+            }
+        }
+    };
+}]);
 "use strict";
 
 angular.module("retro").service("Auth", ["$http", "$localStorage", "$cordovaOauth", "OAUTH_KEYS", "NewHero", "AuthFlow", function ($http, $localStorage, $cordovaOauth, OAUTH_KEYS, NewHero, AuthFlow) {
@@ -301,6 +496,45 @@ angular.module("retro").service("EquipFlow", ["$cordovaToast", "$state", "Player
             });
         }
     };
+}]);
+"use strict";
+
+angular.module("retro").service("LocationWatcher", ["$q", function ($q) {
+
+    var posOptions = { timeout: 30000, enableHighAccuracy: true };
+
+    var defer = $q.defer();
+
+    var error = function () {
+        alert("Could not load GPS. Please check your settings.");
+    };
+
+    var currentCoords = {};
+
+    var watcher = {
+        current: function () {
+            return currentCoords;
+        },
+        center: function () {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                currentCoords = position.coords;
+                defer.notify(position.coords);
+            }, error, posOptions);
+        },
+
+        watcher: function () {
+            navigator.geolocation.watchPosition(function (position) {
+                currentCoords = position.coords;
+                defer.notify(position.coords);
+            }, error);
+        },
+
+        watch: defer.promise
+    };
+
+    watcher.center();
+
+    return watcher;
 }]);
 "use strict";
 

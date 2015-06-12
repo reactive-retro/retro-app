@@ -60,6 +60,7 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
         })
         .state('explore', {
             url: '/explore',
-            templateUrl: 'explore'
+            templateUrl: 'explore',
+            controller: 'ExploreController'
         });
 });

@@ -7690,3 +7690,11 @@ h3.subdued {
       background-color: blue; }
     .stat-bar-container .stat-bar.xp {
       background-color: green; }
+
+map {
+  display: block;
+  width: 100%;
+  height: 100%; }
+
+.scroll {
+  height: 100%; }
