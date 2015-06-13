@@ -1,22 +1,20 @@
 angular.module('retro').service('LocationWatcher', ($q) => {
+    
+    let defer = $q.defer();
 
-    const posOptions = {timeout: 10000, enableHighAccuracy: false};
-
-    var defer = $q.defer();
-
-    var error = () => {
+    let error = () => {
         console.log('GPS turned off, or connection errored.');
     };
 
-    var currentCoords = {};
+    let currentCoords = {};
 
-    var watcher = {
+    let watcher = {
         current: () => currentCoords,
         start: () => {
             navigator.geolocation.getCurrentPosition((position) => {
                 currentCoords = position.coords;
                 defer.notify(currentCoords);
-            }, error, posOptions);
+            }, error, {timeout: 10000});
 
             navigator.geolocation.watchPosition((position) => {
                 currentCoords = position.coords;

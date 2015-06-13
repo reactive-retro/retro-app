@@ -501,8 +501,6 @@ angular.module("retro").service("EquipFlow", ["$cordovaToast", "$state", "Player
 
 angular.module("retro").service("LocationWatcher", ["$q", function ($q) {
 
-    var posOptions = { timeout: 10000, enableHighAccuracy: false };
-
     var defer = $q.defer();
 
     var error = function () {
@@ -519,7 +517,7 @@ angular.module("retro").service("LocationWatcher", ["$q", function ($q) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 currentCoords = position.coords;
                 defer.notify(currentCoords);
-            }, error, posOptions);
+            }, error, { timeout: 10000 });
 
             navigator.geolocation.watchPosition(function (position) {
                 currentCoords = position.coords;
