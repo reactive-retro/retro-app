@@ -1,5 +1,5 @@
 angular.module('retro').service('LocationWatcher', ($q) => {
-    
+
     let defer = $q.defer();
 
     let error = () => {

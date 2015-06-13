@@ -299,7 +299,7 @@ angular.module("retro").controller("MenuController", ["$scope", "$state", functi
 }]);
 "use strict";
 
-angular.module("retro").controller("PlayerController", ["$scope", "$state", "LocationWatcher", "Player", function ($scope, $state, LocationWatcher, Player) {
+angular.module("retro").controller("PlayerController", ["$scope", "$state", "Player", function ($scope, $state, Player) {
     $scope.player = Player.get();
     Player.observer.then(null, null, function (player) {
         return $scope.player = player;
