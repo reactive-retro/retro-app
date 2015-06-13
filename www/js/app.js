@@ -299,7 +299,7 @@ angular.module("retro").controller("MenuController", ["$scope", "$state", functi
 }]);
 "use strict";
 
-angular.module("retro").controller("PlayerController", ["$scope", "$state", "Player", function ($scope, $state, Player) {
+angular.module("retro").controller("PlayerController", ["$scope", "$state", "LocationWatcher", "Player", function ($scope, $state, LocationWatcher, Player) {
     $scope.player = Player.get();
     Player.observer.then(null, null, function (player) {
         return $scope.player = player;
@@ -501,12 +501,12 @@ angular.module("retro").service("EquipFlow", ["$cordovaToast", "$state", "Player
 
 angular.module("retro").service("LocationWatcher", ["$q", function ($q) {
 
-    var posOptions = { timeout: 30000, enableHighAccuracy: true };
+    var posOptions = { timeout: 10000, enableHighAccuracy: false };
 
     var defer = $q.defer();
 
     var error = function () {
-        alert("Could not load GPS. Please check your settings.");
+        console.log("GPS turned off, or connection errored.");
     };
 
     var currentCoords = {};
@@ -515,24 +515,22 @@ angular.module("retro").service("LocationWatcher", ["$q", function ($q) {
         current: function () {
             return currentCoords;
         },
-        center: function () {
+        start: function () {
             navigator.geolocation.getCurrentPosition(function (position) {
                 currentCoords = position.coords;
-                defer.notify(position.coords);
+                defer.notify(currentCoords);
             }, error, posOptions);
-        },
 
-        watcher: function () {
             navigator.geolocation.watchPosition(function (position) {
                 currentCoords = position.coords;
-                defer.notify(position.coords);
-            }, error);
+                defer.notify(currentCoords);
+            }, error, { timeout: 30000 });
         },
 
         watch: defer.promise
     };
 
-    watcher.center();
+    watcher.start();
 
     return watcher;
 }]);

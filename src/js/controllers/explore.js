@@ -18,6 +18,6 @@ angular.module('retro').controller('ExploreController',
         $scope.centerOn = (coords) => {
             if(!$scope.map) { return; }
             $scope.map.setCenter(new google.maps.LatLng(coords.latitude, coords.longitude));
-        }
+        };
     }
 );
