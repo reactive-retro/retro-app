@@ -8,15 +8,16 @@ angular.module('retro').directive('map', (MAP_STYLE) => {
             var init = () => {
                 const mapOptions = {
                     center: new google.maps.LatLng(32.3078, -64.7505),
-                    zoom: 16,
+                    zoom: 17,
                     mapTypeId: google.maps.MapTypeId.ROADMAP,
                     draggable: false,
-                    minZoom: 13,
-                    maxZoom: 19,
+                    minZoom: 17,
+                    maxZoom: 17,
                     styles: MAP_STYLE,
                     mapTypeControlOptions: {mapTypeIds: []},
                     overviewMapControl: false,
-                    streetViewControl: false
+                    streetViewControl: false,
+                    zoomControl: false
                 };
 
                 var map = new google.maps.Map($element[0], mapOptions);

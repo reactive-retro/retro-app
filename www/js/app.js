@@ -245,14 +245,42 @@ angular.module("retro").controller("CreateCharacterController", ["$scope", "NewH
 }]);
 "use strict";
 
-angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "LocationWatcher", function ($scope, $ionicLoading, LocationWatcher) {
+angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "socket", function ($scope, $ionicLoading, Player, LocationWatcher, socket) {
 
     // http://stackoverflow.com/questions/365826/calculate-distance-between-2-gps-coordinates
 
     $scope.mapCreated = function (map) {
         $scope.map = map;
-        $scope.centerOn(LocationWatcher.current());
+        var position = LocationWatcher.current();
+        $scope.drawMe(position);
+        $scope.centerOn(position);
         $scope.findMe();
+    };
+
+    $scope.drawMe = function (coords) {
+        $scope.curPos = new google.maps.Marker({
+            position: new google.maps.LatLng(coords.latitude, coords.longitude),
+            map: $scope.map,
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                strokeColor: "#0000ff",
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: "#0000aa",
+                fillOpacity: 1,
+                scale: 5
+            }
+        });
+
+        var affectRadius = new google.maps.Circle({
+            fillColor: "#ff00ff",
+            strokeColor: "#ff00ff",
+            strokeWeight: 1,
+            radius: 50,
+            map: $scope.map
+        });
+
+        affectRadius.bindTo("center", $scope.curPos, "position");
     };
 
     $scope.findMe = function () {
@@ -265,7 +293,16 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
         if (!$scope.map) {
             return;
         }
-        $scope.map.setCenter(new google.maps.LatLng(coords.latitude, coords.longitude));
+
+        var position = new google.maps.LatLng(coords.latitude, coords.longitude);
+
+        $scope.map.setCenter(position);
+
+        $scope.curPos.setPosition(position);
+
+        //socket.emit('nearby', {name: Player.get().name, latitude: coords.latitude, longitude: coords.longitude}, (err, success) => {
+        //    console.log(err, JSON.stringify(success));
+        //});
     };
 }]);
 "use strict";
@@ -336,15 +373,16 @@ angular.module("retro").directive("map", ["MAP_STYLE", function (MAP_STYLE) {
             var init = function () {
                 var mapOptions = {
                     center: new google.maps.LatLng(32.3078, -64.7505),
-                    zoom: 16,
+                    zoom: 17,
                     mapTypeId: google.maps.MapTypeId.ROADMAP,
                     draggable: false,
-                    minZoom: 13,
-                    maxZoom: 19,
+                    minZoom: 17,
+                    maxZoom: 17,
                     styles: MAP_STYLE,
                     mapTypeControlOptions: { mapTypeIds: [] },
                     overviewMapControl: false,
-                    streetViewControl: false
+                    streetViewControl: false,
+                    zoomControl: false
                 };
 
                 var map = new google.maps.Map($element[0], mapOptions);
