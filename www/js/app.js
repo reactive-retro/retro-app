@@ -10,6 +10,148 @@ angular.module("retro").constant("DEV_CFG", {
 });
 "use strict";
 
+angular.module("retro").constant("CLASSES", {
+    Cleric: "Clerics specialize in healing their companions.",
+    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
+    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!"
+});
+"use strict";
+
+angular.module("retro").constant("OAUTH_KEYS", {
+    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
+    reddit: "CKzP2LKr74VwYw",
+    facebook: "102489756752863"
+});
+"use strict";
+
+angular.module("retro").constant("MAP_STYLE", [{
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{
+        visibility: "on"
+    }, {
+        color: "#aee2e0"
+    }]
+}, {
+    featureType: "landscape",
+    elementType: "geometry.fill",
+    stylers: [{
+        color: "#abce83"
+    }]
+}, {
+    featureType: "poi",
+    elementType: "geometry.fill",
+    stylers: [{
+        color: "#769E72"
+    }]
+}, {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{
+        color: "#7B8758"
+    }]
+}, {
+    featureType: "poi",
+    elementType: "labels.text.stroke",
+    stylers: [{
+        color: "#EBF4A4"
+    }]
+}, {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{
+        visibility: "simplified"
+    }, {
+        color: "#8dab68"
+    }]
+}, {
+    featureType: "road",
+    elementType: "geometry.fill",
+    stylers: [{
+        visibility: "simplified"
+    }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{
+        color: "#5B5B3F"
+    }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.stroke",
+    stylers: [{
+        color: "#ABCE83"
+    }]
+}, {
+    featureType: "road",
+    elementType: "labels.icon",
+    stylers: [{
+        visibility: "off"
+    }]
+}, {
+    featureType: "road.local",
+    elementType: "geometry",
+    stylers: [{
+        color: "#A4C67D"
+    }]
+}, {
+    featureType: "road.arterial",
+    elementType: "geometry",
+    stylers: [{
+        color: "#9BBF72"
+    }]
+}, {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{
+        color: "#EBF4A4"
+    }]
+}, {
+    featureType: "transit",
+    stylers: [{
+        visibility: "off"
+    }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{
+        visibility: "on"
+    }, {
+        color: "#87ae79"
+    }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.fill",
+    stylers: [{
+        color: "#7f2200"
+    }, {
+        visibility: "off"
+    }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.stroke",
+    stylers: [{
+        color: "#ffffff"
+    }, {
+        visibility: "on"
+    }, {
+        weight: 4.1
+    }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.fill",
+    stylers: [{
+        color: "#495421"
+    }]
+}, {
+    featureType: "administrative.neighborhood",
+    elementType: "labels",
+    stylers: [{
+        visibility: "off"
+    }]
+}]);
+"use strict";
+
 angular.module("retro").run(["$ionicPlatform", function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
         if (window.cordova && window.cordova.plugins.Keyboard) {
@@ -225,148 +367,6 @@ angular.module("retro").controller("PlayerController", ["$scope", "$state", "Pla
 }]);
 "use strict";
 
-angular.module("retro").constant("CLASSES", {
-    Cleric: "Clerics specialize in healing their companions.",
-    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
-    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!"
-});
-"use strict";
-
-angular.module("retro").constant("OAUTH_KEYS", {
-    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
-    reddit: "CKzP2LKr74VwYw",
-    facebook: "102489756752863"
-});
-"use strict";
-
-angular.module("retro").constant("MAP_STYLE", [{
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{
-        visibility: "on"
-    }, {
-        color: "#aee2e0"
-    }]
-}, {
-    featureType: "landscape",
-    elementType: "geometry.fill",
-    stylers: [{
-        color: "#abce83"
-    }]
-}, {
-    featureType: "poi",
-    elementType: "geometry.fill",
-    stylers: [{
-        color: "#769E72"
-    }]
-}, {
-    featureType: "poi",
-    elementType: "labels.text.fill",
-    stylers: [{
-        color: "#7B8758"
-    }]
-}, {
-    featureType: "poi",
-    elementType: "labels.text.stroke",
-    stylers: [{
-        color: "#EBF4A4"
-    }]
-}, {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{
-        visibility: "simplified"
-    }, {
-        color: "#8dab68"
-    }]
-}, {
-    featureType: "road",
-    elementType: "geometry.fill",
-    stylers: [{
-        visibility: "simplified"
-    }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{
-        color: "#5B5B3F"
-    }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.stroke",
-    stylers: [{
-        color: "#ABCE83"
-    }]
-}, {
-    featureType: "road",
-    elementType: "labels.icon",
-    stylers: [{
-        visibility: "off"
-    }]
-}, {
-    featureType: "road.local",
-    elementType: "geometry",
-    stylers: [{
-        color: "#A4C67D"
-    }]
-}, {
-    featureType: "road.arterial",
-    elementType: "geometry",
-    stylers: [{
-        color: "#9BBF72"
-    }]
-}, {
-    featureType: "road.highway",
-    elementType: "geometry",
-    stylers: [{
-        color: "#EBF4A4"
-    }]
-}, {
-    featureType: "transit",
-    stylers: [{
-        visibility: "off"
-    }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.stroke",
-    stylers: [{
-        visibility: "on"
-    }, {
-        color: "#87ae79"
-    }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.fill",
-    stylers: [{
-        color: "#7f2200"
-    }, {
-        visibility: "off"
-    }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.stroke",
-    stylers: [{
-        color: "#ffffff"
-    }, {
-        visibility: "on"
-    }, {
-        weight: 4.1
-    }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.fill",
-    stylers: [{
-        color: "#495421"
-    }]
-}, {
-    featureType: "administrative.neighborhood",
-    elementType: "labels",
-    stylers: [{
-        visibility: "off"
-    }]
-}]);
-"use strict";
-
 angular.module("retro").directive("colorText", function () {
     return {
         restrict: "E",
@@ -438,7 +438,9 @@ angular.module("retro").service("Auth", ["$http", "$localStorage", "$cordovaOaut
 
     var auth = {
         _cleanup: function () {
-            _.each(["facebookId"], function (key) {
+            var except = arguments[0] === undefined ? [] : arguments[0];
+
+            _.each(_.difference(["facebookId", "googleId"], except), function (key) {
                 delete $localStorage[key];
                 delete NewHero[key];
             });
@@ -461,12 +463,41 @@ angular.module("retro").service("Auth", ["$http", "$localStorage", "$cordovaOaut
                 var fail = function () {
                     $http.get("https://graph.facebook.com/me?fields=id&access_token=" + $localStorage.facebookToken).then(function (res) {
                         NewHero.facebookId = $localStorage.facebookId = res.data.id;
-                        AuthFlow.tryAuth();
+                        AuthFlow.tryAuth("facebook");
                     });
                 };
 
                 if ($localStorage.facebookId) {
-                    AuthFlow.tryAuth();
+                    AuthFlow.tryAuth("facebook");
+                } else {
+                    fail();
+                }
+            }
+        },
+        google: {
+            creds: function () {
+                if ($localStorage.googleToken) {
+                    auth.google.login();
+                    return;
+                }
+
+                $cordovaOauth.google(OAUTH_KEYS.google, ["email", "profile"]).then(function (result) {
+                    $localStorage.googleToken = result.access_token; //jshint ignore:line
+                    auth.google.login();
+                }, function (error) {
+                    console.log("GOOGLE", error);
+                });
+            },
+            login: function () {
+                var fail = function () {
+                    $http.get("https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + $localStorage.googleToken).then(function (res) {
+                        NewHero.googleId = $localStorage.googleId = res.data.email;
+                        AuthFlow.tryAuth("google");
+                    });
+                };
+
+                if ($localStorage.googleId) {
+                    AuthFlow.tryAuth("google");
                 } else {
                     fail();
                 }
@@ -486,19 +517,19 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
             });
             $state.go("player");
         },
-        tryAuth: function () {
+        tryAuth: function (authsource) {
             var fail = function () {
                 return $state.go("create");
             };
 
-            if ($localStorage.facebookId) {
-                flow.login($localStorage, true).then(null, fail);
+            if ($localStorage.facebookId || $localStorage.googleId) {
+                flow.login(_.clone($localStorage), authsource, true).then(null, fail);
             } else {
                 fail();
             }
         },
-        login: function (NewHero) {
-            var swallow = arguments[1] === undefined ? false : arguments[1];
+        login: function (NewHero, authsource) {
+            var swallow = arguments[2] === undefined ? false : arguments[2];
 
             var defer = $q.defer();
 
@@ -507,6 +538,7 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
                 return $cordovaToast.showLongBottom("No current location. Is your GPS on?");
             }
 
+            NewHero.authsource = authsource;
             NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
 
             socket.emit("login", NewHero, function (err, success) {
