@@ -4,8 +4,9 @@ angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]);
 "use strict";
 
 angular.module("retro").constant("DEV_CFG", {
-    url: "127.0.0.1",
-    port: 8080
+    protocol: "https",
+    url: "reactive-retro.herokuapp.com",
+    port: 80
 });
 "use strict";
 
@@ -77,6 +78,150 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
         templateUrl: "explore",
         controller: "ExploreController"
     });
+}]);
+"use strict";
+
+angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
+    $scope.player = Player.get();
+    $scope.CLASSES = CLASSES;
+    $scope.ClassChangeFlow = ClassChangeFlow;
+
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
+}]);
+"use strict";
+
+angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "AuthFlow", "$localStorage", function ($scope, NewHero, CLASSES, AuthFlow, $localStorage) {
+    $scope.NewHero = NewHero;
+    $scope.CLASSES = CLASSES;
+    $scope.baseProfessions = ["Cleric", "Mage", "Fighter"];
+
+    $scope.create = function () {
+        var hero = _.merge(NewHero, $localStorage);
+        AuthFlow.login(hero);
+    };
+}]);
+"use strict";
+
+angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", function ($scope, $ionicLoading, Player, LocationWatcher) {
+
+    // http://stackoverflow.com/questions/365826/calculate-distance-between-2-gps-coordinates
+
+    $scope.mapCreated = function (map) {
+        $scope.map = map;
+        var position = LocationWatcher.current();
+        $scope.drawMe(position);
+        $scope.centerOn(position);
+        $scope.drawHomepoint(Player.get().homepoint);
+        $scope.findMe();
+    };
+
+    $scope.drawHomepoint = function (coords) {
+        $scope.homepoint = new google.maps.Marker({
+            position: new google.maps.LatLng(coords.lat, coords.lon),
+            map: $scope.map,
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                strokeColor: "#00ff00",
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: "#00aa00",
+                fillOpacity: 1,
+                scale: 5
+            }
+        });
+    };
+
+    $scope.drawMe = function (coords) {
+        $scope.curPos = new google.maps.Marker({
+            position: new google.maps.LatLng(coords.latitude, coords.longitude),
+            map: $scope.map,
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                strokeColor: "#0000ff",
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: "#0000aa",
+                fillOpacity: 1,
+                scale: 5
+            }
+        });
+
+        var affectRadius = new google.maps.Circle({
+            fillColor: "#ff00ff",
+            strokeColor: "#ff00ff",
+            strokeWeight: 1,
+            radius: 50,
+            map: $scope.map
+        });
+
+        affectRadius.bindTo("center", $scope.curPos, "position");
+    };
+
+    $scope.findMe = function () {
+        LocationWatcher.watch.then(null, null, function (coords) {
+            $scope.centerOn(coords);
+        });
+    };
+
+    $scope.centerOn = function (coords) {
+        if (!$scope.map) {
+            return;
+        }
+
+        var position = new google.maps.LatLng(coords.latitude, coords.longitude);
+
+        $scope.map.setCenter(position);
+
+        $scope.curPos.setPosition(position);
+
+        //socket.emit('nearby', {name: Player.get().name, latitude: coords.latitude, longitude: coords.longitude}, (err, success) => {
+        //    console.log(err, JSON.stringify(success));
+        //});
+    };
+}]);
+"use strict";
+
+angular.module("retro").controller("HomeController", ["$scope", "$http", "$state", "LocationWatcher", "Auth", function ($scope, $http, $state, LocationWatcher, Auth) {
+    $scope.auth = Auth;
+}]);
+"use strict";
+
+angular.module("retro").controller("InventoryController", ["$scope", "Player", "EquipFlow", function ($scope, Player, EquipFlow) {
+    $scope.player = Player.get();
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
+    $scope.isEmpty = _.isEmpty;
+
+    $scope.EquipFlow = EquipFlow;
+}]);
+"use strict";
+
+angular.module("retro").controller("MenuController", ["$scope", "$state", function ($scope, $state) {
+    $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore" }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-gear-b", name: "Options", state: "options" }];
+
+    $scope.travel = function (state) {
+        $state.go(state);
+    };
+
+    $scope.$root.$on("$stateChangeSuccess", function (event, toState) {
+        $scope.$root.hideMenu = toState.name === "home" || toState.name === "create";
+    });
+}]);
+"use strict";
+
+angular.module("retro").controller("PlayerController", ["$scope", "$state", "Player", function ($scope, $state, Player) {
+    $scope.player = Player.get();
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
+    $scope.isEmpty = _.isEmpty;
+
+    $scope.go = function (to) {
+        $state.go(to);
+    };
 }]);
 "use strict";
 
@@ -222,133 +367,6 @@ angular.module("retro").constant("MAP_STYLE", [{
 }]);
 "use strict";
 
-angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
-    $scope.player = Player.get();
-    $scope.CLASSES = CLASSES;
-    $scope.ClassChangeFlow = ClassChangeFlow;
-
-    Player.observer.then(null, null, function (player) {
-        return $scope.player = player;
-    });
-}]);
-"use strict";
-
-angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "AuthFlow", "$localStorage", function ($scope, NewHero, CLASSES, AuthFlow, $localStorage) {
-    $scope.NewHero = NewHero;
-    $scope.CLASSES = CLASSES;
-    $scope.baseProfessions = ["Cleric", "Mage", "Fighter"];
-
-    $scope.create = function () {
-        var hero = _.merge(NewHero, $localStorage);
-        AuthFlow.login(hero);
-    };
-}]);
-"use strict";
-
-angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "socket", function ($scope, $ionicLoading, Player, LocationWatcher, socket) {
-
-    // http://stackoverflow.com/questions/365826/calculate-distance-between-2-gps-coordinates
-
-    $scope.mapCreated = function (map) {
-        $scope.map = map;
-        var position = LocationWatcher.current();
-        $scope.drawMe(position);
-        $scope.centerOn(position);
-        $scope.findMe();
-    };
-
-    $scope.drawMe = function (coords) {
-        $scope.curPos = new google.maps.Marker({
-            position: new google.maps.LatLng(coords.latitude, coords.longitude),
-            map: $scope.map,
-            icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                strokeColor: "#0000ff",
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: "#0000aa",
-                fillOpacity: 1,
-                scale: 5
-            }
-        });
-
-        var affectRadius = new google.maps.Circle({
-            fillColor: "#ff00ff",
-            strokeColor: "#ff00ff",
-            strokeWeight: 1,
-            radius: 50,
-            map: $scope.map
-        });
-
-        affectRadius.bindTo("center", $scope.curPos, "position");
-    };
-
-    $scope.findMe = function () {
-        LocationWatcher.watch.then(null, null, function (coords) {
-            $scope.centerOn(coords);
-        });
-    };
-
-    $scope.centerOn = function (coords) {
-        if (!$scope.map) {
-            return;
-        }
-
-        var position = new google.maps.LatLng(coords.latitude, coords.longitude);
-
-        $scope.map.setCenter(position);
-
-        $scope.curPos.setPosition(position);
-
-        //socket.emit('nearby', {name: Player.get().name, latitude: coords.latitude, longitude: coords.longitude}, (err, success) => {
-        //    console.log(err, JSON.stringify(success));
-        //});
-    };
-}]);
-"use strict";
-
-angular.module("retro").controller("HomeController", ["$scope", "$http", "$state", "LocationWatcher", "Auth", function ($scope, $http, $state, LocationWatcher, Auth) {
-    $scope.auth = Auth;
-}]);
-"use strict";
-
-angular.module("retro").controller("InventoryController", ["$scope", "Player", "EquipFlow", function ($scope, Player, EquipFlow) {
-    $scope.player = Player.get();
-    Player.observer.then(null, null, function (player) {
-        return $scope.player = player;
-    });
-    $scope.isEmpty = _.isEmpty;
-
-    $scope.EquipFlow = EquipFlow;
-}]);
-"use strict";
-
-angular.module("retro").controller("MenuController", ["$scope", "$state", function ($scope, $state) {
-    $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore" }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-gear-b", name: "Options", state: "options" }];
-
-    $scope.travel = function (state) {
-        $state.go(state);
-    };
-
-    $scope.$root.$on("$stateChangeSuccess", function (event, toState) {
-        $scope.$root.hideMenu = toState.name === "home" || toState.name === "create";
-    });
-}]);
-"use strict";
-
-angular.module("retro").controller("PlayerController", ["$scope", "$state", "Player", function ($scope, $state, Player) {
-    $scope.player = Player.get();
-    Player.observer.then(null, null, function (player) {
-        return $scope.player = player;
-    });
-    $scope.isEmpty = _.isEmpty;
-
-    $scope.go = function (to) {
-        $state.go(to);
-    };
-}]);
-"use strict";
-
 angular.module("retro").directive("colorText", function () {
     return {
         restrict: "E",
@@ -363,18 +381,29 @@ angular.module("retro").directive("colorText", function () {
 });
 "use strict";
 
-angular.module("retro").directive("map", ["MAP_STYLE", function (MAP_STYLE) {
+angular.module("retro").directive("map", ["MAP_STYLE", "$cordovaToast", "Google", function (MAP_STYLE, $cordovaToast, Google) {
     return {
         restrict: "E",
         scope: {
             onCreate: "&"
         },
         link: function ($scope, $element) {
+
+            if (!Google || !Google.maps) {
+                $cordovaToast.showLongBottom("Could not reach google.");
+                return;
+            }
+
+            // TODO also hit google places for a 25mile radius once upon map creation
+            // this is the available list of places in the game
+
+            // TODO store a home point separate from login point, but when creating a character set it to their current location
+            // make an option to let them set it to their current point
             var init = function () {
                 var mapOptions = {
-                    center: new google.maps.LatLng(32.3078, -64.7505),
+                    center: new Google.maps.LatLng(32.3078, -64.7505),
                     zoom: 17,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
                     draggable: false,
                     minZoom: 17,
                     maxZoom: 17,
@@ -385,11 +414,11 @@ angular.module("retro").directive("map", ["MAP_STYLE", function (MAP_STYLE) {
                     zoomControl: false
                 };
 
-                var map = new google.maps.Map($element[0], mapOptions);
+                var map = new Google.maps.Map($element[0], mapOptions);
 
                 $scope.onCreate({ map: map });
 
-                google.maps.event.addDomListener($element[0], "mousedown", function (e) {
+                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
                     e.preventDefault();
                     return false;
                 });
@@ -398,7 +427,7 @@ angular.module("retro").directive("map", ["MAP_STYLE", function (MAP_STYLE) {
             if (document.readyState === "complete") {
                 init();
             } else {
-                google.maps.event.addDomListener(window, "load", init);
+                Google.maps.event.addDomListener(window, "load", init);
             }
         }
     };
@@ -449,7 +478,7 @@ angular.module("retro").service("Auth", ["$http", "$localStorage", "$cordovaOaut
 }]);
 "use strict";
 
-angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToast", "$localStorage", "$state", "Player", "socket", function ($q, $ionicHistory, $cordovaToast, $localStorage, $state, Player, socket) {
+angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToast", "$localStorage", "$state", "Player", "LocationWatcher", "socket", function ($q, $ionicHistory, $cordovaToast, $localStorage, $state, Player, LocationWatcher, socket) {
     var flow = {
         toPlayer: function () {
             $ionicHistory.nextViewOptions({
@@ -472,6 +501,13 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
             var swallow = arguments[1] === undefined ? false : arguments[1];
 
             var defer = $q.defer();
+
+            var currentLocation = LocationWatcher.current();
+            if (!currentLocation) {
+                return $cordovaToast.showLongBottom("No current location. Is your GPS on?");
+            }
+
+            NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
 
             socket.emit("login", NewHero, function (err, success) {
                 if (err) {
@@ -537,6 +573,11 @@ angular.module("retro").service("EquipFlow", ["$cordovaToast", "$state", "Player
 }]);
 "use strict";
 
+angular.module("retro").service("Google", function () {
+    return window.google;
+});
+"use strict";
+
 angular.module("retro").service("LocationWatcher", ["$q", function ($q) {
 
     var defer = $q.defer();
@@ -586,6 +627,10 @@ angular.module("retro").service("Player", ["$q", function ($q) {
 
     var player = {
         name: "Seiyria",
+        homepoint: {
+            lat: 44.0329402,
+            lon: -88.558683
+        },
         unlockedProfessions: ["Cleric", "Fighter", "Mage"],
         professionLevels: {
             Fighter: 1
@@ -711,5 +756,5 @@ angular.module("retro").service("Player", ["$q", function ($q) {
 angular.module("retro").service("socketCluster", ["$window", function ($window) {
     return $window.socketCluster;
 }]).service("socket", ["DEV_CFG", "socketCluster", function (DEV_CFG, socketCluster) {
-    return socketCluster.connect({ hostname: DEV_CFG.url, port: DEV_CFG.port });
+    return socketCluster.connect({ protocol: DEV_CFG.protocol, hostname: DEV_CFG.url, port: DEV_CFG.port });
 }]);

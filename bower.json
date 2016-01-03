@@ -2,18 +2,18 @@
   "name": "reactive-retro",
   "private": "true",
   "devDependencies": {
-    "ionic": "driftyco/ionic-bower#1.0.0-rc.0"
+    "ionic": "driftyco/ionic-bower"
   },
   "dependencies": {
-    "ngCordova": "~0.1.12-alpha",
-    "ng-cordova-oauth": "~0.1.1",
-    "ionic": "1.0.0",
-    "jsSHA": "*",
+    "ngCordova": "~0.1.23-alpha",
+    "ng-cordova-oauth": "~0.2.0",
+    "ionic": "~1.2.2",
+    "jsSHA": "~2.0.2",
     "ngstorage": "~0.3.4",
-    "socketcluster-client": "https://github.com/TopCloud/socketcluster-client.git#master",
+    "socketcluster-client": "SocketCluster/socketcluster-client#~3.1.1",
     "lodash": "~3.8.0"
   },
   "resolutions": {
-    "angular": "1.3.13"
+    "angular": "1.4.3"
   }
 }

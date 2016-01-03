@@ -8,3 +8,5 @@ plugins/
 .idea
 
 www/lib
+
+npm-*.log

@@ -1,5 +1,5 @@
 angular.module('retro').controller('ExploreController',
-    ($scope, $ionicLoading, Player, LocationWatcher, socket) => {
+    ($scope, $ionicLoading, Player, LocationWatcher) => {
 
         // http://stackoverflow.com/questions/365826/calculate-distance-between-2-gps-coordinates
 
@@ -8,7 +8,24 @@ angular.module('retro').controller('ExploreController',
             var position = LocationWatcher.current();
             $scope.drawMe(position);
             $scope.centerOn(position);
+            $scope.drawHomepoint(Player.get().homepoint);
             $scope.findMe();
+        };
+
+        $scope.drawHomepoint = (coords) => {
+            $scope.homepoint = new google.maps.Marker({
+                position: new google.maps.LatLng(coords.lat, coords.lon),
+                map: $scope.map,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    strokeColor: '#00ff00',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#00aa00',
+                    fillOpacity: 1,
+                    scale: 5
+                }
+            });
         };
 
         $scope.drawMe = (coords) => {

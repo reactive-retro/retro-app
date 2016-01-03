@@ -1,4 +1,5 @@
 angular.module('retro').constant('DEV_CFG', {
-    url: '127.0.0.1',
-    port: 8080
+    protocol: 'https',
+    url: 'reactive-retro.herokuapp.com',
+    port: 80
 });

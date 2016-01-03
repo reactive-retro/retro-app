@@ -5,6 +5,10 @@ angular.module('retro').service('Player', ($q) => {
 
     var player = {
         name: 'Seiyria',
+        homepoint: {
+            lat: 44.0329402,
+            lon: -88.558683
+        },
         unlockedProfessions: ['Cleric', 'Fighter', 'Mage'],
         professionLevels: {
             Fighter: 1

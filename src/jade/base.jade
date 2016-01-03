@@ -3,10 +3,13 @@ html
     head
         meta(charset="utf-8")
         meta(name="viewport", content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width")
+        meta(http-equiv="Content-Security-Policy",
+            content="default-src *; style-src 'self' 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'")
+
         title Reactive Retro
         link(href="css/ionic.app.css",rel="stylesheet")
         script(src="js/lib.js")
-        script(src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAc6kFwQR8Cj4nH0UEbdocIY6wgJ_b_Bes&sensor=true")
+        script(src="https://maps.googleapis.com/maps/api/js")
         script(src="cordova.js")
         script(src="js/app.js")
 
