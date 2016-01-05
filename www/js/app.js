@@ -1,6 +1,6 @@
 "use strict";
 
-angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage"]);
+angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage", "auth0", "angular-jwt"]);
 "use strict";
 
 angular.module("retro").constant("DEV_CFG", {
@@ -8,6 +8,128 @@ angular.module("retro").constant("DEV_CFG", {
     url: "reactive-retro.herokuapp.com",
     port: 80
 });
+"use strict";
+
+angular.module("retro").config(["authProvider", function (authProvider) {
+    authProvider.init({
+        domain: "reactive-retro.auth0.com",
+        clientID: "ucMSnNDYLGdDBL2uppganZv2jKzzJiI0",
+        loginState: "home"
+    });
+}]).run(["auth", "$localStorage", "$rootScope", "$state", "jwtHelper", function (auth, $localStorage, $rootScope, $state, jwtHelper) {
+    auth.hookEvents();
+
+    var refreshingToken = null;
+    $rootScope.$on("$locationChangeStart", function () {
+        var token = $localStorage.token;
+        var refreshToken = $localStorage.refreshToken;
+        var profile = $localStorage.profile;
+
+        if (!token) {
+            return;
+        }
+
+        if (!jwtHelper.isTokenExpired(token)) {
+            if (!auth.isAuthenticated) {
+                auth.authenticate(profile, token);
+            }
+        } else {
+            if (refreshToken) {
+                if (refreshingToken === null) {
+                    refreshingToken = auth.refreshIdToken(refreshToken).then(function (idToken) {
+                        $localStorage.token = idToken;
+                        auth.authenticate(profile, idToken);
+                    })["finally"](function () {
+                        refreshingToken = null;
+                    });
+                }
+                return refreshingToken;
+            } else {
+                $state.go("home");
+            }
+        }
+    });
+}]);
+"use strict";
+
+angular.module("retro").run(["$ionicPlatform", function ($ionicPlatform) {
+    $ionicPlatform.ready(function () {
+        if (window.cordova && window.cordova.plugins.Keyboard) {
+            window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+        }
+
+        if (window.StatusBar) {
+            window.StatusBar.styleDefault();
+        }
+    });
+}]);
+"use strict";
+
+angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$stateProvider", function ($ionicConfigProvider, $urlRouterProvider, $stateProvider) {
+
+    $ionicConfigProvider.views.swipeBackEnabled(false);
+
+    $urlRouterProvider.otherwise("/");
+
+    $stateProvider.state("home", {
+        url: "/",
+        templateUrl: "index",
+        controller: "HomeController"
+    }).state("create", {
+        url: "/create",
+        templateUrl: "createchar",
+        controller: "CreateCharacterController",
+        data: { requiresLogin: true }
+    }).state("player", {
+        url: "/player",
+        templateUrl: "player",
+        controller: "PlayerController",
+        data: { requiresLogin: true }
+    }).state("changeclass", {
+        url: "/changeclass",
+        templateUrl: "changeclass",
+        controller: "ClassChangeController",
+        data: { requiresLogin: true }
+    }).state("inventory", {
+        url: "/inventory",
+        templateUrl: "inventory",
+        controller: "InventoryController",
+        data: { requiresLogin: true }
+    }).state("inventory.armor", {
+        url: "/armor",
+        views: {
+            "armor-tab": {
+                templateUrl: "inventory-tab-armor"
+            }
+        },
+        data: { requiresLogin: true }
+    }).state("inventory.weapons", {
+        url: "/weapons",
+        views: {
+            "weapons-tab": {
+                templateUrl: "inventory-tab-weapons"
+            }
+        },
+        data: { requiresLogin: true }
+    }).state("inventory.items", {
+        url: "/items",
+        views: {
+            "items-tab": {
+                templateUrl: "inventory-tab-items"
+            }
+        },
+        data: { requiresLogin: true }
+    }).state("options", {
+        url: "/options",
+        templateUrl: "options",
+        data: { requiresLogin: true }
+    }).state("explore", {
+        url: "/explore",
+        templateUrl: "explore",
+        controller: "ExploreController",
+        data: { requiresLogin: true }
+    });
+}]);
 "use strict";
 
 angular.module("retro").constant("CLASSES", {
@@ -152,77 +274,6 @@ angular.module("retro").constant("MAP_STYLE", [{
 }]);
 "use strict";
 
-angular.module("retro").run(["$ionicPlatform", function ($ionicPlatform) {
-    $ionicPlatform.ready(function () {
-        if (window.cordova && window.cordova.plugins.Keyboard) {
-            window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-        }
-
-        if (window.StatusBar) {
-            window.StatusBar.styleDefault();
-        }
-    });
-}]);
-"use strict";
-
-angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$stateProvider", function ($ionicConfigProvider, $urlRouterProvider, $stateProvider) {
-
-    $ionicConfigProvider.views.swipeBackEnabled(false);
-
-    $urlRouterProvider.otherwise("/");
-
-    $stateProvider.state("home", {
-        url: "/",
-        templateUrl: "index",
-        controller: "HomeController"
-    }).state("create", {
-        url: "/create",
-        templateUrl: "createchar",
-        controller: "CreateCharacterController"
-    }).state("player", {
-        url: "/player",
-        templateUrl: "player",
-        controller: "PlayerController"
-    }).state("changeclass", {
-        url: "/changeclass",
-        templateUrl: "changeclass",
-        controller: "ClassChangeController"
-    }).state("inventory", {
-        url: "/inventory",
-        templateUrl: "inventory",
-        controller: "InventoryController"
-    }).state("inventory.armor", {
-        url: "/armor",
-        views: {
-            "armor-tab": {
-                templateUrl: "inventory-tab-armor"
-            }
-        }
-    }).state("inventory.weapons", {
-        url: "/weapons",
-        views: {
-            "weapons-tab": {
-                templateUrl: "inventory-tab-weapons"
-            }
-        }
-    }).state("inventory.items", {
-        url: "/items",
-        views: {
-            "items-tab": {
-                templateUrl: "inventory-tab-items"
-            }
-        }
-    }).state("options", {
-        url: "/options",
-        templateUrl: "options"
-    }).state("explore", {
-        url: "/explore",
-        templateUrl: "explore",
-        controller: "ExploreController"
-    });
-}]);
-"use strict";
-
 angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
     $scope.player = Player.get();
     $scope.CLASSES = CLASSES;
@@ -325,7 +376,7 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
 }]);
 "use strict";
 
-angular.module("retro").controller("HomeController", ["$scope", "$http", "$state", "LocationWatcher", "Auth", function ($scope, $http, $state, LocationWatcher, Auth) {
+angular.module("retro").controller("HomeController", ["$scope", "LocationWatcher", "Auth", function ($scope, LocationWatcher, Auth) {
     $scope.auth = Auth;
 }]);
 "use strict";
@@ -434,78 +485,28 @@ angular.module("retro").directive("map", ["MAP_STYLE", "$cordovaToast", "Google"
 }]);
 "use strict";
 
-angular.module("retro").service("Auth", ["$http", "$localStorage", "$cordovaOauth", "OAUTH_KEYS", "NewHero", "AuthFlow", function ($http, $localStorage, $cordovaOauth, OAUTH_KEYS, NewHero, AuthFlow) {
+angular.module("retro").service("Auth", ["$localStorage", "$state", "auth", "AuthFlow", function ($localStorage, $state, auth, AuthFlow) {
 
-    var auth = {
-        _cleanup: function () {
-            var except = arguments[0] === undefined ? [] : arguments[0];
+    var localAuth = {
+        login: function () {
+            auth.signin({
+                authParams: {
+                    scope: "openid offline_access email",
+                    device: "Mobile device"
+                }
+            }, function (profile, token, accessToken, state, refreshToken) {
+                $localStorage.profile = profile;
+                $localStorage.token = token;
+                $localStorage.refreshToken = refreshToken;
 
-            _.each(_.difference(["facebookId", "googleId"], except), function (key) {
-                delete $localStorage[key];
-                delete NewHero[key];
+                AuthFlow.tryAuth();
+            }, function (err) {
+                console.log("failed", JSON.stringify(err));
             });
-        },
-        facebook: {
-            creds: function () {
-                if ($localStorage.facebookToken) {
-                    auth.facebook.login();
-                    return;
-                }
-
-                $cordovaOauth.facebook(OAUTH_KEYS.facebook, ["email"]).then(function (result) {
-                    $localStorage.facebookToken = result.access_token; //jshint ignore:line
-                    auth.facebook.login();
-                }, function (error) {
-                    console.log("FACEBOOK", error);
-                });
-            },
-            login: function () {
-                var fail = function () {
-                    $http.get("https://graph.facebook.com/me?fields=id&access_token=" + $localStorage.facebookToken).then(function (res) {
-                        NewHero.facebookId = $localStorage.facebookId = res.data.id;
-                        AuthFlow.tryAuth("facebook");
-                    });
-                };
-
-                if ($localStorage.facebookId) {
-                    AuthFlow.tryAuth("facebook");
-                } else {
-                    fail();
-                }
-            }
-        },
-        google: {
-            creds: function () {
-                if ($localStorage.googleToken) {
-                    auth.google.login();
-                    return;
-                }
-
-                $cordovaOauth.google(OAUTH_KEYS.google, ["email", "profile"]).then(function (result) {
-                    $localStorage.googleToken = result.access_token; //jshint ignore:line
-                    auth.google.login();
-                }, function (error) {
-                    console.log("GOOGLE", error);
-                });
-            },
-            login: function () {
-                var fail = function () {
-                    $http.get("https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + $localStorage.googleToken).then(function (res) {
-                        NewHero.googleId = $localStorage.googleId = res.data.email;
-                        AuthFlow.tryAuth("google");
-                    });
-                };
-
-                if ($localStorage.googleId) {
-                    AuthFlow.tryAuth("google");
-                } else {
-                    fail();
-                }
-            }
         }
     };
 
-    return auth;
+    return localAuth;
 }]);
 "use strict";
 
@@ -517,28 +518,37 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
             });
             $state.go("player");
         },
-        tryAuth: function (authsource) {
+        tryAuth: function () {
             var fail = function () {
                 return $state.go("create");
             };
 
-            if ($localStorage.facebookId || $localStorage.googleId) {
-                flow.login(_.clone($localStorage), authsource, true).then(null, fail);
+            if ($localStorage.profile.user_id) {
+                // jshint ignore:line
+                flow.login(_.clone($localStorage), true).then(null, fail);
             } else {
                 fail();
             }
         },
-        login: function (NewHero, authsource) {
-            var swallow = arguments[2] === undefined ? false : arguments[2];
+        login: function (NewHeroProto) {
+            var swallow = arguments[1] === undefined ? false : arguments[1];
 
             var defer = $q.defer();
+
+            var NewHero = {
+                name: NewHeroProto.name,
+                profession: NewHeroProto.profession,
+                user_id: NewHeroProto.profile.user_id,
+                token: NewHeroProto.token
+            };
+
+            console.log(JSON.stringify(NewHero));
 
             var currentLocation = LocationWatcher.current();
             if (!currentLocation) {
                 return $cordovaToast.showLongBottom("No current location. Is your GPS on?");
             }
 
-            NewHero.authsource = authsource;
             NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
 
             socket.emit("login", NewHero, function (err, success) {

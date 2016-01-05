@@ -6,24 +6,33 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
             });
             $state.go('player');
         },
-        tryAuth: (authsource) => {
+        tryAuth: () => {
             var fail = () => $state.go('create');
 
-            if($localStorage.facebookId || $localStorage.googleId) {
-                flow.login(_.clone($localStorage), authsource, true).then(null, fail);
+
+            if($localStorage.profile.user_id) { // jshint ignore:line
+                flow.login(_.clone($localStorage), true).then(null, fail);
             } else {
                 fail();
             }
         },
-        login: (NewHero, authsource, swallow = false) => {
+        login: (NewHeroProto, swallow = false) => {
             var defer = $q.defer();
+
+            var NewHero = {
+                name: NewHeroProto.name,
+                profession: NewHeroProto.profession,
+                user_id: NewHeroProto.profile.user_id,
+                token: NewHeroProto.token
+            };
+
+            console.log(JSON.stringify(NewHero));
 
             var currentLocation = LocationWatcher.current();
             if(!currentLocation) {
                 return $cordovaToast.showLongBottom('No current location. Is your GPS on?');
             }
 
-            NewHero.authsource = authsource;
             NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
 
             socket.emit('login', NewHero, (err, success) => {
