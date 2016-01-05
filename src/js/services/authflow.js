@@ -9,7 +9,6 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
         tryAuth: () => {
             var fail = () => $state.go('create');
 
-
             if($localStorage.profile.user_id) { // jshint ignore:line
                 flow.login(_.clone($localStorage), true).then(null, fail);
             } else {
@@ -22,11 +21,9 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
             var NewHero = {
                 name: NewHeroProto.name,
                 profession: NewHeroProto.profession,
-                user_id: NewHeroProto.profile.user_id,
+                userId: NewHeroProto.profile.user_id,
                 token: NewHeroProto.token
             };
-
-            console.log(JSON.stringify(NewHero));
 
             var currentLocation = LocationWatcher.current();
             if(!currentLocation) {

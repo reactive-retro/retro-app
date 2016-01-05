@@ -538,11 +538,9 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
             var NewHero = {
                 name: NewHeroProto.name,
                 profession: NewHeroProto.profession,
-                user_id: NewHeroProto.profile.user_id,
+                userId: NewHeroProto.profile.user_id,
                 token: NewHeroProto.token
             };
-
-            console.log(JSON.stringify(NewHero));
 
             var currentLocation = LocationWatcher.current();
             if (!currentLocation) {
