@@ -28,9 +28,7 @@ angular.module('retro')
                 autologin();
             } else {
                 if (refreshToken) {
-                    console.log('refresh token');
                     if (refreshingToken === null) {
-                        console.log('no refreshing token');
                         refreshingToken = auth.refreshIdToken(refreshToken).then((idToken) => {
                             $localStorage.token = idToken;
                             auth.authenticate(profile, idToken);
