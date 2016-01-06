@@ -17,6 +17,7 @@ angular.module('retro')
 
         let refreshingToken = null;
         $rootScope.$on('$locationChangeStart', () => {
+            if(AuthFlow.isLoggedIn) { return; }
 
             const {token, refreshToken, profile} = $localStorage;
             if(!token) { return; }

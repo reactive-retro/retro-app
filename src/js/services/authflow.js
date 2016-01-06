@@ -39,6 +39,7 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
                     defer.resolve();
                     Player.set(success.player);
                     flow.toPlayer();
+                    flow.isLoggedIn = true;
                 }
 
                 if(!swallow) {
