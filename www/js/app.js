@@ -16,8 +16,16 @@ angular.module("retro").config(["authProvider", function (authProvider) {
         clientID: "ucMSnNDYLGdDBL2uppganZv2jKzzJiI0",
         loginState: "home"
     });
-}]).run(["auth", "$localStorage", "$rootScope", "$state", "jwtHelper", function (auth, $localStorage, $rootScope, $state, jwtHelper) {
+}]).run(["auth", "$localStorage", "$rootScope", "$state", "jwtHelper", "AuthFlow", function (auth, $localStorage, $rootScope, $state, jwtHelper, AuthFlow) {
     auth.hookEvents();
+
+    var autologin = function () {
+        if (!auth.isAuthenticated || !$localStorage.profile || !$localStorage.profile.user_id) {
+            return;
+        } // jshint ignore:line
+
+        AuthFlow.login(_.clone($localStorage), true);
+    };
 
     var refreshingToken = null;
     $rootScope.$on("$locationChangeStart", function () {
@@ -33,12 +41,16 @@ angular.module("retro").config(["authProvider", function (authProvider) {
             if (!auth.isAuthenticated) {
                 auth.authenticate(profile, token);
             }
+            autologin();
         } else {
             if (refreshToken) {
+                console.log("refresh token");
                 if (refreshingToken === null) {
+                    console.log("no refreshing token");
                     refreshingToken = auth.refreshIdToken(refreshToken).then(function (idToken) {
                         $localStorage.token = idToken;
                         auth.authenticate(profile, idToken);
+                        autologin();
                     })["finally"](function () {
                         refreshingToken = null;
                     });
@@ -129,148 +141,6 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
         controller: "ExploreController",
         data: { requiresLogin: true }
     });
-}]);
-"use strict";
-
-angular.module("retro").constant("CLASSES", {
-    Cleric: "Clerics specialize in healing their companions.",
-    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
-    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!"
-});
-"use strict";
-
-angular.module("retro").constant("OAUTH_KEYS", {
-    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
-    reddit: "CKzP2LKr74VwYw",
-    facebook: "102489756752863"
-});
-"use strict";
-
-angular.module("retro").constant("MAP_STYLE", [{
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{
-        visibility: "on"
-    }, {
-        color: "#aee2e0"
-    }]
-}, {
-    featureType: "landscape",
-    elementType: "geometry.fill",
-    stylers: [{
-        color: "#abce83"
-    }]
-}, {
-    featureType: "poi",
-    elementType: "geometry.fill",
-    stylers: [{
-        color: "#769E72"
-    }]
-}, {
-    featureType: "poi",
-    elementType: "labels.text.fill",
-    stylers: [{
-        color: "#7B8758"
-    }]
-}, {
-    featureType: "poi",
-    elementType: "labels.text.stroke",
-    stylers: [{
-        color: "#EBF4A4"
-    }]
-}, {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{
-        visibility: "simplified"
-    }, {
-        color: "#8dab68"
-    }]
-}, {
-    featureType: "road",
-    elementType: "geometry.fill",
-    stylers: [{
-        visibility: "simplified"
-    }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{
-        color: "#5B5B3F"
-    }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.stroke",
-    stylers: [{
-        color: "#ABCE83"
-    }]
-}, {
-    featureType: "road",
-    elementType: "labels.icon",
-    stylers: [{
-        visibility: "off"
-    }]
-}, {
-    featureType: "road.local",
-    elementType: "geometry",
-    stylers: [{
-        color: "#A4C67D"
-    }]
-}, {
-    featureType: "road.arterial",
-    elementType: "geometry",
-    stylers: [{
-        color: "#9BBF72"
-    }]
-}, {
-    featureType: "road.highway",
-    elementType: "geometry",
-    stylers: [{
-        color: "#EBF4A4"
-    }]
-}, {
-    featureType: "transit",
-    stylers: [{
-        visibility: "off"
-    }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.stroke",
-    stylers: [{
-        visibility: "on"
-    }, {
-        color: "#87ae79"
-    }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.fill",
-    stylers: [{
-        color: "#7f2200"
-    }, {
-        visibility: "off"
-    }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.stroke",
-    stylers: [{
-        color: "#ffffff"
-    }, {
-        visibility: "on"
-    }, {
-        weight: 4.1
-    }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.fill",
-    stylers: [{
-        color: "#495421"
-    }]
-}, {
-    featureType: "administrative.neighborhood",
-    elementType: "labels",
-    stylers: [{
-        visibility: "off"
-    }]
 }]);
 "use strict";
 
@@ -547,6 +417,148 @@ angular.module("retro").directive("map", ["MAP_STYLE", "$cordovaToast", "Google"
             }
         }
     };
+}]);
+"use strict";
+
+angular.module("retro").constant("CLASSES", {
+    Cleric: "Clerics specialize in healing their companions.",
+    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
+    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!"
+});
+"use strict";
+
+angular.module("retro").constant("OAUTH_KEYS", {
+    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
+    reddit: "CKzP2LKr74VwYw",
+    facebook: "102489756752863"
+});
+"use strict";
+
+angular.module("retro").constant("MAP_STYLE", [{
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{
+        visibility: "on"
+    }, {
+        color: "#aee2e0"
+    }]
+}, {
+    featureType: "landscape",
+    elementType: "geometry.fill",
+    stylers: [{
+        color: "#abce83"
+    }]
+}, {
+    featureType: "poi",
+    elementType: "geometry.fill",
+    stylers: [{
+        color: "#769E72"
+    }]
+}, {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{
+        color: "#7B8758"
+    }]
+}, {
+    featureType: "poi",
+    elementType: "labels.text.stroke",
+    stylers: [{
+        color: "#EBF4A4"
+    }]
+}, {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{
+        visibility: "simplified"
+    }, {
+        color: "#8dab68"
+    }]
+}, {
+    featureType: "road",
+    elementType: "geometry.fill",
+    stylers: [{
+        visibility: "simplified"
+    }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{
+        color: "#5B5B3F"
+    }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.stroke",
+    stylers: [{
+        color: "#ABCE83"
+    }]
+}, {
+    featureType: "road",
+    elementType: "labels.icon",
+    stylers: [{
+        visibility: "off"
+    }]
+}, {
+    featureType: "road.local",
+    elementType: "geometry",
+    stylers: [{
+        color: "#A4C67D"
+    }]
+}, {
+    featureType: "road.arterial",
+    elementType: "geometry",
+    stylers: [{
+        color: "#9BBF72"
+    }]
+}, {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{
+        color: "#EBF4A4"
+    }]
+}, {
+    featureType: "transit",
+    stylers: [{
+        visibility: "off"
+    }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{
+        visibility: "on"
+    }, {
+        color: "#87ae79"
+    }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.fill",
+    stylers: [{
+        color: "#7f2200"
+    }, {
+        visibility: "off"
+    }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.stroke",
+    stylers: [{
+        color: "#ffffff"
+    }, {
+        visibility: "on"
+    }, {
+        weight: 4.1
+    }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.fill",
+    stylers: [{
+        color: "#495421"
+    }]
+}, {
+    featureType: "administrative.neighborhood",
+    elementType: "labels",
+    stylers: [{
+        visibility: "off"
+    }]
 }]);
 "use strict";
 

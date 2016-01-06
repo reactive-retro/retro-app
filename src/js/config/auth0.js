@@ -6,8 +6,14 @@ angular.module('retro')
             loginState: 'home'
         });
     })
-    .run((auth, $localStorage, $rootScope, $state, jwtHelper) => {
+    .run((auth, $localStorage, $rootScope, $state, jwtHelper, AuthFlow) => {
         auth.hookEvents();
+
+        const autologin = () => {
+            if(!auth.isAuthenticated || !$localStorage.profile || !$localStorage.profile.user_id) { return; } // jshint ignore:line
+
+            AuthFlow.login(_.clone($localStorage), true);
+        };
 
         let refreshingToken = null;
         $rootScope.$on('$locationChangeStart', () => {
@@ -19,12 +25,16 @@ angular.module('retro')
                 if (!auth.isAuthenticated) {
                     auth.authenticate(profile, token);
                 }
+                autologin();
             } else {
                 if (refreshToken) {
+                    console.log('refresh token');
                     if (refreshingToken === null) {
+                        console.log('no refreshing token');
                         refreshingToken = auth.refreshIdToken(refreshToken).then((idToken) => {
                             $localStorage.token = idToken;
                             auth.authenticate(profile, idToken);
+                            autologin();
                         }).finally(() => {
                             refreshingToken = null;
                         });
