@@ -297,7 +297,55 @@ angular.module("retro").controller("CreateCharacterController", ["$scope", "NewH
 }]);
 "use strict";
 
-angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", function ($scope, $ionicLoading, Player, LocationWatcher) {
+angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", function ($scope, $ionicLoading, Player, LocationWatcher, Google) {
+
+    // TODO refactor all of this into services, the directive, etc, maybe make the directive take a places array
+    // TODO use radius to get a list of places
+
+    var MAX_VIEW_RADIUS = 5000; //meters
+
+    var bounds = new google.maps.LatLngBounds();
+
+    var mercatorWorldBounds = [new Google.maps.LatLng(85, 180), new Google.maps.LatLng(85, 90), new Google.maps.LatLng(85, 0), new Google.maps.LatLng(85, -90), new Google.maps.LatLng(85, -180), new Google.maps.LatLng(0, -180), new Google.maps.LatLng(-85, -180), new Google.maps.LatLng(-85, -90), new Google.maps.LatLng(-85, 0), new Google.maps.LatLng(-85, 90), new Google.maps.LatLng(-85, 180), new Google.maps.LatLng(0, 180), new Google.maps.LatLng(85, 180)];
+
+    // radius in meters
+    var drawCircle = function (point, radius) {
+        var d2r = Math.PI / 180; // degrees to radians
+        var r2d = 180 / Math.PI; // radians to degrees
+        var earthsradius = 3963; // 3963 is the radius of the earth in miles
+        var points = 32;
+
+        // find the radius in lat/lon - convert meters to miles
+        var rlat = radius * 0.000621371192 / earthsradius * r2d;
+        var rlng = rlat / Math.cos(point.lat() * d2r);
+
+        var start = points + 1;
+        var end = 0;
+
+        var extp = [];
+
+        for (var i = start; i > end; i--) {
+            var theta = Math.PI * (i / (points / 2));
+            var ey = point.lng() + rlng * Math.cos(theta); // center a + radius x * cos(theta)
+            var ex = point.lat() + rlat * Math.sin(theta); // center b + radius y * sin(theta)
+            extp.push(new Google.maps.LatLng(ex, ey));
+            bounds.extend(extp[extp.length - 1]);
+        }
+        return extp;
+    };
+
+    $scope.addEvents = function () {
+        var lastValidCenter = null;
+
+        google.maps.event.addListener($scope.map, "center_changed", function () {
+            if (bounds.contains($scope.map.getCenter())) {
+                lastValidCenter = $scope.map.getCenter();
+                return;
+            }
+
+            $scope.map.panTo(lastValidCenter);
+        });
+    };
 
     // http://stackoverflow.com/questions/365826/calculate-distance-between-2-gps-coordinates
 
@@ -308,14 +356,17 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
         $scope.centerOn(position);
         $scope.drawHomepoint(Player.get().homepoint);
         $scope.findMe();
+        $scope.addEvents();
     };
 
     $scope.drawHomepoint = function (coords) {
-        $scope.homepoint = new google.maps.Marker({
-            position: new google.maps.LatLng(coords.lat, coords.lon),
+        var homepointCenter = new Google.maps.LatLng(coords.lat, coords.lon);
+
+        $scope.homepoint = new Google.maps.Marker({
+            position: homepointCenter,
             map: $scope.map,
             icon: {
-                path: google.maps.SymbolPath.CIRCLE,
+                path: Google.maps.SymbolPath.CIRCLE,
                 strokeColor: "#00ff00",
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
@@ -324,14 +375,25 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
                 scale: 5
             }
         });
+
+        var miasmaOptions = {
+            strokeColor: "#000000",
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: "#000000",
+            fillOpacity: 0.35,
+            map: $scope.map,
+            paths: [mercatorWorldBounds, drawCircle(homepointCenter, MAX_VIEW_RADIUS)]
+        };
+        $scope.miasma = new Google.maps.Polygon(miasmaOptions);
     };
 
     $scope.drawMe = function (coords) {
-        $scope.curPos = new google.maps.Marker({
-            position: new google.maps.LatLng(coords.latitude, coords.longitude),
+        $scope.curPos = new Google.maps.Marker({
+            position: new Google.maps.LatLng(coords.latitude, coords.longitude),
             map: $scope.map,
             icon: {
-                path: google.maps.SymbolPath.CIRCLE,
+                path: Google.maps.SymbolPath.CIRCLE,
                 strokeColor: "#0000ff",
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
@@ -341,7 +403,7 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
             }
         });
 
-        var affectRadius = new google.maps.Circle({
+        var affectRadius = new Google.maps.Circle({
             fillColor: "#ff00ff",
             strokeColor: "#ff00ff",
             strokeWeight: 1,
@@ -353,6 +415,10 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
     };
 
     $scope.findMe = function () {
+        LocationWatcher.ready.then($scope.centerOn);
+    };
+
+    $scope.watchMe = function () {
         LocationWatcher.watch.then(null, null, function (coords) {
             $scope.centerOn(coords);
         });
@@ -362,8 +428,10 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
         if (!$scope.map) {
             return;
         }
-
-        var position = new google.maps.LatLng(coords.latitude, coords.longitude);
+        if (!coords.latitude || !coords.longitude) {
+            return;
+        }
+        var position = new Google.maps.LatLng(coords.latitude, coords.longitude);
 
         $scope.map.setCenter(position);
 
@@ -447,16 +515,13 @@ angular.module("retro").directive("map", ["MAP_STYLE", "$cordovaToast", "Google"
 
             // TODO also hit google places for a 25mile radius once upon map creation
             // this is the available list of places in the game
-
-            // TODO store a home point separate from login point, but when creating a character set it to their current location
-            // make an option to let them set it to their current point
             var init = function () {
                 var mapOptions = {
                     center: new Google.maps.LatLng(32.3078, -64.7505),
                     zoom: 17,
                     mapTypeId: Google.maps.MapTypeId.ROADMAP,
-                    draggable: false,
-                    minZoom: 17,
+                    draggable: true,
+                    minZoom: 15,
                     maxZoom: 17,
                     styles: MAP_STYLE,
                     mapTypeControlOptions: { mapTypeIds: [] },
@@ -621,6 +686,7 @@ angular.module("retro").service("Google", function () {
 angular.module("retro").service("LocationWatcher", ["$q", function ($q) {
 
     var defer = $q.defer();
+    var ready = $q.defer();
 
     var error = function () {
         console.log("GPS turned off, or connection errored.");
@@ -636,6 +702,7 @@ angular.module("retro").service("LocationWatcher", ["$q", function ($q) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 currentCoords = position.coords;
                 defer.notify(currentCoords);
+                ready.resolve(currentCoords);
             }, error, { timeout: 10000 });
 
             navigator.geolocation.watchPosition(function (position) {
@@ -644,6 +711,7 @@ angular.module("retro").service("LocationWatcher", ["$q", function ($q) {
             }, error, { timeout: 30000 });
         },
 
+        ready: ready.promise,
         watch: defer.promise
     };
 
