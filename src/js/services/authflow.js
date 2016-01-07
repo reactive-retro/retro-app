@@ -1,4 +1,4 @@
-angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $localStorage, $state, Player, LocationWatcher, socket) => {
+angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $localStorage, $state, Player, Settings, LocationWatcher, socket) => {
     var flow = {
         toPlayer: () => {
             $ionicHistory.nextViewOptions({
@@ -16,12 +16,12 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
             }
         },
         login: (NewHeroProto, swallow = false) => {
-            var defer = $q.defer();
+            var defer = Settings.isReady = $q.defer();
 
             var NewHero = {
                 name: NewHeroProto.name,
                 profession: NewHeroProto.profession,
-                userId: NewHeroProto.profile.user_id,
+                userId: NewHeroProto.profile.user_id, //jshint ignore:line
                 token: NewHeroProto.token
             };
 
@@ -38,6 +38,7 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
                 } else {
                     defer.resolve();
                     Player.set(success.player);
+                    _.extend(Settings, success.settings);
                     flow.toPlayer();
                     flow.isLoggedIn = true;
                 }

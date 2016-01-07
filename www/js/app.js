@@ -3,10 +3,17 @@
 angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage", "auth0", "angular-jwt"]);
 "use strict";
 
-angular.module("retro").constant("DEV_CFG", {
-    protocol: "https",
-    url: "reactive-retro.herokuapp.com",
-    port: 80
+angular.module("retro").constant("Config", {
+    _cfg: "DEV",
+    DEV: {
+        url: "192.168.1.10",
+        port: 8080
+    },
+    PROD: {
+        protocol: "https",
+        url: "reactive-retro.herokuapp.com",
+        port: 80
+    }
 });
 "use strict";
 
@@ -98,17 +105,32 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
         url: "/player",
         templateUrl: "player",
         controller: "PlayerController",
-        data: { requiresLogin: true }
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
     }).state("changeclass", {
         url: "/changeclass",
         templateUrl: "changeclass",
         controller: "ClassChangeController",
-        data: { requiresLogin: true }
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
     }).state("inventory", {
         url: "/inventory",
         templateUrl: "inventory",
         controller: "InventoryController",
-        data: { requiresLogin: true }
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
     }).state("inventory.armor", {
         url: "/armor",
         views: {
@@ -116,7 +138,12 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
                 templateUrl: "inventory-tab-armor"
             }
         },
-        data: { requiresLogin: true }
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
     }).state("inventory.weapons", {
         url: "/weapons",
         views: {
@@ -124,7 +151,12 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
                 templateUrl: "inventory-tab-weapons"
             }
         },
-        data: { requiresLogin: true }
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
     }).state("inventory.items", {
         url: "/items",
         views: {
@@ -132,16 +164,30 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
                 templateUrl: "inventory-tab-items"
             }
         },
-        data: { requiresLogin: true }
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
     }).state("options", {
         url: "/options",
         templateUrl: "options",
-        data: { requiresLogin: true }
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
     }).state("explore", {
         url: "/explore",
         templateUrl: "explore",
         controller: "ExploreController",
-        data: { requiresLogin: true }
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
     });
 }]);
 "use strict";
@@ -169,12 +215,11 @@ angular.module("retro").controller("CreateCharacterController", ["$scope", "NewH
 }]);
 "use strict";
 
-angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", function ($scope, $ionicLoading, Player, LocationWatcher, Google) {
+angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "Settings", function ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings) {
 
     // TODO refactor all of this into services, the directive, etc, maybe make the directive take a places array
-    // TODO use radius to get a list of places
 
-    var MAX_VIEW_RADIUS = 5000; //meters
+    var MAX_VIEW_RADIUS = Settings.RADIUS || 5000; //meters
 
     var bounds = new google.maps.LatLngBounds();
 
@@ -589,7 +634,7 @@ angular.module("retro").service("Auth", ["$localStorage", "$state", "auth", "Aut
 }]);
 "use strict";
 
-angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToast", "$localStorage", "$state", "Player", "LocationWatcher", "socket", function ($q, $ionicHistory, $cordovaToast, $localStorage, $state, Player, LocationWatcher, socket) {
+angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToast", "$localStorage", "$state", "Player", "Settings", "LocationWatcher", "socket", function ($q, $ionicHistory, $cordovaToast, $localStorage, $state, Player, Settings, LocationWatcher, socket) {
     var flow = {
         toPlayer: function () {
             $ionicHistory.nextViewOptions({
@@ -612,12 +657,12 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
         login: function (NewHeroProto) {
             var swallow = arguments[1] === undefined ? false : arguments[1];
 
-            var defer = $q.defer();
+            var defer = Settings.isReady = $q.defer();
 
             var NewHero = {
                 name: NewHeroProto.name,
                 profession: NewHeroProto.profession,
-                userId: NewHeroProto.profile.user_id,
+                userId: NewHeroProto.profile.user_id, //jshint ignore:line
                 token: NewHeroProto.token
             };
 
@@ -634,6 +679,7 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
                 } else {
                     defer.resolve();
                     Player.set(success.player);
+                    _.extend(Settings, success.settings);
                     flow.toPlayer();
                     flow.isLoggedIn = true;
                 }
@@ -876,8 +922,11 @@ angular.module("retro").service("Player", ["$q", function ($q) {
 }]);
 "use strict";
 
+angular.module("retro").service("Settings", function () {});
+"use strict";
+
 angular.module("retro").service("socketCluster", ["$window", function ($window) {
     return $window.socketCluster;
-}]).service("socket", ["DEV_CFG", "socketCluster", function (DEV_CFG, socketCluster) {
-    return socketCluster.connect({ protocol: DEV_CFG.protocol, hostname: DEV_CFG.url, port: DEV_CFG.port });
+}]).service("socket", ["Config", "socketCluster", function (Config, socketCluster) {
+    return socketCluster.connect({ protocol: Config[Config._cfg].protocol, hostname: Config[Config._cfg].url, port: Config[Config._cfg].port });
 }]);

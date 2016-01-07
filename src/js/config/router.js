@@ -20,19 +20,28 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
             url: '/player',
             templateUrl: 'player',
             controller: 'PlayerController',
-            data: { requiresLogin: true }
+            data: { requiresLogin: true },
+            resolve: {
+                playerLoaded: ($injector) => $injector.get('Settings').isReady
+            }
         })
         .state('changeclass', {
             url: '/changeclass',
             templateUrl: 'changeclass',
             controller: 'ClassChangeController',
-            data: { requiresLogin: true }
+            data: { requiresLogin: true },
+            resolve: {
+                playerLoaded: ($injector) => $injector.get('Settings').isReady
+            }
         })
         .state('inventory', {
             url: '/inventory',
             templateUrl: 'inventory',
             controller: 'InventoryController',
-            data: { requiresLogin: true }
+            data: { requiresLogin: true },
+            resolve: {
+                playerLoaded: ($injector) => $injector.get('Settings').isReady
+            }
         })
         .state('inventory.armor', {
             url: '/armor',
@@ -41,7 +50,10 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
                     templateUrl: 'inventory-tab-armor'
                 }
             },
-            data: { requiresLogin: true }
+            data: { requiresLogin: true },
+            resolve: {
+                playerLoaded: ($injector) => $injector.get('Settings').isReady
+            }
         })
         .state('inventory.weapons', {
             url: '/weapons',
@@ -50,7 +62,10 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
                     templateUrl: 'inventory-tab-weapons'
                 }
             },
-            data: { requiresLogin: true }
+            data: { requiresLogin: true },
+            resolve: {
+                playerLoaded: ($injector) => $injector.get('Settings').isReady
+            }
         })
         .state('inventory.items', {
             url: '/items',
@@ -59,17 +74,25 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
                     templateUrl: 'inventory-tab-items'
                 }
             },
-            data: { requiresLogin: true }
+            data: { requiresLogin: true },
+            resolve: {
+                playerLoaded: ($injector) => $injector.get('Settings').isReady
+            }
         })
         .state('options', {
             url: '/options',
             templateUrl: 'options',
-            data: { requiresLogin: true }
+            data: { requiresLogin: true },
+            resolve: {
+                playerLoaded: ($injector) => $injector.get('Settings').isReady
+            }
         })
         .state('explore', {
             url: '/explore',
             templateUrl: 'explore',
             controller: 'ExploreController',
-            data: { requiresLogin: true }
+            resolve: {
+                playerLoaded: ($injector) => $injector.get('Settings').isReady
+            }
         });
 });

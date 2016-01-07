@@ -1,3 +1,3 @@
 angular.module('retro')
     .service('socketCluster', ($window) => $window.socketCluster)
-    .service('socket', (DEV_CFG, socketCluster) => socketCluster.connect({protocol: DEV_CFG.protocol, hostname: DEV_CFG.url, port: DEV_CFG.port}));
+    .service('socket', (Config, socketCluster) => socketCluster.connect({protocol: Config[Config._cfg].protocol, hostname: Config[Config._cfg].url, port: Config[Config._cfg].port}));

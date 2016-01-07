@@ -1,10 +1,9 @@
 angular.module('retro').controller('ExploreController',
-    ($scope, $ionicLoading, Player, LocationWatcher, Google) => {
+    ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings) => {
 
         // TODO refactor all of this into services, the directive, etc, maybe make the directive take a places array
-        // TODO use radius to get a list of places
 
-        const MAX_VIEW_RADIUS = 5000; //meters
+        const MAX_VIEW_RADIUS = Settings.RADIUS || 5000; //meters
 
         const bounds = new google.maps.LatLngBounds();
 
