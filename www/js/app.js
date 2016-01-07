@@ -335,6 +335,70 @@ angular.module("retro").constant("MAP_STYLE", [{
 }]);
 "use strict";
 
+angular.module("retro").directive("colorText", function () {
+    return {
+        restrict: "E",
+        template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            ",
+        link: function (scope, elem, attrs) {
+            scope.preText = attrs.preText;
+            attrs.$observe("value", function (val) {
+                return scope.value = val;
+            });
+        }
+    };
+});
+"use strict";
+
+angular.module("retro").directive("map", ["MAP_STYLE", "$cordovaToast", "Google", function (MAP_STYLE, $cordovaToast, Google) {
+    return {
+        restrict: "E",
+        scope: {
+            onCreate: "&"
+        },
+        link: function ($scope, $element) {
+
+            if (!Google || !Google.maps) {
+                $cordovaToast.showLongBottom("Could not reach google.");
+                return;
+            }
+
+            // TODO also hit google places for a 25mile radius once upon map creation
+            // this is the available list of places in the game
+            var init = function () {
+                var mapOptions = {
+                    center: new Google.maps.LatLng(32.3078, -64.7505),
+                    zoom: 17,
+                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
+                    draggable: true,
+                    minZoom: 15,
+                    maxZoom: 17,
+                    styles: MAP_STYLE,
+                    mapTypeControlOptions: { mapTypeIds: [] },
+                    overviewMapControl: false,
+                    streetViewControl: false,
+                    zoomControl: false
+                };
+
+                var map = new Google.maps.Map($element[0], mapOptions);
+
+                $scope.onCreate({ map: map });
+
+                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
+                    e.preventDefault();
+                    return false;
+                });
+            };
+
+            if (document.readyState === "complete") {
+                init();
+            } else {
+                Google.maps.event.addDomListener(window, "load", init);
+            }
+        }
+    };
+}]);
+"use strict";
+
 angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
     $scope.player = Player.get();
     $scope.CLASSES = CLASSES;
@@ -359,10 +423,9 @@ angular.module("retro").controller("CreateCharacterController", ["$scope", "NewH
 "use strict";
 
 angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "Settings", function ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings) {
-
     // TODO refactor all of this into services, the directive, etc, maybe make the directive take a places array
 
-    var MAX_VIEW_RADIUS = Settings.RADIUS || 5000; //meters
+    var MAX_VIEW_RADIUS = Settings.RADIUS; //meters
 
     var bounds = new google.maps.LatLngBounds();
 
@@ -406,8 +469,6 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
             $scope.map.panTo(lastValidCenter);
         });
     };
-
-    // http://stackoverflow.com/questions/365826/calculate-distance-between-2-gps-coordinates
 
     $scope.mapCreated = function (map) {
         $scope.map = map;
@@ -546,70 +607,6 @@ angular.module("retro").controller("PlayerController", ["$scope", "$state", "Pla
 }]);
 "use strict";
 
-angular.module("retro").directive("colorText", function () {
-    return {
-        restrict: "E",
-        template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            ",
-        link: function (scope, elem, attrs) {
-            scope.preText = attrs.preText;
-            attrs.$observe("value", function (val) {
-                return scope.value = val;
-            });
-        }
-    };
-});
-"use strict";
-
-angular.module("retro").directive("map", ["MAP_STYLE", "$cordovaToast", "Google", function (MAP_STYLE, $cordovaToast, Google) {
-    return {
-        restrict: "E",
-        scope: {
-            onCreate: "&"
-        },
-        link: function ($scope, $element) {
-
-            if (!Google || !Google.maps) {
-                $cordovaToast.showLongBottom("Could not reach google.");
-                return;
-            }
-
-            // TODO also hit google places for a 25mile radius once upon map creation
-            // this is the available list of places in the game
-            var init = function () {
-                var mapOptions = {
-                    center: new Google.maps.LatLng(32.3078, -64.7505),
-                    zoom: 17,
-                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
-                    draggable: true,
-                    minZoom: 15,
-                    maxZoom: 17,
-                    styles: MAP_STYLE,
-                    mapTypeControlOptions: { mapTypeIds: [] },
-                    overviewMapControl: false,
-                    streetViewControl: false,
-                    zoomControl: false
-                };
-
-                var map = new Google.maps.Map($element[0], mapOptions);
-
-                $scope.onCreate({ map: map });
-
-                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
-                    e.preventDefault();
-                    return false;
-                });
-            };
-
-            if (document.readyState === "complete") {
-                init();
-            } else {
-                Google.maps.event.addDomListener(window, "load", init);
-            }
-        }
-    };
-}]);
-"use strict";
-
 angular.module("retro").service("Auth", ["$localStorage", "$state", "auth", "AuthFlow", function ($localStorage, $state, auth, AuthFlow) {
 
     var localAuth = {
@@ -660,7 +657,7 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
         login: function (NewHeroProto) {
             var swallow = arguments[1] === undefined ? false : arguments[1];
 
-            var defer = Settings.isReady = $q.defer();
+            var defer = $q.defer();
 
             var NewHero = {
                 name: NewHeroProto.name,
@@ -693,7 +690,8 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
                 }
             });
 
-            return defer.promise;
+            Settings.isReady = defer.promise;
+            return Settings.isReady;
         }
     };
     return flow;

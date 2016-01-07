@@ -2,7 +2,7 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
     var flow = {
         toPlayer: () => {
             if(!_.contains(['home', 'create'], $state.current.name)) return;
-            
+
             $ionicHistory.nextViewOptions({
                 disableBack: true
             });
@@ -18,7 +18,7 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
             }
         },
         login: (NewHeroProto, swallow = false) => {
-            var defer = Settings.isReady = $q.defer();
+            var defer = $q.defer();
 
             var NewHero = {
                 name: NewHeroProto.name,
@@ -51,7 +51,8 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
                 }
             });
 
-            return defer.promise;
+            Settings.isReady = defer.promise;
+            return Settings.isReady;
         }
     };
     return flow;

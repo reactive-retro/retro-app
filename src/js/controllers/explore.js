@@ -1,9 +1,8 @@
 angular.module('retro').controller('ExploreController',
     ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings) => {
-
         // TODO refactor all of this into services, the directive, etc, maybe make the directive take a places array
 
-        const MAX_VIEW_RADIUS = Settings.RADIUS || 5000; //meters
+        const MAX_VIEW_RADIUS = Settings.RADIUS; //meters
 
         const bounds = new google.maps.LatLngBounds();
 
@@ -61,8 +60,6 @@ angular.module('retro').controller('ExploreController',
                 $scope.map.panTo(lastValidCenter);
             });
         };
-
-        // http://stackoverflow.com/questions/365826/calculate-distance-between-2-gps-coordinates
 
         $scope.mapCreated = (map) => {
             $scope.map = map;
