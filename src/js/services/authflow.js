@@ -1,6 +1,8 @@
 angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $localStorage, $state, Player, Settings, LocationWatcher, socket) => {
     var flow = {
         toPlayer: () => {
+            if(!_.contains(['home', 'create'], $state.current.name)) return;
+            
             $ionicHistory.nextViewOptions({
                 disableBack: true
             });
