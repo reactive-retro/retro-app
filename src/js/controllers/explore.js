@@ -68,7 +68,29 @@ angular.module('retro').controller('ExploreController',
             $scope.centerOn(position);
             $scope.drawHomepoint(Player.get().homepoint);
             $scope.findMe();
+            $scope.drawPlaces(Settings.places);
             $scope.addEvents();
+        };
+
+        $scope.places = [];
+
+        $scope.drawPlaces = (places) => {
+            _.each($scope.places, place => place.setMap(null));
+            _.each(places, place => {
+                $scope.places.push(new Google.maps.Marker({
+                    position: place.geometry.location,
+                    map: $scope.map,
+                    icon: {
+                        path: Google.maps.SymbolPath.CIRCLE,
+                        strokeColor: '#ff0000',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: '#aa0000',
+                        fillOpacity: 1,
+                        scale: 5
+                    }
+                }));
+            });
         };
 
         $scope.drawHomepoint = (coords) => {

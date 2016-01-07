@@ -335,70 +335,6 @@ angular.module("retro").constant("MAP_STYLE", [{
 }]);
 "use strict";
 
-angular.module("retro").directive("colorText", function () {
-    return {
-        restrict: "E",
-        template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            ",
-        link: function (scope, elem, attrs) {
-            scope.preText = attrs.preText;
-            attrs.$observe("value", function (val) {
-                return scope.value = val;
-            });
-        }
-    };
-});
-"use strict";
-
-angular.module("retro").directive("map", ["MAP_STYLE", "$cordovaToast", "Google", function (MAP_STYLE, $cordovaToast, Google) {
-    return {
-        restrict: "E",
-        scope: {
-            onCreate: "&"
-        },
-        link: function ($scope, $element) {
-
-            if (!Google || !Google.maps) {
-                $cordovaToast.showLongBottom("Could not reach google.");
-                return;
-            }
-
-            // TODO also hit google places for a 25mile radius once upon map creation
-            // this is the available list of places in the game
-            var init = function () {
-                var mapOptions = {
-                    center: new Google.maps.LatLng(32.3078, -64.7505),
-                    zoom: 17,
-                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
-                    draggable: true,
-                    minZoom: 15,
-                    maxZoom: 17,
-                    styles: MAP_STYLE,
-                    mapTypeControlOptions: { mapTypeIds: [] },
-                    overviewMapControl: false,
-                    streetViewControl: false,
-                    zoomControl: false
-                };
-
-                var map = new Google.maps.Map($element[0], mapOptions);
-
-                $scope.onCreate({ map: map });
-
-                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
-                    e.preventDefault();
-                    return false;
-                });
-            };
-
-            if (document.readyState === "complete") {
-                init();
-            } else {
-                Google.maps.event.addDomListener(window, "load", init);
-            }
-        }
-    };
-}]);
-"use strict";
-
 angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
     $scope.player = Player.get();
     $scope.CLASSES = CLASSES;
@@ -477,7 +413,31 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
         $scope.centerOn(position);
         $scope.drawHomepoint(Player.get().homepoint);
         $scope.findMe();
+        $scope.drawPlaces(Settings.places);
         $scope.addEvents();
+    };
+
+    $scope.places = [];
+
+    $scope.drawPlaces = function (places) {
+        _.each($scope.places, function (place) {
+            return place.setMap(null);
+        });
+        _.each(places, function (place) {
+            $scope.places.push(new Google.maps.Marker({
+                position: place.geometry.location,
+                map: $scope.map,
+                icon: {
+                    path: Google.maps.SymbolPath.CIRCLE,
+                    strokeColor: "#ff0000",
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: "#aa0000",
+                    fillOpacity: 1,
+                    scale: 5
+                }
+            }));
+        });
     };
 
     $scope.drawHomepoint = function (coords) {
@@ -607,6 +567,70 @@ angular.module("retro").controller("PlayerController", ["$scope", "$state", "Pla
 }]);
 "use strict";
 
+angular.module("retro").directive("colorText", function () {
+    return {
+        restrict: "E",
+        template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            ",
+        link: function (scope, elem, attrs) {
+            scope.preText = attrs.preText;
+            attrs.$observe("value", function (val) {
+                return scope.value = val;
+            });
+        }
+    };
+});
+"use strict";
+
+angular.module("retro").directive("map", ["MAP_STYLE", "$cordovaToast", "Google", function (MAP_STYLE, $cordovaToast, Google) {
+    return {
+        restrict: "E",
+        scope: {
+            onCreate: "&"
+        },
+        link: function ($scope, $element) {
+
+            if (!Google || !Google.maps) {
+                $cordovaToast.showLongBottom("Could not reach google.");
+                return;
+            }
+
+            // TODO also hit google places for a 25mile radius once upon map creation
+            // this is the available list of places in the game
+            var init = function () {
+                var mapOptions = {
+                    center: new Google.maps.LatLng(32.3078, -64.7505),
+                    zoom: 17,
+                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
+                    draggable: true,
+                    minZoom: 15,
+                    maxZoom: 17,
+                    styles: MAP_STYLE,
+                    mapTypeControlOptions: { mapTypeIds: [] },
+                    overviewMapControl: false,
+                    streetViewControl: false,
+                    zoomControl: false
+                };
+
+                var map = new Google.maps.Map($element[0], mapOptions);
+
+                $scope.onCreate({ map: map });
+
+                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
+                    e.preventDefault();
+                    return false;
+                });
+            };
+
+            if (document.readyState === "complete") {
+                init();
+            } else {
+                Google.maps.event.addDomListener(window, "load", init);
+            }
+        }
+    };
+}]);
+"use strict";
+
 angular.module("retro").service("Auth", ["$localStorage", "$state", "auth", "AuthFlow", function ($localStorage, $state, auth, AuthFlow) {
 
     var localAuth = {
@@ -680,6 +704,7 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
                     defer.resolve();
                     Player.set(success.player);
                     _.extend(Settings, success.settings);
+                    Settings.places = success.places;
                     flow.toPlayer();
                     flow.isLoggedIn = true;
                 }
