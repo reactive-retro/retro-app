@@ -6,7 +6,7 @@ angular.module('retro').constant('Config', {
     },
     PROD: {
         protocol: 'https',
-        url: 'reactive-retro.herokuappa.com',
+        url: 'reactive-retro.herokuapp.com',
         port: 80
     }
 });
