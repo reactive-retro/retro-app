@@ -27,6 +27,6 @@ html
                     h1.title Menu
                 ion-content.has-header
                     ion-list
-                        ion-item(menu-close, ng-repeat="place in menu", ui-sref="{{place.state}}")
+                        ion-item(menu-close, ng-repeat="place in menu", ng-href="{{stateHref(place.state)}}", ng-click="place.call()")
                             i(ng-class="place.icon")
                             span &nbsp;{{place.name}}

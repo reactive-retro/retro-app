@@ -1,4 +1,4 @@
-angular.module('retro').service('Auth', ($localStorage, $state, auth, AuthFlow) => {
+angular.module('retro').service('Auth', ($localStorage, $state, $ionicHistory, auth, AuthFlow) => {
 
     var localAuth = {
         login: () => {
@@ -16,6 +16,17 @@ angular.module('retro').service('Auth', ($localStorage, $state, auth, AuthFlow) 
             }, (err) => {
                 console.log('failed', JSON.stringify(err));
             });
+        },
+        logout: () => {
+            auth.signout();
+            $localStorage.profile = null;
+            $localStorage.token = null;
+
+            $ionicHistory.nextViewOptions({
+                disableBack: true
+            });
+
+            $state.go('home');
         }
     };
 

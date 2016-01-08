@@ -3,20 +3,6 @@
 angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage", "auth0", "angular-jwt"]);
 "use strict";
 
-angular.module("retro").constant("Config", {
-    _cfg: "DEV",
-    DEV: {
-        url: "192.168.1.10",
-        port: 8080
-    },
-    PROD: {
-        protocol: "https",
-        url: "reactive-retro.herokuapp.com",
-        port: 80
-    }
-});
-"use strict";
-
 angular.module("retro").config(["authProvider", function (authProvider) {
     authProvider.init({
         domain: "reactive-retro.auth0.com",
@@ -73,7 +59,12 @@ angular.module("retro").config(["authProvider", function (authProvider) {
 }]);
 "use strict";
 
-angular.module("retro").run(["$ionicPlatform", function ($ionicPlatform) {
+angular.module("retro").run(["$rootScope", "$ionicPlatform", function ($rootScope, $ionicPlatform) {
+
+    $rootScope.$on("$stateChangeSuccess", function (event, toState) {
+        $rootScope.hideMenu = toState.name === "home" || toState.name === "create";
+    });
+
     $ionicPlatform.ready(function () {
         if (window.cordova && window.cordova.plugins.Keyboard) {
             window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -191,6 +182,20 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
         }
     });
 }]);
+"use strict";
+
+angular.module("retro").constant("Config", {
+    _cfg: "PROD",
+    DEV: {
+        url: "192.168.1.8",
+        port: 8080
+    },
+    PROD: {
+        protocol: "https",
+        url: "reactive-retro.herokuapp.com",
+        port: 80
+    }
+});
 "use strict";
 
 angular.module("retro").constant("CLASSES", {
@@ -541,16 +546,23 @@ angular.module("retro").controller("InventoryController", ["$scope", "Player", "
 }]);
 "use strict";
 
-angular.module("retro").controller("MenuController", ["$scope", "$state", function ($scope, $state) {
-    $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore" }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-gear-b", name: "Options", state: "options" }];
+angular.module("retro").controller("MenuController", ["$scope", "$state", "$ionicPopup", "Auth", function ($scope, $state, $ionicPopup, Auth) {
 
-    $scope.travel = function (state) {
-        $state.go(state);
+    var logoutCheck = function () {
+        $ionicPopup.confirm({
+            title: "Log out?",
+            template: "Are you sure you want to log out?"
+        }).then(function (res) {
+            if (!res) return;
+            Auth.logout();
+        });
     };
 
-    $scope.$root.$on("$stateChangeSuccess", function (event, toState) {
-        $scope.$root.hideMenu = toState.name === "home" || toState.name === "create";
-    });
+    $scope.stateHref = $state.href;
+
+    $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore" }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-gear-b", name: "Options", state: "options" }, { icon: "ion-android-exit", name: "Logout", call: logoutCheck }];
+
+    $scope.travel = $state.go;
 }]);
 "use strict";
 
@@ -631,7 +643,7 @@ angular.module("retro").directive("map", ["MAP_STYLE", "$cordovaToast", "Google"
 }]);
 "use strict";
 
-angular.module("retro").service("Auth", ["$localStorage", "$state", "auth", "AuthFlow", function ($localStorage, $state, auth, AuthFlow) {
+angular.module("retro").service("Auth", ["$localStorage", "$state", "$ionicHistory", "auth", "AuthFlow", function ($localStorage, $state, $ionicHistory, auth, AuthFlow) {
 
     var localAuth = {
         login: function () {
@@ -649,6 +661,17 @@ angular.module("retro").service("Auth", ["$localStorage", "$state", "auth", "Aut
             }, function (err) {
                 console.log("failed", JSON.stringify(err));
             });
+        },
+        logout: function () {
+            auth.signout();
+            $localStorage.profile = null;
+            $localStorage.token = null;
+
+            $ionicHistory.nextViewOptions({
+                disableBack: true
+            });
+
+            $state.go("home");
         }
     };
 
