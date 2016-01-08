@@ -1,4 +1,4 @@
-angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $localStorage, $state, Player, Settings, LocationWatcher, socket) => {
+angular.module('retro').service('AuthFlow', ($q, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, socket) => {
     var flow = {
         toPlayer: () => {
             if(!_.contains(['home', 'create'], $state.current.name)) return;
@@ -29,7 +29,7 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
 
             var currentLocation = LocationWatcher.current();
             if(!currentLocation) {
-                return $cordovaToast.showLongBottom('No current location. Is your GPS on?');
+                return Toaster.show('No current location. Is your GPS on?');
             }
 
             NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
@@ -48,7 +48,7 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, $cordovaToast, $
 
                 if(!swallow) {
                     var msgObj = err ? err : success;
-                    $cordovaToast.showLongBottom(msgObj.msg);
+                    Toaster.show(msgObj.msg);
                 }
             });
 

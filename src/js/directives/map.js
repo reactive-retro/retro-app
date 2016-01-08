@@ -1,4 +1,4 @@
-angular.module('retro').directive('map', (MAP_STYLE, $cordovaToast, Google) => {
+angular.module('retro').directive('map', (MAP_STYLE, Toaster, Google) => {
     return {
         restrict: 'E',
         scope: {
@@ -7,7 +7,7 @@ angular.module('retro').directive('map', (MAP_STYLE, $cordovaToast, Google) => {
         link: ($scope, $element) => {
 
             if(!Google || !Google.maps) {
-                $cordovaToast.showLongBottom('Could not reach google.');
+                Toaster.show('Could not reach google.');
                 return;
             }
 

@@ -1,4 +1,4 @@
-angular.module('retro').service('ClassChangeFlow', ($cordovaToast, $state, Player, socket) => {
+angular.module('retro').service('ClassChangeFlow', (Toaster, $state, Player, socket) => {
     return {
         change: (newProfession) => {
 
@@ -7,7 +7,7 @@ angular.module('retro').service('ClassChangeFlow', ($cordovaToast, $state, Playe
             var opts = {name: player.name, newProfession: newProfession};
             socket.emit('classchange', opts, (err, success) => {
                 var msgObj = err ? err : success;
-                $cordovaToast.showLongBottom(msgObj.msg);
+                Toaster.show(msgObj.msg);
 
                 if(success) {
                     Player.set(success.player);

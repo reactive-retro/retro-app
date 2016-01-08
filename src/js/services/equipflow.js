@@ -1,4 +1,4 @@
-angular.module('retro').service('EquipFlow', ($cordovaToast, $state, Player, socket) => {
+angular.module('retro').service('EquipFlow', (Toaster, $state, Player, socket) => {
     return {
         equip: (newItem) => {
 
@@ -7,7 +7,7 @@ angular.module('retro').service('EquipFlow', ($cordovaToast, $state, Player, soc
             var opts = {name: player.name, itemId: newItem.itemId};
             socket.emit('equip', opts, (err, success) => {
                 var msgObj = err ? err : success;
-                $cordovaToast.showLongBottom(msgObj.msg);
+                Toaster.show(msgObj.msg);
 
                 if(success) {
                     Player.set(success.player);

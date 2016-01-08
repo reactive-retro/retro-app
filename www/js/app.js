@@ -11,10 +11,110 @@ angular.module("retro").constant("Config", {
     },
     PROD: {
         protocol: "https",
-        url: "reactive-retro.herokuapp.com",
+        url: "reactive-retro.herokuappa.com",
         port: 80
     }
 });
+"use strict";
+
+angular.module("retro").constant("CLASSES", {
+    Cleric: "Clerics specialize in healing their companions.",
+    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
+    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!"
+});
+"use strict";
+
+angular.module("retro").constant("OAUTH_KEYS", {
+    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
+    reddit: "CKzP2LKr74VwYw",
+    facebook: "102489756752863"
+});
+"use strict";
+
+angular.module("retro").constant("MAP_STYLE", [{
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
+}, {
+    featureType: "landscape",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#abce83" }]
+}, {
+    featureType: "poi",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#769E72" }]
+}, {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#7B8758" }]
+}, {
+    featureType: "poi",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#EBF4A4" }]
+}, {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
+}, {
+    featureType: "road",
+    elementType: "geometry.fill",
+    stylers: [{ visibility: "simplified" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#5B5B3F" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ABCE83" }]
+}, {
+    featureType: "road",
+    elementType: "labels.icon",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "road.local",
+    elementType: "geometry",
+    stylers: [{ color: "#A4C67D" }]
+}, {
+    featureType: "road.arterial",
+    elementType: "geometry",
+    stylers: [{ color: "#9BBF72" }]
+}, {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#EBF4A4" }]
+}, {
+    featureType: "transit",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#495421" }]
+}, {
+    featureType: "administrative.neighborhood",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.land_parcel",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.locality",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}]);
 "use strict";
 
 angular.module("retro").config(["authProvider", function (authProvider) {
@@ -437,106 +537,6 @@ angular.module("retro").controller("PlayerController", ["$scope", "$state", "Pla
 }]);
 "use strict";
 
-angular.module("retro").constant("CLASSES", {
-    Cleric: "Clerics specialize in healing their companions.",
-    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
-    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!"
-});
-"use strict";
-
-angular.module("retro").constant("OAUTH_KEYS", {
-    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
-    reddit: "CKzP2LKr74VwYw",
-    facebook: "102489756752863"
-});
-"use strict";
-
-angular.module("retro").constant("MAP_STYLE", [{
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
-}, {
-    featureType: "landscape",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#abce83" }]
-}, {
-    featureType: "poi",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#769E72" }]
-}, {
-    featureType: "poi",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#7B8758" }]
-}, {
-    featureType: "poi",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#EBF4A4" }]
-}, {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
-}, {
-    featureType: "road",
-    elementType: "geometry.fill",
-    stylers: [{ visibility: "simplified" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#5B5B3F" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ABCE83" }]
-}, {
-    featureType: "road",
-    elementType: "labels.icon",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "road.local",
-    elementType: "geometry",
-    stylers: [{ color: "#A4C67D" }]
-}, {
-    featureType: "road.arterial",
-    elementType: "geometry",
-    stylers: [{ color: "#9BBF72" }]
-}, {
-    featureType: "road.highway",
-    elementType: "geometry",
-    stylers: [{ color: "#EBF4A4" }]
-}, {
-    featureType: "transit",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.stroke",
-    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#495421" }]
-}, {
-    featureType: "administrative.neighborhood",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.land_parcel",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.locality",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}]);
-"use strict";
-
 angular.module("retro").directive("colorText", function () {
     return {
         restrict: "E",
@@ -551,7 +551,7 @@ angular.module("retro").directive("colorText", function () {
 });
 "use strict";
 
-angular.module("retro").directive("map", ["MAP_STYLE", "$cordovaToast", "Google", function (MAP_STYLE, $cordovaToast, Google) {
+angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
     return {
         restrict: "E",
         scope: {
@@ -560,7 +560,7 @@ angular.module("retro").directive("map", ["MAP_STYLE", "$cordovaToast", "Google"
         link: function ($scope, $element) {
 
             if (!Google || !Google.maps) {
-                $cordovaToast.showLongBottom("Could not reach google.");
+                Toaster.show("Could not reach google.");
                 return;
             }
 
@@ -637,7 +637,7 @@ angular.module("retro").service("Auth", ["$localStorage", "$state", "$ionicHisto
 }]);
 "use strict";
 
-angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToast", "$localStorage", "$state", "Player", "Settings", "LocationWatcher", "socket", function ($q, $ionicHistory, $cordovaToast, $localStorage, $state, Player, Settings, LocationWatcher, socket) {
+angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "Toaster", "$localStorage", "$state", "Player", "Settings", "LocationWatcher", "socket", function ($q, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, socket) {
     var flow = {
         toPlayer: function () {
             if (!_.contains(["home", "create"], $state.current.name)) return;
@@ -673,7 +673,7 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
 
             var currentLocation = LocationWatcher.current();
             if (!currentLocation) {
-                return $cordovaToast.showLongBottom("No current location. Is your GPS on?");
+                return Toaster.show("No current location. Is your GPS on?");
             }
 
             NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
@@ -692,7 +692,7 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
 
                 if (!swallow) {
                     var msgObj = err ? err : success;
-                    $cordovaToast.showLongBottom(msgObj.msg);
+                    Toaster.show(msgObj.msg);
                 }
             });
 
@@ -704,7 +704,7 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "$cordovaToa
 }]);
 "use strict";
 
-angular.module("retro").service("ClassChangeFlow", ["$cordovaToast", "$state", "Player", "socket", function ($cordovaToast, $state, Player, socket) {
+angular.module("retro").service("ClassChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
     return {
         change: function (newProfession) {
 
@@ -713,7 +713,7 @@ angular.module("retro").service("ClassChangeFlow", ["$cordovaToast", "$state", "
             var opts = { name: player.name, newProfession: newProfession };
             socket.emit("classchange", opts, function (err, success) {
                 var msgObj = err ? err : success;
-                $cordovaToast.showLongBottom(msgObj.msg);
+                Toaster.show(msgObj.msg);
 
                 if (success) {
                     Player.set(success.player);
@@ -725,7 +725,7 @@ angular.module("retro").service("ClassChangeFlow", ["$cordovaToast", "$state", "
 }]);
 "use strict";
 
-angular.module("retro").service("EquipFlow", ["$cordovaToast", "$state", "Player", "socket", function ($cordovaToast, $state, Player, socket) {
+angular.module("retro").service("EquipFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
     return {
         equip: function (newItem) {
 
@@ -734,7 +734,7 @@ angular.module("retro").service("EquipFlow", ["$cordovaToast", "$state", "Player
             var opts = { name: player.name, itemId: newItem.itemId };
             socket.emit("equip", opts, function (err, success) {
                 var msgObj = err ? err : success;
-                $cordovaToast.showLongBottom(msgObj.msg);
+                Toaster.show(msgObj.msg);
 
                 if (success) {
                     Player.set(success.player);
@@ -934,6 +934,38 @@ angular.module("retro").service("Settings", function () {});
 
 angular.module("retro").service("socketCluster", ["$window", function ($window) {
     return $window.socketCluster;
-}]).service("socket", ["Config", "socketCluster", function (Config, socketCluster) {
-    return socketCluster.connect({ protocol: Config[Config._cfg].protocol, hostname: Config[Config._cfg].url, port: Config[Config._cfg].port });
+}]).service("socket", ["$rootScope", "Config", "Toaster", "socketCluster", function ($rootScope, Config, Toaster, socketCluster) {
+    var socket = socketCluster.connect({
+        protocol: Config[Config._cfg].protocol,
+        hostname: Config[Config._cfg].url, port: Config[Config._cfg].port
+    });
+
+    var codes = {
+        1006: "Unable to connect to game server."
+    };
+
+    socket.on("error", function (e) {
+        if (!codes[e.code]) {
+            return;
+        }
+        if (e.code === 1006) {
+            $rootScope.canConnect = false;
+        }
+        Toaster.show(codes[e.code]);
+    });
+
+    socket.on("connect", function () {
+        $rootScope.canConnect = true;
+    });
+
+    return socket;
+}]);
+"use strict";
+
+angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaToast) {
+    return {
+        show: function (msg) {
+            return $cordovaToast.showLongBottom(msg);
+        }
+    };
 }]);
