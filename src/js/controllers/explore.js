@@ -68,6 +68,7 @@ angular.module('retro').controller('ExploreController',
             $scope.centerOn(position);
             $scope.drawHomepoint(Player.get().homepoint);
             $scope.findMe();
+            $scope.watchMe();
             $scope.drawPlaces(Settings.places);
             $scope.addEvents();
         };
@@ -150,7 +151,7 @@ angular.module('retro').controller('ExploreController',
         };
 
         $scope.findMe = () => {
-            LocationWatcher.ready.then($scope.centerOn);
+            LocationWatcher.ready.then(coords => $scope.centerOn(coords, true));
         };
 
         $scope.watchMe = () => {
@@ -159,12 +160,12 @@ angular.module('retro').controller('ExploreController',
             });
         };
 
-        $scope.centerOn = (coords) => {
+        $scope.centerOn = (coords, centerMap = false) => {
             if(!$scope.map) { return; }
             if(!coords.latitude || !coords.longitude) { return; }
             var position = new Google.maps.LatLng(coords.latitude, coords.longitude);
 
-            $scope.map.setCenter(position);
+            if(centerMap) { $scope.map.setCenter(position); }
 
             $scope.curPos.setPosition(position);
 
