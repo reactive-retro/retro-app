@@ -1,5 +1,15 @@
 script(type="text/ng-template", id="index")
     ion-view(view-title="Home", cache-view="false")
         ion-content.has-header(ng-controller="HomeController")
-            div Welcome to Reactive Retro! Ideally, the background here would be some live map feed of your current area, just so you can see what it looks like!
-            button.button.button-balanced(ng-click="auth.login()", ng-disabled="!canConnect") Login
+            .row
+                .col Welcome to Reactive Retro!
+
+            .row
+                .col Ideally, the background here would be some live map feed of your current area, just so you can see what it looks like!
+
+            .row
+                .col This is a very early version of the game.
+
+            .row.row-bottom
+                .col
+                    button.button.button-balanced.button-block(ng-click="auth.login()", ng-disabled="!canConnect") Login
