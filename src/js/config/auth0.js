@@ -16,7 +16,10 @@ angular.module('retro')
         };
 
         let refreshingToken = null;
-        $rootScope.$on('$locationChangeStart', () => {
+        $rootScope.$on('$locationChangeStart', (e, n, c) => {
+            // if you route to the same state and aren't logged in, don't do this event
+            // it causes the login events on the server to fire twice
+            if(n === c) { return; }
             if(AuthFlow.isLoggedIn) { return; }
 
             const {token, refreshToken, profile} = $localStorage;

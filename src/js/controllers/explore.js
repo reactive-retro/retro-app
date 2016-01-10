@@ -1,5 +1,5 @@
 angular.module('retro').controller('ExploreController',
-    ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings) => {
+    ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings, MAP_COLORS) => {
         // TODO refactor all of this into services, the directive, etc, maybe make the directive take a places array
 
         const MAX_VIEW_RADIUS = Settings.RADIUS; //meters
@@ -70,6 +70,7 @@ angular.module('retro').controller('ExploreController',
             $scope.findMe();
             $scope.watchMe();
             $scope.drawPlaces(Settings.places);
+            $scope.drawMonsters(Settings.monsters);
             $scope.addEvents();
         };
 
@@ -83,10 +84,31 @@ angular.module('retro').controller('ExploreController',
                     map: $scope.map,
                     icon: {
                         path: Google.maps.SymbolPath.CIRCLE,
-                        strokeColor: '#ff0000',
+                        strokeColor: MAP_COLORS.poi.outline,
                         strokeOpacity: 0.8,
                         strokeWeight: 2,
-                        fillColor: '#aa0000',
+                        fillColor: MAP_COLORS.poi.fill,
+                        fillOpacity: 1,
+                        scale: 5
+                    }
+                }));
+            });
+        };
+
+        $scope.monsters = [];
+
+        $scope.drawMonsters = (monsters) => {
+            _.each($scope.monsters, monster => monster.setMap(null));
+            _.each(monsters, monster => {
+                $scope.places.push(new Google.maps.Marker({
+                    position: new Google.maps.LatLng(monster.location.lat, monster.location.lon),
+                    map: $scope.map,
+                    icon: {
+                        path: Google.maps.SymbolPath.CIRCLE,
+                        strokeColor: MAP_COLORS.monster.outline,
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: MAP_COLORS.monster.fill,
                         fillOpacity: 1,
                         scale: 5
                     }
@@ -102,20 +124,20 @@ angular.module('retro').controller('ExploreController',
                 map: $scope.map,
                 icon: {
                     path: Google.maps.SymbolPath.CIRCLE,
-                    strokeColor: '#00ff00',
+                    strokeColor: MAP_COLORS.homepoint.outline,
                     strokeOpacity: 0.8,
                     strokeWeight: 2,
-                    fillColor: '#00aa00',
+                    fillColor: MAP_COLORS.homepoint.fill,
                     fillOpacity: 1,
                     scale: 5
                 }
             });
 
             const miasmaOptions = {
-                strokeColor: '#000000',
+                strokeColor: MAP_COLORS.miasma.outline,
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
-                fillColor: '#000000',
+                fillColor: MAP_COLORS.miasma.fill,
                 fillOpacity: 0.35,
                 map: $scope.map,
                 paths: [mercatorWorldBounds, drawCircle(homepointCenter, MAX_VIEW_RADIUS)]
@@ -130,18 +152,18 @@ angular.module('retro').controller('ExploreController',
                 map: $scope.map,
                 icon: {
                     path: Google.maps.SymbolPath.CIRCLE,
-                    strokeColor: '#0000ff',
+                    strokeColor: MAP_COLORS.hero.outline,
                     strokeOpacity: 0.8,
                     strokeWeight: 2,
-                    fillColor: '#0000aa',
+                    fillColor: MAP_COLORS.hero.fill,
                     fillOpacity: 1,
                     scale: 5
                 }
             });
 
             var affectRadius = new Google.maps.Circle({
-                fillColor: '#ff00ff',
-                strokeColor: '#ff00ff',
+                fillColor: MAP_COLORS.heroRadius.fill,
+                strokeColor: MAP_COLORS.heroRadius.outline,
                 strokeWeight: 1,
                 radius: 50,
                 map: $scope.map

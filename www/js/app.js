@@ -35,7 +35,12 @@ angular.module("retro").config(["authProvider", function (authProvider) {
     };
 
     var refreshingToken = null;
-    $rootScope.$on("$locationChangeStart", function () {
+    $rootScope.$on("$locationChangeStart", function (e, n, c) {
+        // if you route to the same state and aren't logged in, don't do this event
+        // it causes the login events on the server to fire twice
+        if (n === c) {
+            return;
+        }
         if (AuthFlow.isLoggedIn) {
             return;
         }
@@ -212,6 +217,34 @@ angular.module("retro").constant("OAUTH_KEYS", {
 });
 "use strict";
 
+angular.module("retro").constant("MAP_COLORS", {
+    monster: {
+        outline: "#ff0000",
+        fill: "#aa0000"
+    },
+    poi: {
+        outline: "#ffff00",
+        fill: "#aaaa00"
+    },
+    homepoint: {
+        outline: "#00ff00",
+        fill: "#00aa00"
+    },
+    miasma: {
+        outline: "#000000",
+        fill: "#000000"
+    },
+    hero: {
+        outline: "#0000ff",
+        fill: "#0000aa"
+    },
+    heroRadius: {
+        outline: "#ff00ff",
+        fill: "#ff00ff"
+    }
+});
+"use strict";
+
 angular.module("retro").constant("MAP_STYLE", [{
     featureType: "water",
     elementType: "geometry",
@@ -321,7 +354,7 @@ angular.module("retro").controller("CreateCharacterController", ["$scope", "NewH
 }]);
 "use strict";
 
-angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "Settings", function ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings) {
+angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "Settings", "MAP_COLORS", function ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings, MAP_COLORS) {
     // TODO refactor all of this into services, the directive, etc, maybe make the directive take a places array
 
     var MAX_VIEW_RADIUS = Settings.RADIUS; //meters
@@ -378,6 +411,7 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
         $scope.findMe();
         $scope.watchMe();
         $scope.drawPlaces(Settings.places);
+        $scope.drawMonsters(Settings.monsters);
         $scope.addEvents();
     };
 
@@ -393,10 +427,33 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
                 map: $scope.map,
                 icon: {
                     path: Google.maps.SymbolPath.CIRCLE,
-                    strokeColor: "#ff0000",
+                    strokeColor: MAP_COLORS.poi.outline,
                     strokeOpacity: 0.8,
                     strokeWeight: 2,
-                    fillColor: "#aa0000",
+                    fillColor: MAP_COLORS.poi.fill,
+                    fillOpacity: 1,
+                    scale: 5
+                }
+            }));
+        });
+    };
+
+    $scope.monsters = [];
+
+    $scope.drawMonsters = function (monsters) {
+        _.each($scope.monsters, function (monster) {
+            return monster.setMap(null);
+        });
+        _.each(monsters, function (monster) {
+            $scope.places.push(new Google.maps.Marker({
+                position: new Google.maps.LatLng(monster.location.lat, monster.location.lon),
+                map: $scope.map,
+                icon: {
+                    path: Google.maps.SymbolPath.CIRCLE,
+                    strokeColor: MAP_COLORS.monster.outline,
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: MAP_COLORS.monster.fill,
                     fillOpacity: 1,
                     scale: 5
                 }
@@ -412,20 +469,20 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
             map: $scope.map,
             icon: {
                 path: Google.maps.SymbolPath.CIRCLE,
-                strokeColor: "#00ff00",
+                strokeColor: MAP_COLORS.homepoint.outline,
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
-                fillColor: "#00aa00",
+                fillColor: MAP_COLORS.homepoint.fill,
                 fillOpacity: 1,
                 scale: 5
             }
         });
 
         var miasmaOptions = {
-            strokeColor: "#000000",
+            strokeColor: MAP_COLORS.miasma.outline,
             strokeOpacity: 0.8,
             strokeWeight: 2,
-            fillColor: "#000000",
+            fillColor: MAP_COLORS.miasma.fill,
             fillOpacity: 0.35,
             map: $scope.map,
             paths: [mercatorWorldBounds, drawCircle(homepointCenter, MAX_VIEW_RADIUS)]
@@ -439,18 +496,18 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
             map: $scope.map,
             icon: {
                 path: Google.maps.SymbolPath.CIRCLE,
-                strokeColor: "#0000ff",
+                strokeColor: MAP_COLORS.hero.outline,
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
-                fillColor: "#0000aa",
+                fillColor: MAP_COLORS.hero.fill,
                 fillOpacity: 1,
                 scale: 5
             }
         });
 
         var affectRadius = new Google.maps.Circle({
-            fillColor: "#ff00ff",
-            strokeColor: "#ff00ff",
+            fillColor: MAP_COLORS.heroRadius.fill,
+            strokeColor: MAP_COLORS.heroRadius.outline,
             strokeWeight: 1,
             radius: 50,
             map: $scope.map
@@ -693,6 +750,7 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "Toaster", "
                     Player.set(success.player);
                     _.extend(Settings, success.settings);
                     Settings.places = success.places;
+                    Settings.monsters = success.monsters;
                     flow.toPlayer();
                     flow.isLoggedIn = true;
                 }

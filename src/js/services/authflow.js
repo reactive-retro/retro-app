@@ -42,6 +42,7 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, Toaster, $localS
                     Player.set(success.player);
                     _.extend(Settings, success.settings);
                     Settings.places = success.places;
+                    Settings.monsters = success.monsters;
                     flow.toPlayer();
                     flow.isLoggedIn = true;
                 }
