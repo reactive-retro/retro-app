@@ -6,8 +6,13 @@ angular.module('retro')
             loginState: 'home'
         });
     })
-    .run((auth, $localStorage, $rootScope, $state, jwtHelper, AuthFlow) => {
+    .run((auth, $localStorage, $rootScope, $state, jwtHelper, AuthFlow, Config) => {
         auth.hookEvents();
+
+        if(Config._cfg !== $localStorage.env) {
+            $localStorage.profile = $localStorage.token = $localStorage.refreshingToken = null;
+            return;
+        }
 
         const autologin = () => {
             if(!auth.isAuthenticated || !$localStorage.profile || !$localStorage.profile.user_id) { return; } // jshint ignore:line

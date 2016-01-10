@@ -1,4 +1,4 @@
-angular.module('retro').service('AuthFlow', ($q, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, socket) => {
+angular.module('retro').service('AuthFlow', ($q, $rootScope, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, Config, socket) => {
     var flow = {
         toPlayer: () => {
             if(!_.contains(['home', 'create'], $state.current.name)) return;
@@ -13,7 +13,9 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, Toaster, $localS
 
             if($localStorage.profile.user_id) { // jshint ignore:line
                 flow.login(_.clone($localStorage), true).then(null, fail);
-            } else {
+
+            //only fail to the char create screen if there's a server connection
+            } else if($rootScope.canConnect) {
                 fail();
             }
         },
@@ -45,6 +47,7 @@ angular.module('retro').service('AuthFlow', ($q, $ionicHistory, Toaster, $localS
                     Settings.monsters = success.monsters;
                     flow.toPlayer();
                     flow.isLoggedIn = true;
+                    $localStorage.env = Config._cfg;
                 }
 
                 if(!swallow) {

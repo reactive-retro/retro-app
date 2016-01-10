@@ -6,7 +6,6 @@
   },
   "dependencies": {
     "ngCordova": "~0.1.23-alpha",
-    "ng-cordova-oauth": "~0.2.0",
     "ionic": "~1.2.2",
     "ngstorage": "~0.3.4",
     "socketcluster-client": "SocketCluster/socketcluster-client#~3.1.1",

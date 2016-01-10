@@ -1,6 +1,6 @@
 "use strict";
 
-angular.module("retro", ["ionic", "ngCordova", "ngCordovaOauth", "ngStorage", "auth0", "angular-jwt"]);
+angular.module("retro", ["ionic", "ngCordova", "ngStorage", "auth0", "angular-jwt"]);
 "use strict";
 
 angular.module("retro").constant("Config", {
@@ -23,8 +23,13 @@ angular.module("retro").config(["authProvider", function (authProvider) {
         clientID: "ucMSnNDYLGdDBL2uppganZv2jKzzJiI0",
         loginState: "home"
     });
-}]).run(["auth", "$localStorage", "$rootScope", "$state", "jwtHelper", "AuthFlow", function (auth, $localStorage, $rootScope, $state, jwtHelper, AuthFlow) {
+}]).run(["auth", "$localStorage", "$rootScope", "$state", "jwtHelper", "AuthFlow", "Config", function (auth, $localStorage, $rootScope, $state, jwtHelper, AuthFlow, Config) {
     auth.hookEvents();
+
+    if (Config._cfg !== $localStorage.env) {
+        $localStorage.profile = $localStorage.token = $localStorage.refreshingToken = null;
+        return;
+    }
 
     var autologin = function () {
         if (!auth.isAuthenticated || !$localStorage.profile || !$localStorage.profile.user_id) {
@@ -701,7 +706,7 @@ angular.module("retro").service("Auth", ["$localStorage", "$state", "$ionicHisto
 }]);
 "use strict";
 
-angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "Toaster", "$localStorage", "$state", "Player", "Settings", "LocationWatcher", "socket", function ($q, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, socket) {
+angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory", "Toaster", "$localStorage", "$state", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, $rootScope, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, Config, socket) {
     var flow = {
         toPlayer: function () {
             if (!_.contains(["home", "create"], $state.current.name)) return;
@@ -719,7 +724,9 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "Toaster", "
             if ($localStorage.profile.user_id) {
                 // jshint ignore:line
                 flow.login(_.clone($localStorage), true).then(null, fail);
-            } else {
+
+                //only fail to the char create screen if there's a server connection
+            } else if ($rootScope.canConnect) {
                 fail();
             }
         },
@@ -753,6 +760,7 @@ angular.module("retro").service("AuthFlow", ["$q", "$ionicHistory", "Toaster", "
                     Settings.monsters = success.monsters;
                     flow.toPlayer();
                     flow.isLoggedIn = true;
+                    $localStorage.env = Config._cfg;
                 }
 
                 if (!swallow) {
