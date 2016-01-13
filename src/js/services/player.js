@@ -9,7 +9,7 @@ angular.module('retro').service('Player', ($q) => {
             lat: 44.0329402,
             lon: -88.558683
         },
-        unlockedProfessions: ['Cleric', 'Fighter', 'Mage'],
+        unlockedProfessions: ['Thief', 'Fighter', 'Mage'],
         professionLevels: {
             Fighter: 1
         },
