@@ -11,7 +11,6 @@ angular.module('retro').directive('map', (MAP_STYLE, Toaster, Google) => {
                 return;
             }
 
-            // TODO also hit google places for a 25mile radius once upon map creation
             // this is the available list of places in the game
             var init = () => {
                 const mapOptions = {

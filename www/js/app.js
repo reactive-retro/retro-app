@@ -17,6 +17,135 @@ angular.module("retro").constant("Config", {
 });
 "use strict";
 
+angular.module("retro").constant("CLASSES", {
+    Cleric: "Clerics specialize in healing their companions.",
+    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
+    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!",
+    Thief: "Thieves specialize in quick attacks and physical debuffing."
+});
+"use strict";
+
+angular.module("retro").constant("OAUTH_KEYS", {
+    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
+    reddit: "CKzP2LKr74VwYw",
+    facebook: "102489756752863"
+});
+"use strict";
+
+angular.module("retro").constant("MAP_COLORS", {
+    monster: {
+        outline: "#ff0000",
+        fill: "#aa0000"
+    },
+    poi: {
+        outline: "#ffff00",
+        fill: "#aaaa00"
+    },
+    homepoint: {
+        outline: "#00ff00",
+        fill: "#00aa00"
+    },
+    miasma: {
+        outline: "#000000",
+        fill: "#000000"
+    },
+    hero: {
+        outline: "#0000ff",
+        fill: "#0000aa"
+    },
+    heroRadius: {
+        outline: "#ff00ff",
+        fill: "#ff00ff"
+    }
+});
+"use strict";
+
+angular.module("retro").constant("MAP_STYLE", [{
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
+}, {
+    featureType: "landscape",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#abce83" }]
+}, {
+    featureType: "poi",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#769E72" }]
+}, {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#7B8758" }]
+}, {
+    featureType: "poi",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#EBF4A4" }]
+}, {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
+}, {
+    featureType: "road",
+    elementType: "geometry.fill",
+    stylers: [{ visibility: "simplified" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#5B5B3F" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ABCE83" }]
+}, {
+    featureType: "road",
+    elementType: "labels.icon",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "road.local",
+    elementType: "geometry",
+    stylers: [{ color: "#A4C67D" }]
+}, {
+    featureType: "road.arterial",
+    elementType: "geometry",
+    stylers: [{ color: "#9BBF72" }]
+}, {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#EBF4A4" }]
+}, {
+    featureType: "transit",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#495421" }]
+}, {
+    featureType: "administrative.neighborhood",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.land_parcel",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.locality",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}]);
+"use strict";
+
 angular.module("retro").config(["authProvider", function (authProvider) {
     authProvider.init({
         domain: "reactive-retro.auth0.com",
@@ -231,166 +360,19 @@ angular.module("retro").controller("CreateCharacterController", ["$scope", "NewH
 }]);
 "use strict";
 
-angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "Settings", "MAP_COLORS", function ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings, MAP_COLORS) {
-    // TODO refactor all of this into services, the directive, etc, maybe make the directive take a places array
-
-    var MAX_VIEW_RADIUS = Settings.RADIUS; //meters
-
-    var bounds = new google.maps.LatLngBounds();
-
-    var mercatorWorldBounds = [new Google.maps.LatLng(85, 180), new Google.maps.LatLng(85, 90), new Google.maps.LatLng(85, 0), new Google.maps.LatLng(85, -90), new Google.maps.LatLng(85, -180), new Google.maps.LatLng(0, -180), new Google.maps.LatLng(-85, -180), new Google.maps.LatLng(-85, -90), new Google.maps.LatLng(-85, 0), new Google.maps.LatLng(-85, 90), new Google.maps.LatLng(-85, 180), new Google.maps.LatLng(0, 180), new Google.maps.LatLng(85, 180)];
-
-    // radius in meters
-    var drawCircle = function (point, radius) {
-        var d2r = Math.PI / 180; // degrees to radians
-        var r2d = 180 / Math.PI; // radians to degrees
-        var earthsradius = 3963; // 3963 is the radius of the earth in miles
-        var points = 32;
-
-        // find the radius in lat/lon - convert meters to miles
-        var rlat = radius * 0.000621371192 / earthsradius * r2d;
-        var rlng = rlat / Math.cos(point.lat() * d2r);
-
-        var start = points + 1;
-        var end = 0;
-
-        var extp = [];
-
-        for (var i = start; i > end; i--) {
-            var theta = Math.PI * (i / (points / 2));
-            var ey = point.lng() + rlng * Math.cos(theta); // center a + radius x * cos(theta)
-            var ex = point.lat() + rlat * Math.sin(theta); // center b + radius y * sin(theta)
-            extp.push(new Google.maps.LatLng(ex, ey));
-            bounds.extend(extp[extp.length - 1]);
-        }
-        return extp;
-    };
-
-    $scope.addEvents = function () {
-        var lastValidCenter = null;
-
-        google.maps.event.addListener($scope.map, "center_changed", function () {
-            if (bounds.contains($scope.map.getCenter())) {
-                lastValidCenter = $scope.map.getCenter();
-                return;
-            }
-
-            $scope.map.panTo(lastValidCenter);
-        });
-    };
+angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "MapDrawing", function ($scope, $ionicLoading, Player, LocationWatcher, Google, MapDrawing) {
 
     $scope.mapCreated = function (map) {
         $scope.map = map;
         var position = LocationWatcher.current();
-        $scope.drawMe(position);
+        MapDrawing.drawMe(map, position);
         $scope.centerOn(position);
-        $scope.drawHomepoint(Player.get().homepoint);
+        MapDrawing.drawHomepoint(map, Player.get().homepoint);
         $scope.findMe();
         $scope.watchMe();
-        $scope.drawPlaces(Settings.places);
-        $scope.drawMonsters(Settings.monsters);
-        $scope.addEvents();
-    };
-
-    $scope.places = [];
-
-    $scope.drawPlaces = function (places) {
-        _.each($scope.places, function (place) {
-            return place.setMap(null);
-        });
-        _.each(places, function (place) {
-            $scope.places.push(new Google.maps.Marker({
-                position: place.geometry.location,
-                map: $scope.map,
-                icon: {
-                    path: Google.maps.SymbolPath.CIRCLE,
-                    strokeColor: MAP_COLORS.poi.outline,
-                    strokeOpacity: 0.8,
-                    strokeWeight: 2,
-                    fillColor: MAP_COLORS.poi.fill,
-                    fillOpacity: 1,
-                    scale: 5
-                }
-            }));
-        });
-    };
-
-    $scope.monsters = [];
-
-    $scope.drawMonsters = function (monsters) {
-        _.each($scope.monsters, function (monster) {
-            return monster.setMap(null);
-        });
-        _.each(monsters, function (monster) {
-            $scope.places.push(new Google.maps.Marker({
-                position: new Google.maps.LatLng(monster.location.lat, monster.location.lon),
-                map: $scope.map,
-                icon: {
-                    path: Google.maps.SymbolPath.CIRCLE,
-                    strokeColor: MAP_COLORS.monster.outline,
-                    strokeOpacity: 0.8,
-                    strokeWeight: 2,
-                    fillColor: MAP_COLORS.monster.fill,
-                    fillOpacity: 1,
-                    scale: 5
-                }
-            }));
-        });
-    };
-
-    $scope.drawHomepoint = function (coords) {
-        var homepointCenter = new Google.maps.LatLng(coords.lat, coords.lon);
-
-        $scope.homepoint = new Google.maps.Marker({
-            position: homepointCenter,
-            map: $scope.map,
-            icon: {
-                path: Google.maps.SymbolPath.CIRCLE,
-                strokeColor: MAP_COLORS.homepoint.outline,
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: MAP_COLORS.homepoint.fill,
-                fillOpacity: 1,
-                scale: 5
-            }
-        });
-
-        var miasmaOptions = {
-            strokeColor: MAP_COLORS.miasma.outline,
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: MAP_COLORS.miasma.fill,
-            fillOpacity: 0.35,
-            map: $scope.map,
-            paths: [mercatorWorldBounds, drawCircle(homepointCenter, MAX_VIEW_RADIUS)]
-        };
-        $scope.miasma = new Google.maps.Polygon(miasmaOptions);
-    };
-
-    $scope.drawMe = function (coords) {
-        $scope.curPos = new Google.maps.Marker({
-            position: new Google.maps.LatLng(coords.latitude, coords.longitude),
-            map: $scope.map,
-            icon: {
-                path: Google.maps.SymbolPath.CIRCLE,
-                strokeColor: MAP_COLORS.hero.outline,
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: MAP_COLORS.hero.fill,
-                fillOpacity: 1,
-                scale: 5
-            }
-        });
-
-        var affectRadius = new Google.maps.Circle({
-            fillColor: MAP_COLORS.heroRadius.fill,
-            strokeColor: MAP_COLORS.heroRadius.outline,
-            strokeWeight: 1,
-            radius: 50,
-            map: $scope.map
-        });
-
-        affectRadius.bindTo("center", $scope.curPos, "position");
+        MapDrawing.drawPlaces(map, Settings.places);
+        MapDrawing.drawMonsters(map, Settings.monsters);
+        MapDrawing.addEvents(map);
     };
 
     $scope.findMe = function () {
@@ -480,135 +462,6 @@ angular.module("retro").controller("PlayerController", ["$scope", "$state", "Pla
 }]);
 "use strict";
 
-angular.module("retro").constant("CLASSES", {
-    Cleric: "Clerics specialize in healing their companions.",
-    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
-    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!",
-    Thief: "Thieves specialize in quick attacks and physical debuffing."
-});
-"use strict";
-
-angular.module("retro").constant("OAUTH_KEYS", {
-    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
-    reddit: "CKzP2LKr74VwYw",
-    facebook: "102489756752863"
-});
-"use strict";
-
-angular.module("retro").constant("MAP_COLORS", {
-    monster: {
-        outline: "#ff0000",
-        fill: "#aa0000"
-    },
-    poi: {
-        outline: "#ffff00",
-        fill: "#aaaa00"
-    },
-    homepoint: {
-        outline: "#00ff00",
-        fill: "#00aa00"
-    },
-    miasma: {
-        outline: "#000000",
-        fill: "#000000"
-    },
-    hero: {
-        outline: "#0000ff",
-        fill: "#0000aa"
-    },
-    heroRadius: {
-        outline: "#ff00ff",
-        fill: "#ff00ff"
-    }
-});
-"use strict";
-
-angular.module("retro").constant("MAP_STYLE", [{
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
-}, {
-    featureType: "landscape",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#abce83" }]
-}, {
-    featureType: "poi",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#769E72" }]
-}, {
-    featureType: "poi",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#7B8758" }]
-}, {
-    featureType: "poi",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#EBF4A4" }]
-}, {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
-}, {
-    featureType: "road",
-    elementType: "geometry.fill",
-    stylers: [{ visibility: "simplified" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#5B5B3F" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ABCE83" }]
-}, {
-    featureType: "road",
-    elementType: "labels.icon",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "road.local",
-    elementType: "geometry",
-    stylers: [{ color: "#A4C67D" }]
-}, {
-    featureType: "road.arterial",
-    elementType: "geometry",
-    stylers: [{ color: "#9BBF72" }]
-}, {
-    featureType: "road.highway",
-    elementType: "geometry",
-    stylers: [{ color: "#EBF4A4" }]
-}, {
-    featureType: "transit",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.stroke",
-    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#495421" }]
-}, {
-    featureType: "administrative.neighborhood",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.land_parcel",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.locality",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}]);
-"use strict";
-
 angular.module("retro").directive("colorText", function () {
     return {
         restrict: "E",
@@ -636,7 +489,6 @@ angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", func
                 return;
             }
 
-            // TODO also hit google places for a 25mile radius once upon map creation
             // this is the available list of places in the game
             var init = function () {
                 var mapOptions = {
@@ -864,6 +716,167 @@ angular.module("retro").service("LocationWatcher", ["$q", function ($q) {
     watcher.start();
 
     return watcher;
+}]);
+"use strict";
+
+angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS", function (Google, Settings, MAP_COLORS) {
+
+    var savedPlaces = [];
+    var savedMonsters = [];
+    var curPos = {};
+    var homepoint = {};
+    var miasma = {};
+
+    var MAX_VIEW_RADIUS = Settings.RADIUS; //meters
+
+    var bounds = new Google.maps.LatLngBounds();
+
+    var mercatorWorldBounds = [new Google.maps.LatLng(85, 180), new Google.maps.LatLng(85, 90), new Google.maps.LatLng(85, 0), new Google.maps.LatLng(85, -90), new Google.maps.LatLng(85, -180), new Google.maps.LatLng(0, -180), new Google.maps.LatLng(-85, -180), new Google.maps.LatLng(-85, -90), new Google.maps.LatLng(-85, 0), new Google.maps.LatLng(-85, 90), new Google.maps.LatLng(-85, 180), new Google.maps.LatLng(0, 180), new Google.maps.LatLng(85, 180)];
+
+    // radius in meters
+    var drawCircle = function (point, radius) {
+        var d2r = Math.PI / 180; // degrees to radians
+        var r2d = 180 / Math.PI; // radians to degrees
+        var earthsradius = 3963; // 3963 is the radius of the earth in miles
+        var points = 32;
+
+        // find the radius in lat/lon - convert meters to miles
+        var rlat = radius * 0.000621371192 / earthsradius * r2d;
+        var rlng = rlat / Math.cos(point.lat() * d2r);
+
+        var start = points + 1;
+        var end = 0;
+
+        var extp = [];
+
+        for (var i = start; i > end; i--) {
+            var theta = Math.PI * (i / (points / 2));
+            var ey = point.lng() + rlng * Math.cos(theta); // center a + radius x * cos(theta)
+            var ex = point.lat() + rlat * Math.sin(theta); // center b + radius y * sin(theta)
+            extp.push(new Google.maps.LatLng(ex, ey));
+            bounds.extend(extp[extp.length - 1]);
+        }
+        return extp;
+    };
+
+    var drawPlaces = function (map, places) {
+        _.each(savedPlaces, function (place) {
+            return place.setMap(null);
+        });
+        _.each(places, function (place) {
+            savedPlaces.push(new Google.maps.Marker({
+                position: place.geometry.location,
+                map: map,
+                icon: {
+                    path: Google.maps.SymbolPath.CIRCLE,
+                    strokeColor: MAP_COLORS.poi.outline,
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: MAP_COLORS.poi.fill,
+                    fillOpacity: 1,
+                    scale: 5
+                }
+            }));
+        });
+    };
+
+    var drawMonsters = function (map, monsters) {
+        _.each(savedMonsters, function (monster) {
+            return monster.setMap(null);
+        });
+        _.each(monsters, function (monster) {
+            savedMonsters.push(new Google.maps.Marker({
+                position: new Google.maps.LatLng(monster.location.lat, monster.location.lon),
+                map: map,
+                icon: {
+                    path: Google.maps.SymbolPath.CIRCLE,
+                    strokeColor: MAP_COLORS.monster.outline,
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: MAP_COLORS.monster.fill,
+                    fillOpacity: 1,
+                    scale: 5
+                }
+            }));
+        });
+    };
+
+    var drawHomepoint = function (map, coords) {
+        var homepointCenter = new Google.maps.LatLng(coords.lat, coords.lon);
+
+        homepoint = new Google.maps.Marker({
+            position: homepointCenter,
+            map: map,
+            icon: {
+                path: Google.maps.SymbolPath.CIRCLE,
+                strokeColor: MAP_COLORS.homepoint.outline,
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: MAP_COLORS.homepoint.fill,
+                fillOpacity: 1,
+                scale: 5
+            }
+        });
+
+        var miasmaOptions = {
+            strokeColor: MAP_COLORS.miasma.outline,
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: MAP_COLORS.miasma.fill,
+            fillOpacity: 0.35,
+            map: map,
+            paths: [mercatorWorldBounds, drawCircle(homepointCenter, MAX_VIEW_RADIUS)]
+        };
+
+        miasma = new Google.maps.Polygon(miasmaOptions);
+    };
+
+    var drawMe = function (map, coords) {
+        curPos = new Google.maps.Marker({
+            position: new Google.maps.LatLng(coords.latitude, coords.longitude),
+            map: map,
+            icon: {
+                path: Google.maps.SymbolPath.CIRCLE,
+                strokeColor: MAP_COLORS.hero.outline,
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: MAP_COLORS.hero.fill,
+                fillOpacity: 1,
+                scale: 5
+            }
+        });
+
+        var affectRadius = new Google.maps.Circle({
+            fillColor: MAP_COLORS.heroRadius.fill,
+            strokeColor: MAP_COLORS.heroRadius.outline,
+            strokeWeight: 1,
+            radius: 50,
+            map: map
+        });
+
+        affectRadius.bindTo("center", curPos, "position");
+    };
+
+    var addMapEvents = function (map) {
+        var lastValidCenter = null;
+
+        Google.maps.event.addListener(map, "center_changed", function () {
+            if (bounds.contains(map.getCenter())) {
+                lastValidCenter = map.getCenter();
+                return;
+            }
+
+            map.panTo(lastValidCenter);
+        });
+    };
+
+    return {
+        addMapEvents: addMapEvents,
+        drawPlaces: drawPlaces,
+        drawHomepoint: drawHomepoint,
+        drawMe: drawMe,
+        drawMonsters: drawMonsters
+    };
 }]);
 "use strict";
 
