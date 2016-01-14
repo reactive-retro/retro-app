@@ -6,9 +6,9 @@ angular.module('retro').controller('MenuController',
                 title: 'Log out?',
                 template: 'Are you sure you want to log out?'
             }).then(res => {
-                if(!res) return;
+                if(!res) { return; }
                 Auth.logout();
-            })
+            });
         };
 
         $scope.stateHref = $state.href;

@@ -4,9 +4,9 @@ angular.module("retro", ["ionic", "ngCordova", "ngStorage", "auth0", "angular-jw
 "use strict";
 
 angular.module("retro").constant("Config", {
-    _cfg: "PROD",
+    _cfg: "DEV",
     DEV: {
-        url: "192.168.1.8",
+        url: "192.168.1.9",
         port: 8080
     },
     PROD: {
@@ -208,134 +208,6 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
 }]);
 "use strict";
 
-angular.module("retro").constant("CLASSES", {
-    Cleric: "Clerics specialize in healing their companions.",
-    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
-    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!"
-});
-"use strict";
-
-angular.module("retro").constant("OAUTH_KEYS", {
-    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
-    reddit: "CKzP2LKr74VwYw",
-    facebook: "102489756752863"
-});
-"use strict";
-
-angular.module("retro").constant("MAP_COLORS", {
-    monster: {
-        outline: "#ff0000",
-        fill: "#aa0000"
-    },
-    poi: {
-        outline: "#ffff00",
-        fill: "#aaaa00"
-    },
-    homepoint: {
-        outline: "#00ff00",
-        fill: "#00aa00"
-    },
-    miasma: {
-        outline: "#000000",
-        fill: "#000000"
-    },
-    hero: {
-        outline: "#0000ff",
-        fill: "#0000aa"
-    },
-    heroRadius: {
-        outline: "#ff00ff",
-        fill: "#ff00ff"
-    }
-});
-"use strict";
-
-angular.module("retro").constant("MAP_STYLE", [{
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
-}, {
-    featureType: "landscape",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#abce83" }]
-}, {
-    featureType: "poi",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#769E72" }]
-}, {
-    featureType: "poi",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#7B8758" }]
-}, {
-    featureType: "poi",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#EBF4A4" }]
-}, {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
-}, {
-    featureType: "road",
-    elementType: "geometry.fill",
-    stylers: [{ visibility: "simplified" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#5B5B3F" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ABCE83" }]
-}, {
-    featureType: "road",
-    elementType: "labels.icon",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "road.local",
-    elementType: "geometry",
-    stylers: [{ color: "#A4C67D" }]
-}, {
-    featureType: "road.arterial",
-    elementType: "geometry",
-    stylers: [{ color: "#9BBF72" }]
-}, {
-    featureType: "road.highway",
-    elementType: "geometry",
-    stylers: [{ color: "#EBF4A4" }]
-}, {
-    featureType: "transit",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.stroke",
-    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#495421" }]
-}, {
-    featureType: "administrative.neighborhood",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.land_parcel",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.locality",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}]);
-"use strict";
-
 angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
     $scope.player = Player.get();
     $scope.CLASSES = CLASSES;
@@ -350,7 +222,7 @@ angular.module("retro").controller("ClassChangeController", ["$scope", "Player",
 angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "AuthFlow", "$localStorage", function ($scope, NewHero, CLASSES, AuthFlow, $localStorage) {
     $scope.NewHero = NewHero;
     $scope.CLASSES = CLASSES;
-    $scope.baseProfessions = ["Cleric", "Mage", "Fighter"];
+    $scope.baseProfessions = ["Thief", "Mage", "Fighter"];
 
     $scope.create = function () {
         var hero = _.merge(NewHero, $localStorage);
@@ -580,7 +452,9 @@ angular.module("retro").controller("MenuController", ["$scope", "$state", "$ioni
             title: "Log out?",
             template: "Are you sure you want to log out?"
         }).then(function (res) {
-            if (!res) return;
+            if (!res) {
+                return;
+            }
             Auth.logout();
         });
     };
@@ -603,6 +477,135 @@ angular.module("retro").controller("PlayerController", ["$scope", "$state", "Pla
     $scope.go = function (to) {
         $state.go(to);
     };
+}]);
+"use strict";
+
+angular.module("retro").constant("CLASSES", {
+    Cleric: "Clerics specialize in healing their companions.",
+    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
+    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!",
+    Thief: "Thieves specialize in quick attacks and physical debuffing."
+});
+"use strict";
+
+angular.module("retro").constant("OAUTH_KEYS", {
+    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
+    reddit: "CKzP2LKr74VwYw",
+    facebook: "102489756752863"
+});
+"use strict";
+
+angular.module("retro").constant("MAP_COLORS", {
+    monster: {
+        outline: "#ff0000",
+        fill: "#aa0000"
+    },
+    poi: {
+        outline: "#ffff00",
+        fill: "#aaaa00"
+    },
+    homepoint: {
+        outline: "#00ff00",
+        fill: "#00aa00"
+    },
+    miasma: {
+        outline: "#000000",
+        fill: "#000000"
+    },
+    hero: {
+        outline: "#0000ff",
+        fill: "#0000aa"
+    },
+    heroRadius: {
+        outline: "#ff00ff",
+        fill: "#ff00ff"
+    }
+});
+"use strict";
+
+angular.module("retro").constant("MAP_STYLE", [{
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
+}, {
+    featureType: "landscape",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#abce83" }]
+}, {
+    featureType: "poi",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#769E72" }]
+}, {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#7B8758" }]
+}, {
+    featureType: "poi",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#EBF4A4" }]
+}, {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
+}, {
+    featureType: "road",
+    elementType: "geometry.fill",
+    stylers: [{ visibility: "simplified" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#5B5B3F" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ABCE83" }]
+}, {
+    featureType: "road",
+    elementType: "labels.icon",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "road.local",
+    elementType: "geometry",
+    stylers: [{ color: "#A4C67D" }]
+}, {
+    featureType: "road.arterial",
+    elementType: "geometry",
+    stylers: [{ color: "#9BBF72" }]
+}, {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#EBF4A4" }]
+}, {
+    featureType: "transit",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#495421" }]
+}, {
+    featureType: "administrative.neighborhood",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.land_parcel",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.locality",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
 }]);
 "use strict";
 
@@ -709,7 +712,9 @@ angular.module("retro").service("Auth", ["$localStorage", "$state", "$ionicHisto
 angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory", "Toaster", "$localStorage", "$state", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, $rootScope, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, Config, socket) {
     var flow = {
         toPlayer: function () {
-            if (!_.contains(["home", "create"], $state.current.name)) return;
+            if (!_.contains(["home", "create"], $state.current.name)) {
+                return;
+            }
 
             $ionicHistory.nextViewOptions({
                 disableBack: true
@@ -874,106 +879,7 @@ angular.module("retro").service("Player", ["$q", function ($q) {
 
     var defer = $q.defer();
 
-    var player = {
-        name: "Seiyria",
-        homepoint: {
-            lat: 44.0329402,
-            lon: -88.558683
-        },
-        unlockedProfessions: ["Cleric", "Fighter", "Mage"],
-        professionLevels: {
-            Fighter: 1
-        },
-        profession: "Fighter",
-        stats: {
-            str: 10,
-            agi: 10,
-            int: 10,
-            luk: 1,
-
-            gold: 100,
-            xp: {
-                cur: 100,
-                max: 1000
-            },
-            hp: {
-                cur: 100,
-                max: 1000
-            },
-            mp: {
-                cur: 300,
-                max: 500
-            }
-        },
-        equipment: {
-            weapon: {
-                type: "weapon",
-                name: "Knife",
-                stats: {
-                    str: 1,
-                    int: -1
-                }
-            },
-            armor: {
-                type: "armor",
-                name: "Shirt",
-                weight: 1,
-                stats: {
-                    agi: 2
-                }
-            }
-        },
-        inventory: [{
-            type: "weapon",
-            name: "Dagger",
-            stats: {
-                str: 2
-            }
-        }, {
-            type: "weapon",
-            name: "Club",
-            stats: {
-                str: 3,
-                agi: -1
-            }
-        }, {
-            type: "weapon",
-            name: "Staff",
-            stats: {
-                int: 2
-            }
-        }, {
-            type: "weapon",
-            name: "Main Gauche",
-            stats: {
-                str: 2,
-                agi: 1
-            }
-        }, {
-            type: "weapon",
-            name: "Glaive",
-            stats: {
-                str: 2,
-                agi: 4
-            }
-        }, {
-            type: "armor",
-            name: "Chainmail",
-            weight: 2,
-            stats: {
-                agi: 3,
-                str: 1
-            }
-        }, {
-            type: "armor",
-            name: "Fullplate",
-            weight: 3,
-            stats: {
-                agi: -3,
-                str: 4
-            }
-        }]
-    };
+    var player = {};
 
     var functions = {
         calc: {
