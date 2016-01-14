@@ -1,5 +1,5 @@
 angular.module('retro').controller('ExploreController',
-    ($scope, $ionicLoading, Player, LocationWatcher, Google, MapDrawing) => {
+    ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings, MapDrawing) => {
 
         $scope.mapCreated = (map) => {
             $scope.map = map;
@@ -11,7 +11,7 @@ angular.module('retro').controller('ExploreController',
             $scope.watchMe();
             MapDrawing.drawPlaces(map, Settings.places);
             MapDrawing.drawMonsters(map, Settings.monsters);
-            MapDrawing.addEvents(map);
+            MapDrawing.addMapEvents(map);
         };
 
         $scope.findMe = () => {
@@ -31,7 +31,7 @@ angular.module('retro').controller('ExploreController',
 
             if(centerMap) { $scope.map.setCenter(position); }
 
-            $scope.curPos.setPosition(position);
+            MapDrawing.setCurrentPosition(position);
 
             //socket.emit('nearby', {name: Player.get().name, latitude: coords.latitude, longitude: coords.longitude}, (err, success) => {
             //    console.log(err, JSON.stringify(success));

@@ -160,11 +160,15 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
         });
     };
 
+    const setCurrentPosition = (pos) => curPos.setPosition(pos);
+
     return {
         addMapEvents,
         drawPlaces,
         drawHomepoint,
         drawMe,
-        drawMonsters
+        drawMonsters,
+
+        setCurrentPosition
     };
 });
