@@ -10,3 +10,5 @@ plugins/
 www/lib
 
 npm-*.log
+
+src/js/_init/config.js
