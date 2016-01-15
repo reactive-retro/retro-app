@@ -160,8 +160,10 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
         affectRadius.bindTo('center', curPos, 'position');
     };
 
-    const addMapEvents = (map) => {
+    const addMapEvents = (map, dragCallback = () => {}) => {
         var lastValidCenter = null;
+
+        Google.maps.event.addListener(map, 'drag', dragCallback);
 
         Google.maps.event.addListener(map, 'center_changed', () => {
             if (bounds.contains(map.getCenter())) {

@@ -9756,6 +9756,11 @@ map {
 .gmaps-button {
   position: absolute;
   z-index: 20; }
+  .gmaps-button.findme-button {
+    bottom: 30px;
+    left: 15px; }
+    .gmaps-button.findme-button .icon {
+      font-size: smaller; }
   .gmaps-button.fight-button {
     bottom: 30px;
     right: 15px; }

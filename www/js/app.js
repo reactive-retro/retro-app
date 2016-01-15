@@ -354,6 +354,11 @@ angular.module("retro").controller("CreateCharacterController", ["$scope", "NewH
 angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "Settings", "MapDrawing", function ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings, MapDrawing) {
 
     $scope.currentlySelected = null;
+    $scope.centered = true;
+
+    var unCenter = function () {
+        return $scope.centered = false;
+    };
 
     $scope.mapCreated = function (map) {
         $scope.map = map;
@@ -365,7 +370,12 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
         $scope.watchMe();
         MapDrawing.drawPlaces(map, Settings.places);
         MapDrawing.drawMonsters(map, Settings.monsters, $scope.select);
-        MapDrawing.addMapEvents(map);
+        MapDrawing.addMapEvents(map, unCenter);
+    };
+
+    $scope.centerOnMe = function () {
+        $scope.findMe();
+        $scope.centered = true;
     };
 
     var _setSelected = function (opts) {
@@ -393,7 +403,7 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
 
     $scope.watchMe = function () {
         LocationWatcher.watch.then(null, null, function (coords) {
-            $scope.centerOn(coords);
+            $scope.centerOn(coords, !$scope.centered);
         });
     };
 
@@ -881,7 +891,11 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
     };
 
     var addMapEvents = function (map) {
+        var dragCallback = arguments[1] === undefined ? function () {} : arguments[1];
+
         var lastValidCenter = null;
+
+        Google.maps.event.addListener(map, "drag", dragCallback);
 
         Google.maps.event.addListener(map, "center_changed", function () {
             if (bounds.contains(map.getCenter())) {

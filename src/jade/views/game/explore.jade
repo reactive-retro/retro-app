@@ -2,4 +2,7 @@ script(type="text/ng-template", id="explore")
     ion-view(view-title="Explore")
         ion-content(scroll="false")
             map(on-create="mapCreated(map)", on-click="reset()")
+            button.gmaps-button.findme-button.button(ng-if="!centered", ng-click="centerOnMe()")
+                i.icon.ion-pinpoint
+                | &nbsp;Find Me
             button.gmaps-button.fight-button.button(ng-if="currentlySelected.monster") Fight {{currentlySelected.monster.name}}

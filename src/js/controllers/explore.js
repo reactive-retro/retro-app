@@ -2,6 +2,9 @@ angular.module('retro').controller('ExploreController',
     ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings, MapDrawing) => {
 
         $scope.currentlySelected = null;
+        $scope.centered = true;
+
+        const unCenter = () => $scope.centered = false;
 
         $scope.mapCreated = (map) => {
             $scope.map = map;
@@ -13,7 +16,12 @@ angular.module('retro').controller('ExploreController',
             $scope.watchMe();
             MapDrawing.drawPlaces(map, Settings.places);
             MapDrawing.drawMonsters(map, Settings.monsters, $scope.select);
-            MapDrawing.addMapEvents(map);
+            MapDrawing.addMapEvents(map, unCenter);
+        };
+
+        $scope.centerOnMe = () => {
+            $scope.findMe();
+            $scope.centered = true;
         };
 
         const _setSelected = (opts) => {
@@ -39,7 +47,7 @@ angular.module('retro').controller('ExploreController',
 
         $scope.watchMe = () => {
             LocationWatcher.watch.then(null, null, (coords) => {
-                $scope.centerOn(coords);
+                $scope.centerOn(coords, !$scope.centered);
             });
         };
 

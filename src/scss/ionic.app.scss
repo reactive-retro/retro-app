@@ -66,6 +66,15 @@ map {
   position: absolute;
   z-index: 20;
 
+  &.findme-button {
+    bottom: 30px;
+    left: 15px;
+
+    .icon {
+      font-size: smaller;
+    }
+  }
+
   &.fight-button {
     bottom: 30px;
     right: 15px;
