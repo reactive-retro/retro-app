@@ -1,6 +1,8 @@
 angular.module('retro').controller('ExploreController',
     ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings, MapDrawing) => {
 
+        $scope.currentlySelected = null;
+
         $scope.mapCreated = (map) => {
             $scope.map = map;
             var position = LocationWatcher.current();
@@ -10,8 +12,20 @@ angular.module('retro').controller('ExploreController',
             $scope.findMe();
             $scope.watchMe();
             MapDrawing.drawPlaces(map, Settings.places);
-            MapDrawing.drawMonsters(map, Settings.monsters);
+            MapDrawing.drawMonsters(map, Settings.monsters, $scope.select);
             MapDrawing.addMapEvents(map);
+        };
+
+        $scope.select = (mon, win) => {
+            $scope.reset();
+            $scope.currentlySelected = win;
+        };
+
+        $scope.reset = () => {
+            if($scope.currentlySelected) {
+                $scope.currentlySelected.close();
+            }
+            $scope.currentlySelected = null;
         };
 
         $scope.findMe = () => {
@@ -32,10 +46,6 @@ angular.module('retro').controller('ExploreController',
             if(centerMap) { $scope.map.setCenter(position); }
 
             MapDrawing.setCurrentPosition(position);
-
-            //socket.emit('nearby', {name: Player.get().name, latitude: coords.latitude, longitude: coords.longitude}, (err, success) => {
-            //    console.log(err, JSON.stringify(success));
-            //});
         };
     }
 );

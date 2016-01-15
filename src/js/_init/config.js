@@ -1,5 +1,5 @@
 angular.module('retro').constant('Config', {
-    _cfg: 'DEV',
+    _cfg: 'PROD',
     DEV: {
         url: '192.168.1.9',
         port: 8080

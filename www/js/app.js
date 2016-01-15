@@ -3,6 +3,20 @@
 angular.module("retro", ["ionic", "ngCordova", "ngStorage", "auth0", "angular-jwt"]);
 "use strict";
 
+angular.module("retro").constant("Config", {
+    _cfg: "PROD",
+    DEV: {
+        url: "192.168.1.9",
+        port: 8080
+    },
+    PROD: {
+        protocol: "https",
+        url: "reactive-retro.herokuapp.com",
+        port: 80
+    }
+});
+"use strict";
+
 angular.module("retro").config(["authProvider", function (authProvider) {
     authProvider.init({
         domain: "reactive-retro.auth0.com",
@@ -194,20 +208,6 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
 }]);
 "use strict";
 
-angular.module("retro").constant("Config", {
-    _cfg: "DEV",
-    DEV: {
-        url: "192.168.1.9",
-        port: 8080
-    },
-    PROD: {
-        protocol: "https",
-        url: "reactive-retro.herokuapp.com",
-        port: 80
-    }
-});
-"use strict";
-
 angular.module("retro").constant("CLASSES", {
     Cleric: "Clerics specialize in healing their companions.",
     Fighter: "Fighters specialize in making their enemies hurt via physical means.",
@@ -362,6 +362,8 @@ angular.module("retro").controller("CreateCharacterController", ["$scope", "NewH
 
 angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "Settings", "MapDrawing", function ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings, MapDrawing) {
 
+    $scope.currentlySelected = null;
+
     $scope.mapCreated = function (map) {
         $scope.map = map;
         var position = LocationWatcher.current();
@@ -371,8 +373,20 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
         $scope.findMe();
         $scope.watchMe();
         MapDrawing.drawPlaces(map, Settings.places);
-        MapDrawing.drawMonsters(map, Settings.monsters);
+        MapDrawing.drawMonsters(map, Settings.monsters, $scope.select);
         MapDrawing.addMapEvents(map);
+    };
+
+    $scope.select = function (mon, win) {
+        $scope.reset();
+        $scope.currentlySelected = win;
+    };
+
+    $scope.reset = function () {
+        if ($scope.currentlySelected) {
+            $scope.currentlySelected.close();
+        }
+        $scope.currentlySelected = null;
     };
 
     $scope.findMe = function () {
@@ -403,10 +417,6 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
         }
 
         MapDrawing.setCurrentPosition(position);
-
-        //socket.emit('nearby', {name: Player.get().name, latitude: coords.latitude, longitude: coords.longitude}, (err, success) => {
-        //    console.log(err, JSON.stringify(success));
-        //});
     };
 }]);
 "use strict";
@@ -480,7 +490,8 @@ angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", func
     return {
         restrict: "E",
         scope: {
-            onCreate: "&"
+            onCreate: "&",
+            onClick: "&"
         },
         link: function ($scope, $element) {
 
@@ -510,6 +521,7 @@ angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", func
                 $scope.onCreate({ map: map });
 
                 Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
+                    $scope.onClick();
                     e.preventDefault();
                     return false;
                 });
@@ -781,11 +793,13 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
     };
 
     var drawMonsters = function (map, monsters) {
+        var click = arguments[2] === undefined ? function () {} : arguments[2];
+
         _.each(savedMonsters, function (monster) {
             return monster.setMap(null);
         });
         _.each(monsters, function (monster) {
-            savedMonsters.push(new Google.maps.Marker({
+            var monsterMarker = new Google.maps.Marker({
                 position: new Google.maps.LatLng(monster.location.lat, monster.location.lon),
                 map: map,
                 icon: {
@@ -797,7 +811,22 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
                     fillOpacity: 1,
                     scale: 5
                 }
-            }));
+            });
+
+            monsterMarker.addListener("click", function () {
+
+                console.log("click", monsterMarker, monster);
+
+                var infoWindow = new Google.maps.InfoWindow({
+                    content: monster.name
+                });
+
+                infoWindow.open(map, monsterMarker);
+
+                click(monster, infoWindow);
+            });
+
+            savedMonsters.push(monsterMarker);
         });
     };
 

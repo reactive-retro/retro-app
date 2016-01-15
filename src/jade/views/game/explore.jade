@@ -1,4 +1,4 @@
 script(type="text/ng-template", id="explore")
     ion-view(view-title="Explore")
         ion-content(scroll="false")
-            map(on-create="mapCreated(map)")
+            map(on-create="mapCreated(map)", on-click="reset()")

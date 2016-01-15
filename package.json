@@ -20,6 +20,9 @@
     "gulp-util": "^2.2.14",
     "shelljs": "^0.3.0"
   },
+  "scripts": {
+    "start": "ionic serve -c -l -r"
+  },
   "cordovaPlugins": [
     "org.apache.cordova.geolocation",
     "com.ionic.keyboard",

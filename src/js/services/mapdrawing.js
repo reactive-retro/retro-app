@@ -71,10 +71,10 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
         });
     };
 
-    const drawMonsters = (map, monsters) => {
+    const drawMonsters = (map, monsters, click = () => {}) => {
         _.each(savedMonsters, monster => monster.setMap(null));
         _.each(monsters, monster => {
-            savedMonsters.push(new Google.maps.Marker({
+            const monsterMarker = new Google.maps.Marker({
                 position: new Google.maps.LatLng(monster.location.lat, monster.location.lon),
                 map: map,
                 icon: {
@@ -86,7 +86,22 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
                     fillOpacity: 1,
                     scale: 5
                 }
-            }));
+            });
+
+            monsterMarker.addListener('click', () => {
+
+                console.log('click', monsterMarker, monster);
+
+                const infoWindow = new Google.maps.InfoWindow({
+                    content: monster.name
+                });
+
+                infoWindow.open(map, monsterMarker);
+
+                click(monster, infoWindow);
+            });
+
+            savedMonsters.push(monsterMarker);
         });
     };
 

@@ -2,7 +2,8 @@ angular.module('retro').directive('map', (MAP_STYLE, Toaster, Google) => {
     return {
         restrict: 'E',
         scope: {
-            onCreate: '&'
+            onCreate: '&',
+            onClick: '&'
         },
         link: ($scope, $element) => {
 
@@ -32,6 +33,7 @@ angular.module('retro').directive('map', (MAP_STYLE, Toaster, Google) => {
                 $scope.onCreate({map: map});
 
                 Google.maps.event.addDomListener($element[0], 'mousedown', (e) => {
+                    $scope.onClick();
                     e.preventDefault();
                     return false;
                 });
