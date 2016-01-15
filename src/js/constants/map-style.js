@@ -16,23 +16,8 @@ angular.module('retro').constant('MAP_STYLE', [
     },
     {
         featureType: 'poi',
-        elementType: 'geometry.fill',
         stylers: [
-            { color: '#769E72' }
-        ]
-    },
-    {
-        featureType: 'poi',
-        elementType: 'labels.text.fill',
-        stylers: [
-            { color: '#7B8758' }
-        ]
-    },
-    {
-        featureType: 'poi',
-        elementType: 'labels.text.stroke',
-        stylers: [
-            { color: '#EBF4A4' }
+            { visibility: 'off' }
         ]
     },
     {

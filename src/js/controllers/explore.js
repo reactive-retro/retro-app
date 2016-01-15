@@ -18,12 +18,12 @@ angular.module('retro').controller('ExploreController',
 
         $scope.select = (mon, win) => {
             $scope.reset();
-            $scope.currentlySelected = win;
+            $scope.currentlySelected = { mon, win };
         };
 
         $scope.reset = () => {
-            if($scope.currentlySelected) {
-                $scope.currentlySelected.close();
+            if($scope.currentlySelected && $scope.currentlySelected.win) {
+                $scope.currentlySelected.win.close();
             }
             $scope.currentlySelected = null;
         };

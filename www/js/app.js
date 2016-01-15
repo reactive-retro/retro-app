@@ -250,12 +250,12 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
 
     $scope.select = function (mon, win) {
         $scope.reset();
-        $scope.currentlySelected = win;
+        $scope.currentlySelected = { mon: mon, win: win };
     };
 
     $scope.reset = function () {
-        if ($scope.currentlySelected) {
-            $scope.currentlySelected.close();
+        if ($scope.currentlySelected && $scope.currentlySelected.win) {
+            $scope.currentlySelected.win.close();
         }
         $scope.currentlySelected = null;
     };
@@ -396,16 +396,7 @@ angular.module("retro").constant("MAP_STYLE", [{
     stylers: [{ color: "#abce83" }]
 }, {
     featureType: "poi",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#769E72" }]
-}, {
-    featureType: "poi",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#7B8758" }]
-}, {
-    featureType: "poi",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#EBF4A4" }]
+    stylers: [{ visibility: "off" }]
 }, {
     featureType: "poi.park",
     elementType: "geometry",
