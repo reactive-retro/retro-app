@@ -33,7 +33,7 @@ var lib = [
     './www/lib/auth0-lock/build/auth0-lock.js'
 ];
 
-gulp.task('default', ['sass', 'lib', 'html', 'build', 'watch']);
+gulp.task('default', ['sass', 'lib', 'html', 'build', 'ionic:start', 'watch']);
 
 gulp.task('sass', function(done) {
     gulp.src('./src/scss/ionic.app.scss')
@@ -99,6 +99,11 @@ gulp.task('install', ['git-check'], function() {
         .on('log', function(data) {
             gutil.log('bower', gutil.colors.cyan(data.id), data.message);
         });
+});
+
+gulp.task('ionic:start', function(done) {
+    sh.exec('ionic serve -c -l -r', { async: true });
+    done();
 });
 
 gulp.task('git-check', function(done) {

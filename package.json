@@ -21,7 +21,7 @@
     "shelljs": "^0.3.0"
   },
   "scripts": {
-    "start": "ionic serve -c -l -r"
+    "start": "gulp"
   },
   "cordovaPlugins": [
     "org.apache.cordova.geolocation",
