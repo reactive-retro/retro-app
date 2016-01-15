@@ -208,141 +208,6 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
 }]);
 "use strict";
 
-angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
-    $scope.player = Player.get();
-    $scope.CLASSES = CLASSES;
-    $scope.ClassChangeFlow = ClassChangeFlow;
-
-    Player.observer.then(null, null, function (player) {
-        return $scope.player = player;
-    });
-}]);
-"use strict";
-
-angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "AuthFlow", "$localStorage", function ($scope, NewHero, CLASSES, AuthFlow, $localStorage) {
-    $scope.NewHero = NewHero;
-    $scope.CLASSES = CLASSES;
-    $scope.baseProfessions = ["Thief", "Mage", "Fighter"];
-
-    $scope.create = function () {
-        var hero = _.merge(NewHero, $localStorage);
-        AuthFlow.login(hero);
-    };
-}]);
-"use strict";
-
-angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "Settings", "MapDrawing", function ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings, MapDrawing) {
-
-    $scope.currentlySelected = null;
-
-    $scope.mapCreated = function (map) {
-        $scope.map = map;
-        var position = LocationWatcher.current();
-        MapDrawing.drawMe(map, position);
-        $scope.centerOn(position);
-        MapDrawing.drawHomepoint(map, Player.get().homepoint);
-        $scope.findMe();
-        $scope.watchMe();
-        MapDrawing.drawPlaces(map, Settings.places);
-        MapDrawing.drawMonsters(map, Settings.monsters, $scope.select);
-        MapDrawing.addMapEvents(map);
-    };
-
-    $scope.select = function (mon, win) {
-        $scope.reset();
-        $scope.currentlySelected = { mon: mon, win: win };
-    };
-
-    $scope.reset = function () {
-        if ($scope.currentlySelected && $scope.currentlySelected.win) {
-            $scope.currentlySelected.win.close();
-        }
-        $scope.currentlySelected = null;
-    };
-
-    $scope.findMe = function () {
-        LocationWatcher.ready.then(function (coords) {
-            return $scope.centerOn(coords, true);
-        });
-    };
-
-    $scope.watchMe = function () {
-        LocationWatcher.watch.then(null, null, function (coords) {
-            $scope.centerOn(coords);
-        });
-    };
-
-    $scope.centerOn = function (coords) {
-        var centerMap = arguments[1] === undefined ? false : arguments[1];
-
-        if (!$scope.map) {
-            return;
-        }
-        if (!coords.latitude || !coords.longitude) {
-            return;
-        }
-        var position = new Google.maps.LatLng(coords.latitude, coords.longitude);
-
-        if (centerMap) {
-            $scope.map.setCenter(position);
-        }
-
-        MapDrawing.setCurrentPosition(position);
-    };
-}]);
-"use strict";
-
-angular.module("retro").controller("HomeController", ["$scope", "LocationWatcher", "Auth", function ($scope, LocationWatcher, Auth) {
-    $scope.auth = Auth;
-}]);
-"use strict";
-
-angular.module("retro").controller("InventoryController", ["$scope", "Player", "EquipFlow", function ($scope, Player, EquipFlow) {
-    $scope.player = Player.get();
-    Player.observer.then(null, null, function (player) {
-        return $scope.player = player;
-    });
-    $scope.isEmpty = _.isEmpty;
-
-    $scope.EquipFlow = EquipFlow;
-}]);
-"use strict";
-
-angular.module("retro").controller("MenuController", ["$scope", "$state", "$ionicPopup", "Auth", function ($scope, $state, $ionicPopup, Auth) {
-
-    var logoutCheck = function () {
-        $ionicPopup.confirm({
-            title: "Log out?",
-            template: "Are you sure you want to log out?"
-        }).then(function (res) {
-            if (!res) {
-                return;
-            }
-            Auth.logout();
-        });
-    };
-
-    $scope.stateHref = $state.href;
-
-    $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore" }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-gear-b", name: "Options", state: "options" }, { icon: "ion-android-exit", name: "Logout", call: logoutCheck }];
-
-    $scope.travel = $state.go;
-}]);
-"use strict";
-
-angular.module("retro").controller("PlayerController", ["$scope", "$state", "Player", function ($scope, $state, Player) {
-    $scope.player = Player.get();
-    Player.observer.then(null, null, function (player) {
-        return $scope.player = player;
-    });
-    $scope.isEmpty = _.isEmpty;
-
-    $scope.go = function (to) {
-        $state.go(to);
-    };
-}]);
-"use strict";
-
 angular.module("retro").constant("CLASSES", {
     Cleric: "Clerics specialize in healing their companions.",
     Fighter: "Fighters specialize in making their enemies hurt via physical means.",
@@ -460,6 +325,146 @@ angular.module("retro").constant("MAP_STYLE", [{
     featureType: "administrative.locality",
     elementType: "labels",
     stylers: [{ visibility: "off" }]
+}]);
+"use strict";
+
+angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
+    $scope.player = Player.get();
+    $scope.CLASSES = CLASSES;
+    $scope.ClassChangeFlow = ClassChangeFlow;
+
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
+}]);
+"use strict";
+
+angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "AuthFlow", "$localStorage", function ($scope, NewHero, CLASSES, AuthFlow, $localStorage) {
+    $scope.NewHero = NewHero;
+    $scope.CLASSES = CLASSES;
+    $scope.baseProfessions = ["Thief", "Mage", "Fighter"];
+
+    $scope.create = function () {
+        var hero = _.merge(NewHero, $localStorage);
+        AuthFlow.login(hero);
+    };
+}]);
+"use strict";
+
+angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "Settings", "MapDrawing", function ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings, MapDrawing) {
+
+    $scope.currentlySelected = null;
+
+    $scope.mapCreated = function (map) {
+        $scope.map = map;
+        var position = LocationWatcher.current();
+        MapDrawing.drawMe(map, position);
+        $scope.centerOn(position);
+        MapDrawing.drawHomepoint(map, Player.get().homepoint);
+        $scope.findMe();
+        $scope.watchMe();
+        MapDrawing.drawPlaces(map, Settings.places);
+        MapDrawing.drawMonsters(map, Settings.monsters, $scope.select);
+        MapDrawing.addMapEvents(map);
+    };
+
+    var _setSelected = function (opts) {
+        $scope.currentlySelected = opts;
+        $scope.$apply();
+    };
+
+    $scope.select = function (opts) {
+        $scope.reset();
+        _setSelected(opts);
+    };
+
+    $scope.reset = function () {
+        if ($scope.currentlySelected && $scope.currentlySelected.infoWindow) {
+            $scope.currentlySelected.infoWindow.close();
+        }
+        _setSelected(null);
+    };
+
+    $scope.findMe = function () {
+        LocationWatcher.ready.then(function (coords) {
+            return $scope.centerOn(coords, true);
+        });
+    };
+
+    $scope.watchMe = function () {
+        LocationWatcher.watch.then(null, null, function (coords) {
+            $scope.centerOn(coords);
+        });
+    };
+
+    $scope.centerOn = function (coords) {
+        var centerMap = arguments[1] === undefined ? false : arguments[1];
+
+        if (!$scope.map) {
+            return;
+        }
+        if (!coords.latitude || !coords.longitude) {
+            return;
+        }
+        var position = new Google.maps.LatLng(coords.latitude, coords.longitude);
+
+        if (centerMap) {
+            $scope.map.setCenter(position);
+        }
+
+        MapDrawing.setCurrentPosition(position);
+    };
+}]);
+"use strict";
+
+angular.module("retro").controller("HomeController", ["$scope", "LocationWatcher", "Auth", function ($scope, LocationWatcher, Auth) {
+    $scope.auth = Auth;
+}]);
+"use strict";
+
+angular.module("retro").controller("InventoryController", ["$scope", "Player", "EquipFlow", function ($scope, Player, EquipFlow) {
+    $scope.player = Player.get();
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
+    $scope.isEmpty = _.isEmpty;
+
+    $scope.EquipFlow = EquipFlow;
+}]);
+"use strict";
+
+angular.module("retro").controller("MenuController", ["$scope", "$state", "$ionicPopup", "Auth", function ($scope, $state, $ionicPopup, Auth) {
+
+    var logoutCheck = function () {
+        $ionicPopup.confirm({
+            title: "Log out?",
+            template: "Are you sure you want to log out?"
+        }).then(function (res) {
+            if (!res) {
+                return;
+            }
+            Auth.logout();
+        });
+    };
+
+    $scope.stateHref = $state.href;
+
+    $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore" }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-gear-b", name: "Options", state: "options" }, { icon: "ion-android-exit", name: "Logout", call: logoutCheck }];
+
+    $scope.travel = $state.go;
+}]);
+"use strict";
+
+angular.module("retro").controller("PlayerController", ["$scope", "$state", "Player", function ($scope, $state, Player) {
+    $scope.player = Player.get();
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
+    $scope.isEmpty = _.isEmpty;
+
+    $scope.go = function (to) {
+        $state.go(to);
+    };
 }]);
 "use strict";
 
@@ -806,15 +811,13 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
 
             monsterMarker.addListener("click", function () {
 
-                console.log("click", monsterMarker, monster);
-
                 var infoWindow = new Google.maps.InfoWindow({
                     content: monster.name
                 });
 
                 infoWindow.open(map, monsterMarker);
 
-                click(monster, infoWindow);
+                click({ monster: monster, infoWindow: infoWindow });
             });
 
             savedMonsters.push(monsterMarker);

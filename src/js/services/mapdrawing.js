@@ -90,15 +90,13 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
 
             monsterMarker.addListener('click', () => {
 
-                console.log('click', monsterMarker, monster);
-
                 const infoWindow = new Google.maps.InfoWindow({
                     content: monster.name
                 });
 
                 infoWindow.open(map, monsterMarker);
 
-                click(monster, infoWindow);
+                click({ monster, infoWindow });
             });
 
             savedMonsters.push(monsterMarker);

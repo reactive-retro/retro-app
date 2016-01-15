@@ -9752,3 +9752,10 @@ map {
 
 .scroll {
   height: 100%; }
+
+.gmaps-button {
+  position: absolute;
+  z-index: 20; }
+  .gmaps-button.fight-button {
+    bottom: 30px;
+    right: 15px; }

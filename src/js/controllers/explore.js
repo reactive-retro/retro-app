@@ -16,16 +16,21 @@ angular.module('retro').controller('ExploreController',
             MapDrawing.addMapEvents(map);
         };
 
-        $scope.select = (mon, win) => {
+        const _setSelected = (opts) => {
+            $scope.currentlySelected = opts;
+            $scope.$apply();
+        };
+
+        $scope.select = (opts) => {
             $scope.reset();
-            $scope.currentlySelected = { mon, win };
+            _setSelected(opts);
         };
 
         $scope.reset = () => {
-            if($scope.currentlySelected && $scope.currentlySelected.win) {
-                $scope.currentlySelected.win.close();
+            if($scope.currentlySelected && $scope.currentlySelected.infoWindow) {
+                $scope.currentlySelected.infoWindow.close();
             }
-            $scope.currentlySelected = null;
+            _setSelected(null);
         };
 
         $scope.findMe = () => {
