@@ -12,4 +12,7 @@ script(type="text/ng-template", id="index")
 
             .row.row-bottom
                 .col
-                    button.button.button-balanced.button-block(ng-click="auth.login()", ng-disabled="!canConnect") Login
+                    button.button.button-balanced.button-block(ng-click="auth.login()", ng-disabled="!canConnect", ng-show="!attemptAutoLogin") Login
+                    button.button.button-balanced.button-block.button-clear(ng-if="attemptAutoLogin", disabled)
+                        ion-spinner
+                        | &nbsp;Logging you in...

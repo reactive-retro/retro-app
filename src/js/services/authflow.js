@@ -31,6 +31,7 @@ angular.module('retro').service('AuthFlow', ($q, $rootScope, $ionicHistory, Toas
 
             var currentLocation = LocationWatcher.current();
             if(!currentLocation) {
+                $rootScope.attemptAutoLogin = false;
                 return Toaster.show('No current location. Is your GPS on?');
             }
 
@@ -49,6 +50,8 @@ angular.module('retro').service('AuthFlow', ($q, $rootScope, $ionicHistory, Toas
                     flow.isLoggedIn = true;
                     $localStorage.env = Config._cfg;
                 }
+
+                $rootScope.attemptAutoLogin = false;
 
                 if(!swallow) {
                     var msgObj = err ? err : success;

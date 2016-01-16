@@ -21,7 +21,7 @@ angular.module('retro').service('LocationWatcher', ($q) => {
             navigator.geolocation.watchPosition((position) => {
                 currentCoords = position.coords;
                 defer.notify(currentCoords);
-            }, error, {timeout: 30000});
+            }, error, {timeout: 10000});
         },
 
         ready: ready.promise,

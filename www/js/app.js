@@ -36,6 +36,7 @@ angular.module("retro").config(["authProvider", function (authProvider) {
             return;
         } // jshint ignore:line
 
+        $rootScope.attemptAutoLogin = true;
         AuthFlow.login(_.clone($localStorage), true);
     };
 
@@ -619,6 +620,7 @@ angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory"
 
             var currentLocation = LocationWatcher.current();
             if (!currentLocation) {
+                $rootScope.attemptAutoLogin = false;
                 return Toaster.show("No current location. Is your GPS on?");
             }
 
@@ -637,6 +639,8 @@ angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory"
                     flow.isLoggedIn = true;
                     $localStorage.env = Config._cfg;
                 }
+
+                $rootScope.attemptAutoLogin = false;
 
                 if (!swallow) {
                     var msgObj = err ? err : success;
@@ -724,7 +728,7 @@ angular.module("retro").service("LocationWatcher", ["$q", function ($q) {
             navigator.geolocation.watchPosition(function (position) {
                 currentCoords = position.coords;
                 defer.notify(currentCoords);
-            }, error, { timeout: 30000 });
+            }, error, { timeout: 10000 });
         },
 
         ready: ready.promise,

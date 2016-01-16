@@ -17,6 +17,7 @@ angular.module('retro')
         const autologin = () => {
             if(!auth.isAuthenticated || !$localStorage.profile || !$localStorage.profile.user_id) { return; } // jshint ignore:line
 
+            $rootScope.attemptAutoLogin = true;
             AuthFlow.login(_.clone($localStorage), true);
         };
 
