@@ -1,5 +1,5 @@
 angular.module('retro').controller('SkillChangeController',
-    ($scope, $ionicModal, Player, skills) => {
+    ($scope, $ionicModal, Player, SkillChangeFlow, skills) => {
         $scope.player = Player.get();
 
         $scope.allSkills = _(skills)
@@ -16,6 +16,17 @@ angular.module('retro').controller('SkillChangeController',
         $scope.openSkillInfo = (skill) => {
             $scope.activeSkill = skill;
             $scope.modal.show();
+        };
+
+        $scope.setSkillInSlot = (skill, slot) => {
+            // unset skill
+            if($scope.player.skills[slot] === skill) {
+                SkillChangeFlow.change(null, slot);
+                return;
+            }
+
+            // set skill
+            SkillChangeFlow.change(skill, slot);
         };
 
         $scope.closeSkillInfo = () => $scope.modal.hide();
