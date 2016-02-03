@@ -5,7 +5,9 @@ script(type="text/ng-template", id="player")
                 div.item.item-divider
                     h2
                         span {{player.name}}
-                        i.icon.ion-arrow-swap.float-right(ui-sref="changeclass")
+                        span.float-right
+                            button.button.button-small(ng-click="go('changeclass')")
+                                i.icon.ion-arrow-swap
 
                     p Level {{player.professionLevels[player.profession]}} {{player.profession}}
 
@@ -41,7 +43,9 @@ script(type="text/ng-template", id="player")
                 div.item.item-divider
                     h2
                         span {{player.equipment.weapon.name}}
-                        i.icon.ion-arrow-swap.float-right(ng-click="go('inventory.weapons')")
+                        span.float-right
+                            button.button.button-small(ng-click="go('inventory.weapons')")
+                                i.icon.ion-arrow-swap
                     p Weapon
 
                 div.item.item-body
@@ -67,7 +71,9 @@ script(type="text/ng-template", id="player")
                 div.item.item-divider
                     h2
                         span {{player.equipment.armor.name}}
-                        i.icon.ion-arrow-swap.float-right(ng-click="go('inventory.armor')")
+                        span.float-right
+                            button.button.button-small(ng-click="go('inventory.armor')")
+                                i.icon.ion-arrow-swap
                     p Armor
                 div.item.item-body
                     div.row
