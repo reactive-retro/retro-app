@@ -398,6 +398,12 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
         $scope.modal.show();
     };
 
+    $scope.countNumTimesSkillSet = function (skillName) {
+        return _.filter($scope.player.skills, function (skill) {
+            return skill === skillName;
+        }).length;
+    };
+
     $scope.setSkillInSlot = function (skill, slot) {
         // unset skill
         if ($scope.player.skills[slot] === skill) {

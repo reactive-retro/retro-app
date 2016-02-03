@@ -18,6 +18,8 @@ angular.module('retro').controller('SkillChangeController',
             $scope.modal.show();
         };
 
+        $scope.countNumTimesSkillSet = (skillName) => _.filter($scope.player.skills, skill => skill === skillName).length;
+
         $scope.setSkillInSlot = (skill, slot) => {
             // unset skill
             if($scope.player.skills[slot] === skill) {
