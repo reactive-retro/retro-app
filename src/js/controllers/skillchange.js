@@ -1,8 +1,8 @@
 angular.module('retro').controller('SkillChangeController',
-    ($scope, $ionicModal, Player, SkillChangeFlow, skills) => {
+    ($scope, $ionicModal, Player, SkillChangeFlow) => {
         $scope.player = Player.get();
 
-        $scope.allSkills = _(skills)
+        $scope.getAllSkills = () => _($scope.player.possibleSkills)
             .each(skill => skill.spellLevel = skill.spellClasses[_.keys(skill.spellClasses)[0]])
             .sortBy([
                 'spellLevel',
@@ -12,6 +12,8 @@ angular.module('retro').controller('SkillChangeController',
                 return _.keys(skill.spellClasses)[0];
             })
             .value();
+
+        $scope.allSkills = $scope.getAllSkills();
 
         $scope.openSkillInfo = (skill) => {
             $scope.activeSkill = skill;
@@ -45,6 +47,9 @@ angular.module('retro').controller('SkillChangeController',
             $scope.modal.remove();
         });
 
-        Player.observer.then(null, null, (player) => $scope.player = player);
+        Player.observer.then(null, null, (player) => {
+            $scope.player = player;
+            $scope.allSkills = $scope.getAllSkills();
+        });
     }
 );

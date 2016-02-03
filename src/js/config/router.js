@@ -40,20 +40,7 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
             controller: 'SkillChangeController',
             data: { requiresLogin: true },
             resolve: {
-                playerLoaded: ($injector) => $injector.get('Settings').isReady,
-                skills: ($q, Player, socket) => {
-                    const defer = $q.defer();
-
-                    socket.emit('getskills', { name: Player.get().name }, (err, res) => {
-                        if(!res || !res.skills) {
-                            defer.reject();
-                            return;
-                        }
-                        defer.resolve(res.skills);
-                    });
-
-                    return defer.promise;
-                }
+                playerLoaded: ($injector) => $injector.get('Settings').isReady
             }
         })
         .state('inventory', {
