@@ -21,10 +21,6 @@ $ionicons-font-path: "../lib/ionic/release/fonts" !default;
   font-style: italic;
 }
 
-.platform-browser ion-tabs .pane .card:first-child, .header-bar-margin {
-  margin-top: 54px !important; //44 for the header bar, 10 for padding
-}
-
 ion-content .scroll {
   min-height: 70%;
 }
