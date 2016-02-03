@@ -40,7 +40,9 @@ script(type="text/ng-template", id="inventory-item")
     div.item.item-divider
         h2
             span {{item.name}}
-            i.icon.ion-arrow-swap.float-right(ng-click="EquipFlow.equip(item)")
+            span.float-right
+                button.button.button-small(ng-click="EquipFlow.equip(item)")
+                    i.icon.ion-arrow-swap
     div.item.item-body
         div.row
             div.col(ng-if="item.stats.str")

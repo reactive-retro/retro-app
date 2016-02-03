@@ -5,8 +5,11 @@ script(type="text/ng-template", id="changeclass")
                 div.item.item-divider
                     h2
                         span {{prof}} (level {{player.professionLevels[prof]}})
-                        i.icon.ion-arrow-swap.float-right(ng-click="ClassChangeFlow.change(prof)", ng-if="prof !== player.profession")
-                        i.icon.ion-star.float-right(ng-if="prof === player.profession")
+                        span.float-right
+                            button.button.button-small(ng-click="ClassChangeFlow.change(prof)", ng-if="prof !== player.profession")
+                                i.icon.ion-arrow-swap
+                            button.button.button-small(disabled, ng-if="prof === player.profession")
+                                i.icon.ion-star
                 div.item.item-body
                     div.row
                         div.col {{CLASSES[prof]}}
