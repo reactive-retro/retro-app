@@ -5,12 +5,20 @@ $ionicons-font-path: "../lib/ionic/release/fonts" !default;
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
 
+.padding-0 {
+  padding: 0 !important;
+}
+
 .float-right {
   float: right;
 }
 
 .text-center {
   text-align: center;
+}
+
+.italic {
+  font-style: italic;
 }
 
 .platform-browser ion-tabs .pane .card:first-child, .header-bar-margin {
@@ -21,7 +29,7 @@ ion-content .scroll {
   min-height: 70%;
 }
 
-h3.subdued {
+.subdued {
   color: #888;
 }
 
@@ -78,5 +86,47 @@ map {
   &.fight-button {
     bottom: 30px;
     right: 15px;
+  }
+}
+
+.skill-modal-container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+
+  .data-area {
+    flex: 1;
+  }
+
+  .desc-area {
+    flex: 1;
+  }
+
+  .assign-area {
+    flex: 4;
+  }
+
+  .col-flex {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .skill-container {
+    flex: 0.5;
+
+    .skill-row {
+      flex: 0.5;
+
+      .skill-slot {
+        text-align: center;
+        align-self: center;
+
+        .skill-button {
+          line-height: inherit;
+          font-size: inherit;
+          padding: inherit;
+        }
+      }
+    }
   }
 }

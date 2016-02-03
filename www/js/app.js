@@ -4,9 +4,9 @@ angular.module("retro", ["ionic", "ngCordova", "ngStorage", "auth0", "angular-jw
 "use strict";
 
 angular.module("retro").constant("Config", {
-    _cfg: "PROD",
+    _cfg: "DEV",
     DEV: {
-        url: "192.168.1.9",
+        url: "192.168.1.7",
         port: 8080
     },
     PROD: {
@@ -135,6 +135,29 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
         resolve: {
             playerLoaded: ["$injector", function ($injector) {
                 return $injector.get("Settings").isReady;
+            }]
+        }
+    }).state("changeskills", {
+        url: "/changeskills",
+        templateUrl: "changeskills",
+        controller: "SkillChangeController",
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }],
+            skills: ["$q", "Player", "socket", function ($q, Player, socket) {
+                var defer = $q.defer();
+
+                socket.emit("getskills", { name: Player.get().name }, function (err, res) {
+                    if (!res || !res.skills) {
+                        defer.reject();
+                        return;
+                    }
+                    defer.resolve(res.skills);
+                });
+
+                return defer.promise;
             }]
         }
     }).state("inventory", {
@@ -460,9 +483,11 @@ angular.module("retro").controller("MenuController", ["$scope", "$state", "$ioni
 
     $scope.stateHref = $state.href;
 
-    $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore" }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-gear-b", name: "Options", state: "options" }, { icon: "ion-android-exit", name: "Logout", call: logoutCheck }];
+    $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore" }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-university", name: "Skills", state: "changeskills" }, { icon: "ion-gear-b", name: "Options", state: "options" }, { icon: "ion-android-exit", name: "Logout", call: logoutCheck }];
 
-    $scope.travel = $state.go;
+    $scope.travel = function (state) {
+        return $state.go(state, { timestamp: Date.now() });
+    };
 }]);
 "use strict";
 
@@ -476,6 +501,42 @@ angular.module("retro").controller("PlayerController", ["$scope", "$state", "Pla
     $scope.go = function (to) {
         $state.go(to);
     };
+}]);
+"use strict";
+
+angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicModal", "Player", "skills", function ($scope, $ionicModal, Player, skills) {
+    $scope.player = Player.get();
+
+    $scope.allSkills = _(skills).each(function (skill) {
+        return skill.spellLevel = skill.spellClasses[_.keys(skill.spellClasses)[0]];
+    }).sortBy(["spellLevel", "spellName"]).groupBy(function (skill) {
+        return _.keys(skill.spellClasses)[0];
+    }).value();
+
+    $scope.openSkillInfo = function (skill) {
+        $scope.activeSkill = skill;
+        $scope.modal.show();
+    };
+
+    $scope.closeSkillInfo = function () {
+        return $scope.modal.hide();
+    };
+
+    $ionicModal.fromTemplateUrl("changeskill.info", {
+        scope: $scope,
+        animation: "slide-in-up"
+    }).then(function (modal) {
+        $scope.modal = modal;
+    });
+
+    // clean up modal b/c memory
+    $scope.$on("$destroy", function () {
+        $scope.modal.remove();
+    });
+
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
 }]);
 "use strict";
 

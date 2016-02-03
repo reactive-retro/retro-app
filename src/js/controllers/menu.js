@@ -17,10 +17,11 @@ angular.module('retro').controller('MenuController',
             { icon: 'ion-person', name: 'Player', state: 'player' },
             { icon: 'ion-earth', name: 'Explore', state: 'explore' },
             { icon: 'ion-briefcase', name: 'Inventory', state: 'inventory' },
+            { icon: 'ion-university', name: 'Skills', state: 'changeskills' },
             { icon: 'ion-gear-b', name: 'Options', state: 'options' },
             { icon: 'ion-android-exit', name: 'Logout', call: logoutCheck }
         ];
 
-        $scope.travel = $state.go;
+        $scope.travel = (state) => $state.go(state, { timestamp: Date.now() });
     }
 );

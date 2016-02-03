@@ -9712,11 +9712,17 @@ a.button {
   -webkit-transition-duration: 0s;
   transition-duration: 0s; }
 
+.padding-0 {
+  padding: 0 !important; }
+
 .float-right {
   float: right; }
 
 .text-center {
   text-align: center; }
+
+.italic {
+  font-style: italic; }
 
 .platform-browser ion-tabs .pane .card:first-child, .header-bar-margin {
   margin-top: 54px !important; }
@@ -9724,7 +9730,7 @@ a.button {
 ion-content .scroll {
   min-height: 70%; }
 
-h3.subdued {
+.subdued {
   color: #888; }
 
 .vertical-center {
@@ -9764,3 +9770,28 @@ map {
   .gmaps-button.fight-button {
     bottom: 30px;
     right: 15px; }
+
+.skill-modal-container {
+  display: flex;
+  height: 100%;
+  flex-direction: column; }
+  .skill-modal-container .data-area {
+    flex: 1; }
+  .skill-modal-container .desc-area {
+    flex: 1; }
+  .skill-modal-container .assign-area {
+    flex: 4; }
+  .skill-modal-container .col-flex {
+    display: flex;
+    flex-direction: column; }
+  .skill-modal-container .skill-container {
+    flex: 0.5; }
+    .skill-modal-container .skill-container .skill-row {
+      flex: 0.5; }
+      .skill-modal-container .skill-container .skill-row .skill-slot {
+        text-align: center;
+        align-self: center; }
+        .skill-modal-container .skill-container .skill-row .skill-slot .skill-button {
+          line-height: inherit;
+          font-size: inherit;
+          padding: inherit; }

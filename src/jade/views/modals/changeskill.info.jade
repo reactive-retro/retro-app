@@ -1,0 +1,74 @@
+
+script(type="text/ng-template", id="changeskill.info")
+    ion-modal-view
+        ion-header-bar.bar-balanced
+            .buttons
+                button.button(ng-click="closeSkillInfo()")
+                    i.icon.ion-close
+            h1.title {{activeSkill.spellName}} (Level {{activeSkill.spellLevel}})
+        ion-content.skill-modal-container(scroll="false")
+            .row.data-area
+                .col
+                    .row
+                        .col.text-center
+                            i.icon.ion-clock
+                            span &nbsp;
+                            ng-pluralize(count="activeSkill.spellCooldown", when="{'0': 'instant', 'one': '1 round', 'other': '{} rounds'}")
+                        .col.text-center
+                            i.icon.ion-waterdrop
+                            span &nbsp;
+                            span {{activeSkill.spellCost}} mp
+                        .col.text-center
+                            i.icon.ion-android-contact
+                            span &nbsp;
+                            span {{activeSkill.spellTargets}}
+
+            .row.desc-area
+                .col.text-center {{activeSkill.spellDescription}}
+
+            .row.assign-area
+                .col.col-flex
+                    .row
+                        .col.text-center
+                            h3.title Assign Skill
+
+                    .row.skill-container
+                        .col.col-flex
+                            .row.skill-row
+                                .col.skill-slot
+                                    .row
+                                        .col Slot 1
+                                    .row
+                                        .col
+                                            button.button.button-full.skill-button(ng-class="{}") Bash
+                                .col.skill-slot
+                                    .row
+                                        .col Slot 2
+                                    .row
+                                        .col
+                                            button.button.button-full.skill-button(ng-class="{}") Bash
+                                .col.skill-slot
+                                    .row
+                                        .col Slot 3
+                                    .row
+                                        .col
+                                            button.button.button-full.skill-button(ng-class="{}") Bash
+                            .row.skill-row
+                                .col.skill-slot
+                                    .row
+                                        .col Slot 4
+                                    .row
+                                        .col
+                                            button.button.button-full.skill-button(ng-class="{}") Eat Spinach
+                                .col.skill-slot
+                                    .row
+                                        .col Slot 5
+                                    .row
+                                        .col
+                                            button.button.button-full.skill-button(ng-class="{}") Eat More Spinach
+                                .col.skill-slot
+                                    .row
+                                        .col Slot 6
+                                    .row
+                                        .col
+                                            button.button.button-full.skill-button(ng-class="{}") Bash

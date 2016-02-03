@@ -1,0 +1,16 @@
+script(type="text/ng-template", id="changeskills")
+    ion-view(view-title="Skills")
+        ion-content
+            .list(ng-repeat="(prof, profSkills) in allSkills")
+                .item.item-divider {{prof}}
+                .item(ng-repeat="skill in profSkills", ng-click="openSkillInfo(skill)")
+                    .row.padding-0
+                        .col.padding-0
+                            span {{skill.spellName}}
+                            span &nbsp;
+                            small.italic.subdued Level {{skill.spellLevel}}
+                        .col.padding-0.text-right
+                            span
+                                i.icon.ion-star
+                                | &nbsp;
+                                | 1
