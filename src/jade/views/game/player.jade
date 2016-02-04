@@ -24,16 +24,16 @@ script(type="text/ng-template", id="player")
                                 div.stat-bar.xp(style="width: {{player.stats.xp.cur/player.stats.xp.max*100}}%")
 
                     div.row
-                        div.col(ng-if="player.calc.stat('str')")
-                            color-text(pre-text="STR", value="{{player.calc.stat('str')}}")
-                        div.col(ng-if="player.calc.stat('dex')")
-                            color-text(pre-text="DEX", value="{{player.calc.stat('dex')}}")
-                        div.col(ng-if="player.calc.stat('vit')")
-                            color-text(pre-text="VIT", value="{{player.calc.stat('vit')}}")
-                        div.col(ng-if="player.calc.stat('mnt')")
-                            color-text(pre-text="MNT", value="{{player.calc.stat('mnt')}}")
-                        div.col(ng-if="player.calc.stat('luk')")
-                            color-text(pre-text="LUK", value="{{player.calc.stat('luk')}}")
+                        div.col(ng-if="player.stats.str")
+                            color-text(pre-text="STR", value="{{player.stats.str}}")
+                        div.col(ng-if="player.stats.dex")
+                            color-text(pre-text="DEX", value="{{player.stats.dex}}")
+                        div.col(ng-if="player.stats.vit")
+                            color-text(pre-text="VIT", value="{{player.stats.vit}}")
+                        div.col(ng-if="player.stats.mnt")
+                            color-text(pre-text="MNT", value="{{player.stats.mnt}}")
+                        div.col(ng-if="player.stats.luk")
+                            color-text(pre-text="LUK", value="{{player.stats.luk}}")
 
                     div.row
                         div.col

@@ -5,17 +5,10 @@ angular.module('retro').service('Player', ($q, Skills) => {
 
     let player = {};
 
-    const functions = {
-        calc: {
-            stat: (stat) => _.reduce(player.equipment, (prev, item) => prev + (item.stats[stat] || 0), 0)
-        }
-    };
-
     let oldProfession = '';
 
     const updatePlayer = (newPlayer) => {
         player = newPlayer;
-        _.merge(player, functions);
         defer.notify(player);
     };
 

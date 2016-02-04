@@ -9776,6 +9776,8 @@ map {
     flex: 1; }
   .skill-modal-container .desc-area {
     flex: 1; }
+  .skill-modal-container .effects-area {
+    flex: 1; }
   .skill-modal-container .assign-area {
     flex: 4; }
   .skill-modal-container .col-flex {

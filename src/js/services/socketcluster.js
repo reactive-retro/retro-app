@@ -5,8 +5,8 @@ angular.module('retro')
 
         const socket = socketCluster.connect({
             protocol: Config[Config._cfg].protocol,
-            hostname: Config[Config._cfg].url, port:
-            Config[Config._cfg].port
+            hostname: Config[Config._cfg].url,
+            port: Config[Config._cfg].port
         });
 
         const codes = {

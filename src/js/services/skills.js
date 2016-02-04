@@ -7,11 +7,7 @@ angular.module('retro').service('Skills', ($q, socket) => {
 
     const getNewSkills = (player) => {
         socket.emit('getskills', { name: player.name }, (err, res) => {
-            if(!res || !res.skills) {
-                skills = [];
-            } else {
-                skills = res.skills;
-            }
+            skills = res && res.skills ? res.skills : [];
             defer.notify(skills);
         });
     };

@@ -1,5 +1,5 @@
 angular.module('retro').controller('SkillChangeController',
-    ($scope, $ionicModal, Player, Skills, SkillChangeFlow) => {
+    ($scope, $ionicModal, Player, Skills, SkillChangeFlow, Dice) => {
         $scope.player = Player.get();
 
         const getAllSkills = (baseSkills) => _(baseSkills)
@@ -17,6 +17,16 @@ angular.module('retro').controller('SkillChangeController',
 
         $scope.openSkillInfo = (skill) => {
             $scope.activeSkill = skill;
+            $scope.activeSkillAttrs = _(skill.spellEffects)
+                .keys()
+                .map(key => {
+                    const stats = Dice.statistics(skill.spellEffects[key].roll, $scope.player.stats);
+                    return { name: key, value: stats, extra: skill.spellEffects[key] };
+                })
+                // Damage always comes first
+                .sortBy((obj) => obj.name === 'Damage' ? '*' : obj.name)
+                .value();
+
             $scope.modal.show();
         };
 

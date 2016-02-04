@@ -23,6 +23,7 @@ var paths = {
 
 var lib = [
     './www/lib/lodash/lodash.js',
+    './www/lib/dice.js/build/dice.js',
     './www/lib/ionic/release/js/ionic.bundle.js',
     './www/lib/ngCordova/dist/ng-cordova.js',
     './www/lib/auth0-angular/build/auth0-angular.js',

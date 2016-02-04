@@ -26,6 +26,18 @@ script(type="text/ng-template", id="changeskill.info")
             .row.desc-area
                 .col.text-center {{activeSkill.spellDescription}}
 
+            .row.effects-area
+                .col.text-center
+                    .row(ng-repeat="effect in activeSkillAttrs")
+                        .col.text-right
+                            strong {{effect.name}}
+                        .col.text-left
+                            span {{effect.value.min_possible}}
+                            span(ng-if="effect.value.min_possible !== effect.value.max_possible") -{{effect.value.max_possible}}
+                            span &nbsp;
+                            ng-pluralize(ng-if="effect.extra.isRounds", count="effect.value.max_possible", when="{'one': 'round', 'other': 'rounds'}")
+
+
             .row.assign-area
                 .col.col-flex
                     .row

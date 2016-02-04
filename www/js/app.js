@@ -219,6 +219,126 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
 }]);
 "use strict";
 
+angular.module("retro").constant("CLASSES", {
+    Cleric: "Clerics specialize in healing their companions.",
+    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
+    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!",
+    Thief: "Thieves specialize in quick attacks and physical debuffing."
+});
+"use strict";
+
+angular.module("retro").constant("OAUTH_KEYS", {
+    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
+    reddit: "CKzP2LKr74VwYw",
+    facebook: "102489756752863"
+});
+"use strict";
+
+angular.module("retro").constant("MAP_COLORS", {
+    monster: {
+        outline: "#ff0000",
+        fill: "#aa0000"
+    },
+    poi: {
+        outline: "#ffff00",
+        fill: "#aaaa00"
+    },
+    homepoint: {
+        outline: "#00ff00",
+        fill: "#00aa00"
+    },
+    miasma: {
+        outline: "#000000",
+        fill: "#000000"
+    },
+    hero: {
+        outline: "#0000ff",
+        fill: "#0000aa"
+    },
+    heroRadius: {
+        outline: "#ff00ff",
+        fill: "#ff00ff"
+    }
+});
+"use strict";
+
+angular.module("retro").constant("MAP_STYLE", [{
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
+}, {
+    featureType: "landscape",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#abce83" }]
+}, {
+    featureType: "poi",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
+}, {
+    featureType: "road",
+    elementType: "geometry.fill",
+    stylers: [{ visibility: "simplified" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#5B5B3F" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ABCE83" }]
+}, {
+    featureType: "road",
+    elementType: "labels.icon",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "road.local",
+    elementType: "geometry",
+    stylers: [{ color: "#A4C67D" }]
+}, {
+    featureType: "road.arterial",
+    elementType: "geometry",
+    stylers: [{ color: "#9BBF72" }]
+}, {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#EBF4A4" }]
+}, {
+    featureType: "transit",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#495421" }]
+}, {
+    featureType: "administrative.neighborhood",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.land_parcel",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.locality",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}]);
+"use strict";
+
 angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
     $scope.player = Player.get();
     $scope.CLASSES = CLASSES;
@@ -371,7 +491,7 @@ angular.module("retro").controller("PlayerController", ["$scope", "$state", "Pla
 }]);
 "use strict";
 
-angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicModal", "Player", "Skills", "SkillChangeFlow", function ($scope, $ionicModal, Player, Skills, SkillChangeFlow) {
+angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicModal", "Player", "Skills", "SkillChangeFlow", "Dice", function ($scope, $ionicModal, Player, Skills, SkillChangeFlow, Dice) {
     $scope.player = Player.get();
 
     var getAllSkills = function (baseSkills) {
@@ -386,6 +506,15 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
 
     $scope.openSkillInfo = function (skill) {
         $scope.activeSkill = skill;
+        $scope.activeSkillAttrs = _(skill.spellEffects).keys().map(function (key) {
+            var stats = Dice.statistics(skill.spellEffects[key].roll, $scope.player.stats);
+            return { name: key, value: stats, extra: skill.spellEffects[key] };
+        })
+        // Damage always comes first
+        .sortBy(function (obj) {
+            return obj.name === "Damage" ? "*" : obj.name;
+        }).value();
+
         $scope.modal.show();
     };
 
@@ -428,126 +557,6 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
     Skills.observer.then(null, null, function (skills) {
         return $scope.allSkills = getAllSkills(skills);
     });
-}]);
-"use strict";
-
-angular.module("retro").constant("CLASSES", {
-    Cleric: "Clerics specialize in healing their companions.",
-    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
-    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!",
-    Thief: "Thieves specialize in quick attacks and physical debuffing."
-});
-"use strict";
-
-angular.module("retro").constant("OAUTH_KEYS", {
-    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
-    reddit: "CKzP2LKr74VwYw",
-    facebook: "102489756752863"
-});
-"use strict";
-
-angular.module("retro").constant("MAP_COLORS", {
-    monster: {
-        outline: "#ff0000",
-        fill: "#aa0000"
-    },
-    poi: {
-        outline: "#ffff00",
-        fill: "#aaaa00"
-    },
-    homepoint: {
-        outline: "#00ff00",
-        fill: "#00aa00"
-    },
-    miasma: {
-        outline: "#000000",
-        fill: "#000000"
-    },
-    hero: {
-        outline: "#0000ff",
-        fill: "#0000aa"
-    },
-    heroRadius: {
-        outline: "#ff00ff",
-        fill: "#ff00ff"
-    }
-});
-"use strict";
-
-angular.module("retro").constant("MAP_STYLE", [{
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
-}, {
-    featureType: "landscape",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#abce83" }]
-}, {
-    featureType: "poi",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
-}, {
-    featureType: "road",
-    elementType: "geometry.fill",
-    stylers: [{ visibility: "simplified" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#5B5B3F" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ABCE83" }]
-}, {
-    featureType: "road",
-    elementType: "labels.icon",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "road.local",
-    elementType: "geometry",
-    stylers: [{ color: "#A4C67D" }]
-}, {
-    featureType: "road.arterial",
-    elementType: "geometry",
-    stylers: [{ color: "#9BBF72" }]
-}, {
-    featureType: "road.highway",
-    elementType: "geometry",
-    stylers: [{ color: "#EBF4A4" }]
-}, {
-    featureType: "transit",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.stroke",
-    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#495421" }]
-}, {
-    featureType: "administrative.neighborhood",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.land_parcel",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.locality",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
 }]);
 "use strict";
 
@@ -746,6 +755,11 @@ angular.module("retro").service("ClassChangeFlow", ["Toaster", "$state", "Player
             });
         }
     };
+}]);
+"use strict";
+
+angular.module("retro").service("Dice", ["$window", function ($window) {
+    return $window.dice;
 }]);
 "use strict";
 
@@ -1013,21 +1027,10 @@ angular.module("retro").service("Player", ["$q", "Skills", function ($q, Skills)
 
     var player = {};
 
-    var functions = {
-        calc: {
-            stat: function (stat) {
-                return _.reduce(player.equipment, function (prev, item) {
-                    return prev + (item.stats[stat] || 0);
-                }, 0);
-            }
-        }
-    };
-
     var oldProfession = "";
 
     var updatePlayer = function (newPlayer) {
         player = newPlayer;
-        _.merge(player, functions);
         defer.notify(player);
     };
 
@@ -1082,11 +1085,7 @@ angular.module("retro").service("Skills", ["$q", "socket", function ($q, socket)
 
     var getNewSkills = function (player) {
         socket.emit("getskills", { name: player.name }, function (err, res) {
-            if (!res || !res.skills) {
-                skills = [];
-            } else {
-                skills = res.skills;
-            }
+            skills = res && res.skills ? res.skills : [];
             defer.notify(skills);
         });
     };
@@ -1108,7 +1107,8 @@ angular.module("retro").service("socketCluster", ["$window", function ($window) 
 
     var socket = socketCluster.connect({
         protocol: Config[Config._cfg].protocol,
-        hostname: Config[Config._cfg].url, port: Config[Config._cfg].port
+        hostname: Config[Config._cfg].url,
+        port: Config[Config._cfg].port
     });
 
     var codes = {
