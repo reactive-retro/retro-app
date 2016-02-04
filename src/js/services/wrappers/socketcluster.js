@@ -27,11 +27,13 @@ angular.module('retro')
 
         return socket;
     })
-    .service('socketManagement', (Player, Skills) => {
+    .service('socketManagement', (Player, Skills, Places, Monsters) => {
         return {
             setUpEvents: (socket) => {
                 socket.on('update:player', Player.set);
                 socket.on('update:skills', Skills.set);
+                socket.on('update:places', Places.set);
+                socket.on('update:monsters', Monsters.set);
             }
         };
     });

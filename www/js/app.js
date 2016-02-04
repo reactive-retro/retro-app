@@ -219,227 +219,6 @@ angular.module("retro").constant("Config", {
 });
 "use strict";
 
-angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
-    $scope.player = Player.get();
-    $scope.CLASSES = CLASSES;
-    $scope.ClassChangeFlow = ClassChangeFlow;
-
-    Player.observer.then(null, null, function (player) {
-        return $scope.player = player;
-    });
-}]);
-"use strict";
-
-angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "AuthFlow", "$localStorage", function ($scope, NewHero, CLASSES, AuthFlow, $localStorage) {
-    $scope.NewHero = NewHero;
-    $scope.CLASSES = CLASSES;
-    $scope.baseProfessions = ["Thief", "Mage", "Fighter"];
-
-    $scope.create = function () {
-        var hero = _.merge(NewHero, $localStorage);
-        AuthFlow.login(hero);
-    };
-}]);
-"use strict";
-
-angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "Settings", "MapDrawing", function ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings, MapDrawing) {
-
-    $scope.currentlySelected = null;
-    $scope.centered = true;
-
-    var unCenter = function () {
-        return $scope.centered = false;
-    };
-
-    $scope.mapCreated = function (map) {
-        $scope.map = map;
-        var position = LocationWatcher.current();
-        MapDrawing.drawMe(map, position);
-        $scope.centerOn(position);
-        MapDrawing.drawHomepoint(map, Player.get().homepoint);
-        $scope.findMe();
-        $scope.watchMe();
-        MapDrawing.drawPlaces(map, Settings.places);
-        MapDrawing.drawMonsters(map, Settings.monsters, $scope.select);
-        MapDrawing.addMapEvents(map, unCenter);
-    };
-
-    $scope.centerOnMe = function () {
-        $scope.findMe();
-        $scope.centered = true;
-    };
-
-    var _setSelected = function (opts) {
-        $scope.currentlySelected = opts;
-        $scope.$apply();
-    };
-
-    $scope.select = function (opts) {
-        $scope.reset();
-        _setSelected(opts);
-    };
-
-    $scope.reset = function () {
-        if ($scope.currentlySelected && $scope.currentlySelected.infoWindow) {
-            $scope.currentlySelected.infoWindow.close();
-        }
-        _setSelected(null);
-    };
-
-    $scope.findMe = function () {
-        LocationWatcher.ready.then(function (coords) {
-            return $scope.centerOn(coords, true);
-        });
-    };
-
-    $scope.watchMe = function () {
-        LocationWatcher.watch.then(null, null, function (coords) {
-            $scope.centerOn(coords, !$scope.centered);
-        });
-    };
-
-    $scope.centerOn = function (coords) {
-        var centerMap = arguments[1] === undefined ? false : arguments[1];
-
-        if (!$scope.map) {
-            return;
-        }
-        if (!coords.latitude || !coords.longitude) {
-            return;
-        }
-        var position = new Google.maps.LatLng(coords.latitude, coords.longitude);
-
-        if (centerMap) {
-            $scope.map.setCenter(position);
-        }
-
-        MapDrawing.setCurrentPosition(position);
-    };
-}]);
-"use strict";
-
-angular.module("retro").controller("HomeController", ["$scope", "LocationWatcher", "Auth", function ($scope, LocationWatcher, Auth) {
-    $scope.auth = Auth;
-}]);
-"use strict";
-
-angular.module("retro").controller("InventoryController", ["$scope", "Player", "EquipFlow", function ($scope, Player, EquipFlow) {
-    $scope.player = Player.get();
-    Player.observer.then(null, null, function (player) {
-        return $scope.player = player;
-    });
-    $scope.isEmpty = _.isEmpty;
-
-    $scope.EquipFlow = EquipFlow;
-}]);
-"use strict";
-
-angular.module("retro").controller("MenuController", ["$scope", "$state", "$ionicPopup", "Auth", function ($scope, $state, $ionicPopup, Auth) {
-
-    var logoutCheck = function () {
-        $ionicPopup.confirm({
-            title: "Log out?",
-            template: "Are you sure you want to log out?"
-        }).then(function (res) {
-            if (!res) {
-                return;
-            }
-            Auth.logout();
-        });
-    };
-
-    $scope.stateHref = $state.href;
-
-    $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore" }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-university", name: "Skills", state: "changeskills" }, { icon: "ion-gear-b", name: "Options", state: "options" }, { icon: "ion-android-exit", name: "Logout", call: logoutCheck }];
-
-    $scope.travel = function (state) {
-        return $state.go(state, { timestamp: Date.now() });
-    };
-}]);
-"use strict";
-
-angular.module("retro").controller("PlayerController", ["$scope", "$state", "Player", function ($scope, $state, Player) {
-    $scope.player = Player.get();
-    Player.observer.then(null, null, function (player) {
-        return $scope.player = player;
-    });
-    $scope.isEmpty = _.isEmpty;
-
-    $scope.go = function (to) {
-        $state.go(to);
-    };
-}]);
-"use strict";
-
-angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicModal", "Player", "Skills", "SkillChangeFlow", "Dice", function ($scope, $ionicModal, Player, Skills, SkillChangeFlow, Dice) {
-    $scope.player = Player.get();
-
-    var getAllSkills = function (baseSkills) {
-        return _(baseSkills).each(function (skill) {
-            return skill.spellLevel = skill.spellClasses[_.keys(skill.spellClasses)[0]];
-        }).sortBy(["spellLevel", "spellName"]).groupBy(function (skill) {
-            return _.keys(skill.spellClasses)[0];
-        }).value();
-    };
-
-    $scope.allSkills = getAllSkills(Skills.get());
-
-    $scope.openSkillInfo = function (skill) {
-        $scope.activeSkill = skill;
-        $scope.activeSkillAttrs = _(skill.spellEffects).keys().map(function (key) {
-            var stats = Dice.statistics(skill.spellEffects[key].roll, $scope.player.stats);
-            return { name: key, value: stats, extra: skill.spellEffects[key] };
-        })
-        // Damage always comes first
-        .sortBy(function (obj) {
-            return obj.name === "Damage" ? "*" : obj.name;
-        }).value();
-
-        $scope.modal.show();
-    };
-
-    $scope.countNumTimesSkillSet = function (skillName) {
-        return _.filter($scope.player.skills, function (skill) {
-            return skill === skillName;
-        }).length;
-    };
-
-    $scope.setSkillInSlot = function (skill, slot) {
-        // unset skill
-        if ($scope.player.skills[slot] === skill) {
-            SkillChangeFlow.change(null, slot);
-            return;
-        }
-
-        // set skill
-        SkillChangeFlow.change(skill, slot);
-    };
-
-    $scope.closeSkillInfo = function () {
-        return $scope.modal.hide();
-    };
-
-    $ionicModal.fromTemplateUrl("changeskill.info", {
-        scope: $scope,
-        animation: "slide-in-up"
-    }).then(function (modal) {
-        $scope.modal = modal;
-    });
-
-    // clean up modal b/c memory
-    $scope.$on("$destroy", function () {
-        $scope.modal.remove();
-    });
-
-    Player.observer.then(null, null, function (player) {
-        return $scope.player = player;
-    });
-    Skills.observer.then(null, null, function (skills) {
-        return $scope.allSkills = getAllSkills(skills);
-    });
-}]);
-"use strict";
-
 angular.module("retro").constant("CLASSES", {
     Cleric: "Clerics specialize in healing their companions.",
     Fighter: "Fighters specialize in making their enemies hurt via physical means.",
@@ -622,6 +401,227 @@ angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", func
             }
         }
     };
+}]);
+"use strict";
+
+angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
+    $scope.player = Player.get();
+    $scope.CLASSES = CLASSES;
+    $scope.ClassChangeFlow = ClassChangeFlow;
+
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
+}]);
+"use strict";
+
+angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "AuthFlow", "$localStorage", function ($scope, NewHero, CLASSES, AuthFlow, $localStorage) {
+    $scope.NewHero = NewHero;
+    $scope.CLASSES = CLASSES;
+    $scope.baseProfessions = ["Thief", "Mage", "Fighter"];
+
+    $scope.create = function () {
+        var hero = _.merge(NewHero, $localStorage);
+        AuthFlow.login(hero);
+    };
+}]);
+"use strict";
+
+angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "MapDrawing", "Places", "Monsters", function ($scope, $ionicLoading, Player, LocationWatcher, Google, MapDrawing, Places, Monsters) {
+
+    $scope.currentlySelected = null;
+    $scope.centered = true;
+
+    var unCenter = function () {
+        return $scope.centered = false;
+    };
+
+    $scope.mapCreated = function (map) {
+        $scope.map = map;
+        var position = LocationWatcher.current();
+        MapDrawing.drawMe(map, position);
+        $scope.centerOn(position);
+        MapDrawing.drawHomepoint(map, Player.get().homepoint);
+        $scope.findMe();
+        $scope.watchMe();
+        MapDrawing.drawPlaces(map, Places.get());
+        MapDrawing.drawMonsters(map, Monsters.get(), $scope.select);
+        MapDrawing.addMapEvents(map, unCenter);
+    };
+
+    $scope.centerOnMe = function () {
+        $scope.findMe();
+        $scope.centered = true;
+    };
+
+    var _setSelected = function (opts) {
+        $scope.currentlySelected = opts;
+        $scope.$apply();
+    };
+
+    $scope.select = function (opts) {
+        $scope.reset();
+        _setSelected(opts);
+    };
+
+    $scope.reset = function () {
+        if ($scope.currentlySelected && $scope.currentlySelected.infoWindow) {
+            $scope.currentlySelected.infoWindow.close();
+        }
+        _setSelected(null);
+    };
+
+    $scope.findMe = function () {
+        LocationWatcher.ready.then(function (coords) {
+            return $scope.centerOn(coords, true);
+        });
+    };
+
+    $scope.watchMe = function () {
+        LocationWatcher.watch.then(null, null, function (coords) {
+            $scope.centerOn(coords, !$scope.centered);
+        });
+    };
+
+    $scope.centerOn = function (coords) {
+        var centerMap = arguments[1] === undefined ? false : arguments[1];
+
+        if (!$scope.map) {
+            return;
+        }
+        if (!coords.latitude || !coords.longitude) {
+            return;
+        }
+        var position = new Google.maps.LatLng(coords.latitude, coords.longitude);
+
+        if (centerMap) {
+            $scope.map.setCenter(position);
+        }
+
+        MapDrawing.setCurrentPosition(position);
+    };
+}]);
+"use strict";
+
+angular.module("retro").controller("HomeController", ["$scope", "LocationWatcher", "Auth", function ($scope, LocationWatcher, Auth) {
+    $scope.auth = Auth;
+}]);
+"use strict";
+
+angular.module("retro").controller("InventoryController", ["$scope", "Player", "EquipFlow", function ($scope, Player, EquipFlow) {
+    $scope.player = Player.get();
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
+    $scope.isEmpty = _.isEmpty;
+
+    $scope.EquipFlow = EquipFlow;
+}]);
+"use strict";
+
+angular.module("retro").controller("MenuController", ["$scope", "$state", "$ionicPopup", "Auth", function ($scope, $state, $ionicPopup, Auth) {
+
+    var logoutCheck = function () {
+        $ionicPopup.confirm({
+            title: "Log out?",
+            template: "Are you sure you want to log out?"
+        }).then(function (res) {
+            if (!res) {
+                return;
+            }
+            Auth.logout();
+        });
+    };
+
+    $scope.stateHref = $state.href;
+
+    $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore" }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-university", name: "Skills", state: "changeskills" }, { icon: "ion-gear-b", name: "Options", state: "options" }, { icon: "ion-android-exit", name: "Logout", call: logoutCheck }];
+
+    $scope.travel = function (state) {
+        return $state.go(state, { timestamp: Date.now() });
+    };
+}]);
+"use strict";
+
+angular.module("retro").controller("PlayerController", ["$scope", "$state", "Player", function ($scope, $state, Player) {
+    $scope.player = Player.get();
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
+    $scope.isEmpty = _.isEmpty;
+
+    $scope.go = function (to) {
+        $state.go(to);
+    };
+}]);
+"use strict";
+
+angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicModal", "Player", "Skills", "SkillChangeFlow", "Dice", function ($scope, $ionicModal, Player, Skills, SkillChangeFlow, Dice) {
+    $scope.player = Player.get();
+
+    var getAllSkills = function (baseSkills) {
+        return _(baseSkills).each(function (skill) {
+            return skill.spellLevel = skill.spellClasses[_.keys(skill.spellClasses)[0]];
+        }).sortBy(["spellLevel", "spellName"]).groupBy(function (skill) {
+            return _.keys(skill.spellClasses)[0];
+        }).value();
+    };
+
+    $scope.allSkills = getAllSkills(Skills.get());
+
+    $scope.openSkillInfo = function (skill) {
+        $scope.activeSkill = skill;
+        $scope.activeSkillAttrs = _(skill.spellEffects).keys().map(function (key) {
+            var stats = Dice.statistics(skill.spellEffects[key].roll, $scope.player.stats);
+            return { name: key, value: stats, extra: skill.spellEffects[key] };
+        })
+        // Damage always comes first
+        .sortBy(function (obj) {
+            return obj.name === "Damage" ? "*" : obj.name;
+        }).value();
+
+        $scope.modal.show();
+    };
+
+    $scope.countNumTimesSkillSet = function (skillName) {
+        return _.filter($scope.player.skills, function (skill) {
+            return skill === skillName;
+        }).length;
+    };
+
+    $scope.setSkillInSlot = function (skill, slot) {
+        // unset skill
+        if ($scope.player.skills[slot] === skill) {
+            SkillChangeFlow.change(null, slot);
+            return;
+        }
+
+        // set skill
+        SkillChangeFlow.change(skill, slot);
+    };
+
+    $scope.closeSkillInfo = function () {
+        return $scope.modal.hide();
+    };
+
+    $ionicModal.fromTemplateUrl("changeskill.info", {
+        scope: $scope,
+        animation: "slide-in-up"
+    }).then(function (modal) {
+        $scope.modal = modal;
+    });
+
+    // clean up modal b/c memory
+    $scope.$on("$destroy", function () {
+        $scope.modal.remove();
+    });
+
+    Player.observer.then(null, null, function (player) {
+        return $scope.player = player;
+    });
+    Skills.observer.then(null, null, function (skills) {
+        return $scope.allSkills = getAllSkills(skills);
+    });
 }]);
 "use strict";
 
@@ -908,6 +908,54 @@ angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaT
 }]);
 "use strict";
 
+angular.module("retro").service("Monsters", ["$q", function ($q) {
+
+    var defer = $q.defer();
+
+    var monsters = [];
+
+    var updateMonsters = function (newMonsters) {
+        monsters = newMonsters;
+        defer.notify(monsters);
+    };
+
+    return {
+        observer: defer.promise,
+        apply: function () {
+            defer.notify(monsters);
+        },
+        set: updateMonsters,
+        get: function () {
+            return monsters;
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("Places", ["$q", function ($q) {
+
+    var defer = $q.defer();
+
+    var places = [];
+
+    var updatePlaces = function (newPlaces) {
+        places = newPlaces;
+        defer.notify(places);
+    };
+
+    return {
+        observer: defer.promise,
+        apply: function () {
+            defer.notify(places);
+        },
+        set: updatePlaces,
+        get: function () {
+            return places;
+        }
+    };
+}]);
+"use strict";
+
 angular.module("retro").service("Player", ["$q", function ($q) {
     //var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
 
@@ -1006,8 +1054,6 @@ angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory"
                 } else {
                     defer.resolve();
                     _.extend(Settings, success.settings);
-                    Settings.places = success.places;
-                    Settings.monsters = success.monsters;
                     flow.toPlayer();
                     flow.isLoggedIn = true;
                     $localStorage.env = Config._cfg;
@@ -1127,11 +1173,13 @@ angular.module("retro").service("socketCluster", ["$window", function ($window) 
     socketManagement.setUpEvents(socket);
 
     return socket;
-}]).service("socketManagement", ["Player", "Skills", function (Player, Skills) {
+}]).service("socketManagement", ["Player", "Skills", "Places", "Monsters", function (Player, Skills, Places, Monsters) {
     return {
         setUpEvents: function (socket) {
             socket.on("update:player", Player.set);
             socket.on("update:skills", Skills.set);
+            socket.on("update:places", Places.set);
+            socket.on("update:monsters", Monsters.set);
         }
     };
 }]);

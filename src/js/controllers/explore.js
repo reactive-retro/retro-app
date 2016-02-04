@@ -1,5 +1,5 @@
 angular.module('retro').controller('ExploreController',
-    ($scope, $ionicLoading, Player, LocationWatcher, Google, Settings, MapDrawing) => {
+    ($scope, $ionicLoading, Player, LocationWatcher, Google, MapDrawing, Places, Monsters) => {
 
         $scope.currentlySelected = null;
         $scope.centered = true;
@@ -14,8 +14,8 @@ angular.module('retro').controller('ExploreController',
             MapDrawing.drawHomepoint(map, Player.get().homepoint);
             $scope.findMe();
             $scope.watchMe();
-            MapDrawing.drawPlaces(map, Settings.places);
-            MapDrawing.drawMonsters(map, Settings.monsters, $scope.select);
+            MapDrawing.drawPlaces(map, Places.get());
+            MapDrawing.drawMonsters(map, Monsters.get(), $scope.select);
             MapDrawing.addMapEvents(map, unCenter);
         };
 
