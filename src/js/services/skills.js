@@ -1,20 +1,17 @@
-angular.module('retro').service('Skills', ($q, socket) => {
-    //var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
+angular.module('retro').service('Skills', ($q) => {
 
     const defer = $q.defer();
 
     let skills = [];
 
-    const getNewSkills = (player) => {
-        socket.emit('getskills', { name: player.name }, (err, res) => {
-            skills = res && res.skills ? res.skills : [];
-            defer.notify(skills);
-        });
+    const getNewSkills = (newSkills) => {
+        skills = newSkills;
+        defer.notify(skills);
     };
 
     return {
         observer: defer.promise,
-        update: getNewSkills,
+        set: getNewSkills,
         get: () => skills
     };
 });

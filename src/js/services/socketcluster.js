@@ -1,6 +1,6 @@
 angular.module('retro')
     .service('socketCluster', ($window) => $window.socketCluster)
-    .service('socket', ($rootScope, Config, Toaster, socketCluster) => {
+    .service('socket', ($rootScope, Config, Toaster, socketCluster, socketManagement) => {
         $rootScope.canConnect = true;
 
         const socket = socketCluster.connect({
@@ -23,5 +23,15 @@ angular.module('retro')
             $rootScope.canConnect = true;
         });
 
+        socketManagement.setUpEvents(socket);
+
         return socket;
+    })
+    .service('socketManagement', (Player, Skills) => {
+        return {
+            setUpEvents: (socket) => {
+                socket.on('update:player', Player.set);
+                socket.on('update:skills', Skills.set);
+            }
+        };
     });

@@ -712,7 +712,6 @@ angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory"
                     defer.reject();
                 } else {
                     defer.resolve();
-                    Player.set(success.player);
                     _.extend(Settings, success.settings);
                     Settings.places = success.places;
                     Settings.monsters = success.monsters;
@@ -744,12 +743,11 @@ angular.module("retro").service("ClassChangeFlow", ["Toaster", "$state", "Player
             var player = Player.get();
 
             var opts = { name: player.name, newProfession: newProfession };
-            socket.emit("classchange", opts, function (err, success) {
+            socket.emit("player:change:class", opts, function (err, success) {
                 var msgObj = err ? err : success;
                 Toaster.show(msgObj.msg);
 
                 if (success) {
-                    Player.set(success.player);
                     $state.go("player");
                 }
             });
@@ -770,12 +768,11 @@ angular.module("retro").service("EquipFlow", ["Toaster", "$state", "Player", "so
             var player = Player.get();
 
             var opts = { name: player.name, itemId: newItem.itemId };
-            socket.emit("equip", opts, function (err, success) {
+            socket.emit("player:change:equipment", opts, function (err, success) {
                 var msgObj = err ? err : success;
                 Toaster.show(msgObj.msg);
 
                 if (success) {
-                    Player.set(success.player);
                     $state.go("player");
                 }
             });
@@ -1020,14 +1017,12 @@ angular.module("retro").service("NewHero", function () {
 });
 "use strict";
 
-angular.module("retro").service("Player", ["$q", "Skills", function ($q, Skills) {
+angular.module("retro").service("Player", ["$q", function ($q) {
     //var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
 
     var defer = $q.defer();
 
     var player = {};
-
-    var oldProfession = "";
 
     var updatePlayer = function (newPlayer) {
         player = newPlayer;
@@ -1039,13 +1034,7 @@ angular.module("retro").service("Player", ["$q", "Skills", function ($q, Skills)
         apply: function () {
             defer.notify(player);
         },
-        set: function (newPlayer) {
-            updatePlayer(newPlayer);
-
-            if (oldProfession !== newPlayer.profession) {
-                Skills.update(newPlayer);
-            }
-        },
+        set: updatePlayer,
         get: function () {
             return player;
         }
@@ -1063,36 +1052,29 @@ angular.module("retro").service("SkillChangeFlow", ["Toaster", "$state", "Player
             var player = Player.get();
 
             var opts = { name: player.name, skillName: skill, skillSlot: slot };
-            socket.emit("skillchange", opts, function (err, success) {
+            socket.emit("player:change:skill", opts, function (err, success) {
                 var msgObj = err ? err : success;
                 Toaster.show(msgObj.msg);
-
-                if (success) {
-                    Player.set(success.player);
-                }
             });
         }
     };
 }]);
 "use strict";
 
-angular.module("retro").service("Skills", ["$q", "socket", function ($q, socket) {
-    //var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
+angular.module("retro").service("Skills", ["$q", function ($q) {
 
     var defer = $q.defer();
 
     var skills = [];
 
-    var getNewSkills = function (player) {
-        socket.emit("getskills", { name: player.name }, function (err, res) {
-            skills = res && res.skills ? res.skills : [];
-            defer.notify(skills);
-        });
+    var getNewSkills = function (newSkills) {
+        skills = newSkills;
+        defer.notify(skills);
     };
 
     return {
         observer: defer.promise,
-        update: getNewSkills,
+        set: getNewSkills,
         get: function () {
             return skills;
         }
@@ -1102,7 +1084,7 @@ angular.module("retro").service("Skills", ["$q", "socket", function ($q, socket)
 
 angular.module("retro").service("socketCluster", ["$window", function ($window) {
     return $window.socketCluster;
-}]).service("socket", ["$rootScope", "Config", "Toaster", "socketCluster", function ($rootScope, Config, Toaster, socketCluster) {
+}]).service("socket", ["$rootScope", "Config", "Toaster", "socketCluster", "socketManagement", function ($rootScope, Config, Toaster, socketCluster, socketManagement) {
     $rootScope.canConnect = true;
 
     var socket = socketCluster.connect({
@@ -1129,7 +1111,16 @@ angular.module("retro").service("socketCluster", ["$window", function ($window) 
         $rootScope.canConnect = true;
     });
 
+    socketManagement.setUpEvents(socket);
+
     return socket;
+}]).service("socketManagement", ["Player", "Skills", function (Player, Skills) {
+    return {
+        setUpEvents: function (socket) {
+            socket.on("update:player", Player.set);
+            socket.on("update:skills", Skills.set);
+        }
+    };
 }]);
 "use strict";
 

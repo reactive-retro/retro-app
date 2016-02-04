@@ -42,7 +42,6 @@ angular.module('retro').service('AuthFlow', ($q, $rootScope, $ionicHistory, Toas
                     defer.reject();
                 } else {
                     defer.resolve();
-                    Player.set(success.player);
                     _.extend(Settings, success.settings);
                     Settings.places = success.places;
                     Settings.monsters = success.monsters;
