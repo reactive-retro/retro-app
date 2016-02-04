@@ -339,71 +339,6 @@ angular.module("retro").constant("MAP_STYLE", [{
 }]);
 "use strict";
 
-angular.module("retro").directive("colorText", function () {
-    return {
-        restrict: "E",
-        template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            ",
-        link: function (scope, elem, attrs) {
-            scope.preText = attrs.preText;
-            attrs.$observe("value", function (val) {
-                return scope.value = val;
-            });
-        }
-    };
-});
-"use strict";
-
-angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
-    return {
-        restrict: "E",
-        scope: {
-            onCreate: "&",
-            onClick: "&"
-        },
-        link: function ($scope, $element) {
-
-            if (!Google || !Google.maps) {
-                Toaster.show("Could not reach google.");
-                return;
-            }
-
-            // this is the available list of places in the game
-            var init = function () {
-                var mapOptions = {
-                    center: new Google.maps.LatLng(32.3078, -64.7505),
-                    zoom: 17,
-                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
-                    draggable: true,
-                    minZoom: 15,
-                    maxZoom: 17,
-                    styles: MAP_STYLE,
-                    mapTypeControlOptions: { mapTypeIds: [] },
-                    overviewMapControl: false,
-                    streetViewControl: false,
-                    zoomControl: false
-                };
-
-                var map = new Google.maps.Map($element[0], mapOptions);
-
-                $scope.onCreate({ map: map });
-
-                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
-                    $scope.onClick();
-                    e.preventDefault();
-                    return false;
-                });
-            };
-
-            if (document.readyState === "complete") {
-                init();
-            } else {
-                Google.maps.event.addDomListener(window, "load", init);
-            }
-        }
-    };
-}]);
-"use strict";
-
 angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
     $scope.player = Player.get();
     $scope.CLASSES = CLASSES;
@@ -622,6 +557,71 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
     Skills.observer.then(null, null, function (skills) {
         return $scope.allSkills = getAllSkills(skills);
     });
+}]);
+"use strict";
+
+angular.module("retro").directive("colorText", function () {
+    return {
+        restrict: "E",
+        template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            ",
+        link: function (scope, elem, attrs) {
+            scope.preText = attrs.preText;
+            attrs.$observe("value", function (val) {
+                return scope.value = val;
+            });
+        }
+    };
+});
+"use strict";
+
+angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
+    return {
+        restrict: "E",
+        scope: {
+            onCreate: "&",
+            onClick: "&"
+        },
+        link: function ($scope, $element) {
+
+            if (!Google || !Google.maps) {
+                Toaster.show("Could not reach google.");
+                return;
+            }
+
+            // this is the available list of places in the game
+            var init = function () {
+                var mapOptions = {
+                    center: new Google.maps.LatLng(32.3078, -64.7505),
+                    zoom: 17,
+                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
+                    draggable: true,
+                    minZoom: 15,
+                    maxZoom: 17,
+                    styles: MAP_STYLE,
+                    mapTypeControlOptions: { mapTypeIds: [] },
+                    overviewMapControl: false,
+                    streetViewControl: false,
+                    zoomControl: false
+                };
+
+                var map = new Google.maps.Map($element[0], mapOptions);
+
+                $scope.onCreate({ map: map });
+
+                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
+                    $scope.onClick();
+                    e.preventDefault();
+                    return false;
+                });
+            };
+
+            if (document.readyState === "complete") {
+                init();
+            } else {
+                Google.maps.event.addDomListener(window, "load", init);
+            }
+        }
+    };
 }]);
 "use strict";
 
@@ -896,14 +896,28 @@ angular.module("retro").service("Settings", function () {});
 "use strict";
 
 angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaToast) {
-    return {
-        show: function (msg) {
-            try {
-                $cordovaToast.showLongBottom(msg);
-            } catch (e) {
-                console.log(msg);
-            }
+
+    var show = function (msg) {
+        try {
+            $cordovaToast.showLongBottom(msg);
+        } catch (e) {
+            console.log(msg);
         }
+    };
+
+    var handleDefault = function () {
+        var callback = arguments[0] === undefined ? function () {} : arguments[0];
+        return function (err, success) {
+            var msgObj = err ? err : success;
+            Toaster.show(msgObj.msg);
+
+            callback();
+        };
+    };
+
+    return {
+        show: show,
+        handleDefault: handleDefault
     };
 }]);
 "use strict";
@@ -1082,14 +1096,9 @@ angular.module("retro").service("ClassChangeFlow", ["Toaster", "$state", "Player
             var player = Player.get();
 
             var opts = { name: player.name, newProfession: newProfession };
-            socket.emit("player:change:class", opts, function (err, success) {
-                var msgObj = err ? err : success;
-                Toaster.show(msgObj.msg);
-
-                if (success) {
-                    $state.go("player");
-                }
-            });
+            socket.emit("player:change:class", opts, Toaster.handleDefault(function () {
+                return $state.go("player");
+            }));
         }
     };
 }]);
@@ -1102,14 +1111,9 @@ angular.module("retro").service("EquipFlow", ["Toaster", "$state", "Player", "so
             var player = Player.get();
 
             var opts = { name: player.name, itemId: newItem.itemId };
-            socket.emit("player:change:equipment", opts, function (err, success) {
-                var msgObj = err ? err : success;
-                Toaster.show(msgObj.msg);
-
-                if (success) {
-                    $state.go("player");
-                }
-            });
+            socket.emit("player:change:equipment", opts, Toaster.handleDefault(function () {
+                return $state.go("player");
+            }));
         }
     };
 }]);
@@ -1122,10 +1126,7 @@ angular.module("retro").service("SkillChangeFlow", ["Toaster", "$state", "Player
             var player = Player.get();
 
             var opts = { name: player.name, skillName: skill, skillSlot: slot };
-            socket.emit("player:change:skill", opts, function (err, success) {
-                var msgObj = err ? err : success;
-                Toaster.show(msgObj.msg);
-            });
+            socket.emit("player:change:skill", opts, Toaster.handleDefault());
         }
     };
 }]);

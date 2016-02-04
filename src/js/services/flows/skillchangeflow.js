@@ -5,10 +5,7 @@ angular.module('retro').service('SkillChangeFlow', (Toaster, $state, Player, soc
             var player = Player.get();
 
             var opts = {name: player.name, skillName: skill, skillSlot: slot};
-            socket.emit('player:change:skill', opts, (err, success) => {
-                var msgObj = err ? err : success;
-                Toaster.show(msgObj.msg);
-            });
+            socket.emit('player:change:skill', opts, Toaster.handleDefault());
         }
     };
 });
