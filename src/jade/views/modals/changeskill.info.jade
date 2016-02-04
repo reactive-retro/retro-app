@@ -29,7 +29,7 @@ script(type="text/ng-template", id="changeskill.info")
             .row.effects-area
                 .col.text-center
                     .row(ng-repeat="effect in activeSkillAttrs")
-                        .col.text-right
+                        .col.col-20.col-offset-20.text-right
                             strong {{effect.name}}
                         .col.text-left
                             span {{effect.value.min_possible}}
