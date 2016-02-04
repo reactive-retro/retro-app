@@ -519,7 +519,7 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
     };
 
     $scope.countNumTimesSkillSet = function (skillName) {
-        return _.filter(Skills.get(), function (skill) {
+        return _.filter($scope.player.skills, function (skill) {
             return skill === skillName;
         }).length;
     };

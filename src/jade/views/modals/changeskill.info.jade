@@ -35,7 +35,7 @@ script(type="text/ng-template", id="changeskill.info")
                             span {{effect.value.min_possible}}
                             span(ng-if="effect.value.min_possible !== effect.value.max_possible") -{{effect.value.max_possible}}
                             span &nbsp;
-                            ng-pluralize(ng-if="effect.extra.isRounds", count="effect.value.max_possible", when="{'one': 'round', 'other': 'rounds'}")
+                            ng-pluralize(ng-if="effect.extra.string", count="effect.value.max_possible", when="{'one': effect.extra.string, 'other': effect.extra.string+'s'}")
                             span &nbsp;
                             span(ng-if="effect.extra.chance") ({{effect.extra.chance}}% chance)
 
