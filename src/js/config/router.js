@@ -104,5 +104,11 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
             resolve: {
                 playerLoaded: ($injector) => $injector.get('Settings').isReady
             }
+        })
+        .state('battle', {
+            url: '/battle',
+            templateUrl: 'battle',
+            controller: 'BattleController',
+            data: { requiresLogin: true }
         });
 });

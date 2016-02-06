@@ -3,6 +3,20 @@
 angular.module("retro", ["ionic", "ngCordova", "ngStorage", "auth0", "angular-jwt"]);
 "use strict";
 
+angular.module("retro").constant("Config", {
+    _cfg: "DEV",
+    DEV: {
+        url: "192.168.1.7",
+        port: 8080
+    },
+    PROD: {
+        protocol: "https",
+        url: "reactive-retro.herokuapp.com",
+        port: 80
+    }
+});
+"use strict";
+
 angular.module("retro").config(["authProvider", function (authProvider) {
     authProvider.init({
         domain: "reactive-retro.auth0.com",
@@ -73,8 +87,12 @@ angular.module("retro").config(["authProvider", function (authProvider) {
 angular.module("retro").run(["$rootScope", "$ionicPlatform", function ($rootScope, $ionicPlatform) {
 
     $rootScope.$on("$stateChangeSuccess", function (event, toState) {
-        $rootScope.hideMenu = toState.name === "home" || toState.name === "create";
+        $rootScope.hideMenu = toState.name === "home" || toState.name === "create" || toState.name === "battle";
     });
+
+    $ionicPlatform.registerBackButtonAction(function (e) {
+        e.preventDefault();
+    }, 100);
 
     $ionicPlatform.ready(function () {
         if (window.cordova && window.cordova.plugins.Keyboard) {
@@ -201,141 +219,17 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
                 return $injector.get("Settings").isReady;
             }]
         }
+    }).state("battle", {
+        url: "/battle",
+        templateUrl: "battle",
+        controller: "BattleController",
+        data: { requiresLogin: true }
     });
 }]);
 "use strict";
 
-angular.module("retro").constant("Config", {
-    _cfg: "DEV",
-    DEV: {
-        url: "192.168.1.7",
-        port: 8080
-    },
-    PROD: {
-        protocol: "https",
-        url: "reactive-retro.herokuapp.com",
-        port: 80
-    }
-});
-"use strict";
-
-angular.module("retro").constant("CLASSES", {
-    Cleric: "Clerics specialize in healing their companions.",
-    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
-    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!",
-    Thief: "Thieves specialize in quick attacks and physical debuffing."
-});
-"use strict";
-
-angular.module("retro").constant("OAUTH_KEYS", {
-    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
-    reddit: "CKzP2LKr74VwYw",
-    facebook: "102489756752863"
-});
-"use strict";
-
-angular.module("retro").constant("MAP_COLORS", {
-    monster: {
-        outline: "#ff0000",
-        fill: "#aa0000"
-    },
-    poi: {
-        outline: "#ffff00",
-        fill: "#aaaa00"
-    },
-    homepoint: {
-        outline: "#00ff00",
-        fill: "#00aa00"
-    },
-    miasma: {
-        outline: "#000000",
-        fill: "#000000"
-    },
-    hero: {
-        outline: "#0000ff",
-        fill: "#0000aa"
-    },
-    heroRadius: {
-        outline: "#ff00ff",
-        fill: "#ff00ff"
-    }
-});
-"use strict";
-
-angular.module("retro").constant("MAP_STYLE", [{
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
-}, {
-    featureType: "landscape",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#abce83" }]
-}, {
-    featureType: "poi",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
-}, {
-    featureType: "road",
-    elementType: "geometry.fill",
-    stylers: [{ visibility: "simplified" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#5B5B3F" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ABCE83" }]
-}, {
-    featureType: "road",
-    elementType: "labels.icon",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "road.local",
-    elementType: "geometry",
-    stylers: [{ color: "#A4C67D" }]
-}, {
-    featureType: "road.arterial",
-    elementType: "geometry",
-    stylers: [{ color: "#9BBF72" }]
-}, {
-    featureType: "road.highway",
-    elementType: "geometry",
-    stylers: [{ color: "#EBF4A4" }]
-}, {
-    featureType: "transit",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.stroke",
-    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#495421" }]
-}, {
-    featureType: "administrative.neighborhood",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.land_parcel",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.locality",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
+angular.module("retro").controller("BattleController", ["$scope", "BattleFlow", function ($scope, BattleFlow) {
+    $scope.battleFlow = BattleFlow;
 }]);
 "use strict";
 
@@ -362,7 +256,7 @@ angular.module("retro").controller("CreateCharacterController", ["$scope", "NewH
 }]);
 "use strict";
 
-angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "MapDrawing", "Places", "Monsters", function ($scope, $ionicLoading, Player, LocationWatcher, Google, MapDrawing, Places, Monsters) {
+angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "MapDrawing", "Places", "Monsters", "BattleFlow", function ($scope, $ionicLoading, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, BattleFlow) {
 
     $scope.currentlySelected = null;
     $scope.centered = true;
@@ -382,6 +276,10 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
         MapDrawing.drawPlaces(map, Places.get());
         MapDrawing.drawMonsters(map, Monsters.get(), $scope.select);
         MapDrawing.addMapEvents(map, unCenter);
+    };
+
+    $scope.fight = function () {
+        BattleFlow.start($scope.currentlySelected.monster);
     };
 
     $scope.centerOnMe = function () {
@@ -557,6 +455,126 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
     Skills.observer.then(null, null, function (skills) {
         return $scope.allSkills = getAllSkills(skills);
     });
+}]);
+"use strict";
+
+angular.module("retro").constant("CLASSES", {
+    Cleric: "Clerics specialize in healing their companions.",
+    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
+    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!",
+    Thief: "Thieves specialize in quick attacks and physical debuffing."
+});
+"use strict";
+
+angular.module("retro").constant("OAUTH_KEYS", {
+    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
+    reddit: "CKzP2LKr74VwYw",
+    facebook: "102489756752863"
+});
+"use strict";
+
+angular.module("retro").constant("MAP_COLORS", {
+    monster: {
+        outline: "#ff0000",
+        fill: "#aa0000"
+    },
+    poi: {
+        outline: "#ffff00",
+        fill: "#aaaa00"
+    },
+    homepoint: {
+        outline: "#00ff00",
+        fill: "#00aa00"
+    },
+    miasma: {
+        outline: "#000000",
+        fill: "#000000"
+    },
+    hero: {
+        outline: "#0000ff",
+        fill: "#0000aa"
+    },
+    heroRadius: {
+        outline: "#ff00ff",
+        fill: "#ff00ff"
+    }
+});
+"use strict";
+
+angular.module("retro").constant("MAP_STYLE", [{
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
+}, {
+    featureType: "landscape",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#abce83" }]
+}, {
+    featureType: "poi",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
+}, {
+    featureType: "road",
+    elementType: "geometry.fill",
+    stylers: [{ visibility: "simplified" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#5B5B3F" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ABCE83" }]
+}, {
+    featureType: "road",
+    elementType: "labels.icon",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "road.local",
+    elementType: "geometry",
+    stylers: [{ color: "#A4C67D" }]
+}, {
+    featureType: "road.arterial",
+    elementType: "geometry",
+    stylers: [{ color: "#9BBF72" }]
+}, {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#EBF4A4" }]
+}, {
+    featureType: "transit",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#495421" }]
+}, {
+    featureType: "administrative.neighborhood",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.land_parcel",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.locality",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
 }]);
 "use strict";
 
@@ -909,7 +927,7 @@ angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaT
         var callback = arguments[0] === undefined ? function () {} : arguments[0];
         return function (err, success) {
             var msgObj = err ? err : success;
-            Toaster.show(msgObj.msg);
+            show(msgObj.msg);
 
             callback();
         };
@@ -918,6 +936,38 @@ angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaT
     return {
         show: show,
         handleDefault: handleDefault
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("Battle", ["$q", "$ionicHistory", "$state", function ($q, $ionicHistory, $state) {
+
+    var defer = $q.defer();
+
+    var battle = "";
+
+    var updateId = function (newBattle) {
+        battle = newBattle;
+        defer.notify(battle);
+
+        if (battle) {
+            $ionicHistory.nextViewOptions({
+                disableBack: true
+            });
+
+            $state.go("battle");
+        }
+    };
+
+    return {
+        observer: defer.promise,
+        apply: function () {
+            defer.notify(battle);
+        },
+        set: updateId,
+        get: function () {
+            return battle;
+        }
     };
 }]);
 "use strict";
@@ -1089,6 +1139,18 @@ angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory"
 }]);
 "use strict";
 
+angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$state", "$ionicHistory", "socket", function (Player, Battle, Toaster, $state, $ionicHistory, socket) {
+
+    var start = function (monster) {
+        socket.emit("combat:enter", { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
+    };
+
+    return {
+        start: start
+    };
+}]);
+"use strict";
+
 angular.module("retro").service("ClassChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
     return {
         change: function (newProfession) {
@@ -1174,13 +1236,14 @@ angular.module("retro").service("socketCluster", ["$window", function ($window) 
     socketManagement.setUpEvents(socket);
 
     return socket;
-}]).service("socketManagement", ["Player", "Skills", "Places", "Monsters", function (Player, Skills, Places, Monsters) {
+}]).service("socketManagement", ["Player", "Skills", "Places", "Monsters", "Battle", function (Player, Skills, Places, Monsters, Battle) {
     return {
         setUpEvents: function (socket) {
             socket.on("update:player", Player.set);
             socket.on("update:skills", Skills.set);
             socket.on("update:places", Places.set);
             socket.on("update:monsters", Monsters.set);
+            socket.on("combat:entered", Battle.set);
         }
     };
 }]);

@@ -1,5 +1,5 @@
 angular.module('retro').controller('ExploreController',
-    ($scope, $ionicLoading, Player, LocationWatcher, Google, MapDrawing, Places, Monsters) => {
+    ($scope, $ionicLoading, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, BattleFlow) => {
 
         $scope.currentlySelected = null;
         $scope.centered = true;
@@ -17,6 +17,10 @@ angular.module('retro').controller('ExploreController',
             MapDrawing.drawPlaces(map, Places.get());
             MapDrawing.drawMonsters(map, Monsters.get(), $scope.select);
             MapDrawing.addMapEvents(map, unCenter);
+        };
+
+        $scope.fight = () => {
+            BattleFlow.start($scope.currentlySelected.monster);
         };
 
         $scope.centerOnMe = () => {
