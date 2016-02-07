@@ -9786,11 +9786,19 @@ map {
   .skill-modal-container .skill-container {
     flex: 0.5; }
     .skill-modal-container .skill-container .skill-row {
-      flex: 0.5; }
+      flex: 0.5;
+      flex-wrap: wrap; }
       .skill-modal-container .skill-container .skill-row .skill-slot {
         text-align: center;
         align-self: center; }
-        .skill-modal-container .skill-container .skill-row .skill-slot .skill-button {
-          line-height: inherit;
-          font-size: inherit;
-          padding: inherit; }
+
+.skill-button {
+  line-height: inherit;
+  font-size: inherit;
+  padding: inherit; }
+
+.combat .monster-row {
+  margin-bottom: 50px; }
+
+.combat .skill-row .skill-grid {
+  flex-wrap: wrap; }

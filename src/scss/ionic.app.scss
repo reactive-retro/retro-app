@@ -116,17 +116,30 @@ map {
 
     .skill-row {
       flex: 0.5;
+      flex-wrap: wrap;
 
       .skill-slot {
         text-align: center;
         align-self: center;
-
-        .skill-button {
-          line-height: inherit;
-          font-size: inherit;
-          padding: inherit;
-        }
       }
+    }
+  }
+}
+
+.skill-button {
+  line-height: inherit;
+  font-size: inherit;
+  padding: inherit;
+}
+
+.combat {
+  .monster-row {
+    margin-bottom: 50px;
+  }
+
+  .skill-row {
+    .skill-grid {
+      flex-wrap: wrap;
     }
   }
 }

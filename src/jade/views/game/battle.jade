@@ -1,4 +1,36 @@
 script(type="text/ng-template", id="battle")
     ion-view(view-title="Battle")
-        ion-content
-            div battle mode yo
+        ion-content.combat
+            .row.monster-row.text-center
+                .col(ng-repeat="monster in battle.monsters")
+                    div {{monster.name}}
+                    div
+                        stat-bar(target="monster", stat="hp")
+
+            .row(ng-repeat-start="player in battle.playerData")
+                .col {{player.name}} / Level {{player.professionLevels[player.profession]}} {{player.profession}}
+
+            .row
+                .col
+                    stat-bar(target="player", stat="hp")
+                .col
+                    stat-bar(target="player", stat="mp")
+
+            .row
+                .col &nbsp;
+
+            .row.skill-row(ng-if="player.name === currentPlayerName", ng-repeat-end)
+                .col
+                    .row.text-center
+                        .col.text-center
+                            button.button.button-stable.button-block.margin-0(ng-click="") Attack
+
+                        .col.text-center
+                            button.button.button-stable.button-block.margin-0(disabled) Item
+
+                        .col.text-center
+                            button.button.button-stable.button-block.margin-0(disabled) Flee
+
+                    .row.text-center.skill-grid
+                        .col.col-33(ng-repeat="skill in uniqueSkills")
+                            button.button.button-balanced.skill-button.button-block.margin-0(ng-click="") {{skill}}
