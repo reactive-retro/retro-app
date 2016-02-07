@@ -1,9 +1,9 @@
 script(type="text/ng-template", id="changeskills")
     ion-view(view-title="Skills")
         ion-content
-            .list(ng-repeat="(prof, profSkills) in allSkills")
-                .item.item-divider {{prof}}
-                .item(ng-repeat="skill in profSkills", ng-click="openSkillInfo(skill)")
+            .list.margin-0(ng-repeat="skillData in allSkills | orderBy:'prof'")
+                .item.item-divider {{skillData.prof}}
+                .item(ng-repeat="skill in skillData.profSkills", ng-click="openSkillInfo(skill)")
                     .row.padding-0
                         .col.padding-0
                             span {{skill.spellName}}

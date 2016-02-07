@@ -11,7 +11,10 @@ angular.module('retro').controller('SkillChangeController',
             .groupBy(skill => {
                 return _.keys(skill.spellClasses)[0];
             })
-            .value();
+            .reduce((res, val, key) => {
+                res.push({ prof: key, profSkills: val });
+                return res;
+            }, []);
 
         $scope.allSkills = getAllSkills(Skills.get());
 
