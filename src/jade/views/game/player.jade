@@ -14,14 +14,11 @@ script(type="text/ng-template", id="player")
                 .item.item-body
                     .row
                         .col
-                            .stat-bar-container
-                                .stat-bar.hp(style="width: {{player.stats.hp.__current/player.stats.hp.maximum*100}}%")
+                            stat-bar(target="player", stat="hp")
                         .col
-                            .stat-bar-container
-                                .stat-bar.mp(style="width: {{player.stats.mp.__current/player.stats.mp.maximum*100}}%")
+                            stat-bar(target="player", stat="mp")
                         .col
-                            .stat-bar-container
-                                .stat-bar.xp(style="width: {{player.stats.xp.cur/player.stats.xp.max*100}}%")
+                            stat-bar(target="player", stat="xp")
 
                     .row
                         .col
