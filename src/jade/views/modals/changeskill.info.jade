@@ -48,59 +48,14 @@ script(type="text/ng-template", id="changeskill.info")
 
                     .row.skill-container
                         .col.col-flex
+
                             .row.skill-row
-                                .col.skill-slot
+                                .col.col-33.skill-slot(ng-repeat="idx in [0,1,2,3,4,5]")
                                     .row
-                                        .col Slot 1
-                                    .row
-                                        .col
-                                            button.button.button-full.skill-button(
-                                                ng-class="{'button-stable': !player.skills[0], 'button-balanced': player.skills[0]}",
-                                                ng-click="setSkillInSlot(activeSkill.spellName, 0)")
-                                                span.skill-text {{player.skills[0] || 'none'}}
-                                .col.skill-slot
-                                    .row
-                                        .col Slot 2
+                                        .col Slot {{idx+1}}
                                     .row
                                         .col
-                                            button.button.button-full.skill-button(
-                                                ng-class="{'button-stable': !player.skills[1], 'button-balanced': player.skills[1]}",
-                                                ng-click="setSkillInSlot(activeSkill.spellName, 1)")
-                                                span.skill-text {{player.skills[1] || 'none'}}
-                                .col.skill-slot
-                                    .row
-                                        .col Slot 3
-                                    .row
-                                        .col
-                                            button.button.button-full.skill-button(
-                                                ng-class="{'button-stable': !player.skills[2], 'button-balanced': player.skills[2]}",
-                                                ng-click="setSkillInSlot(activeSkill.spellName, 2)")
-                                                span.skill-text {{player.skills[2] || 'none'}}
-                            .row.skill-row
-                                .col.skill-slot
-                                    .row
-                                        .col Slot 4
-                                    .row
-                                        .col
-                                            button.button.button-full.skill-button(
-                                                ng-class="{'button-stable': !player.skills[3], 'button-balanced': player.skills[3]}",
-                                                ng-click="setSkillInSlot(activeSkill.spellName, 3)")
-                                                span.skill-text {{player.skills[3] || 'none'}}
-                                .col.skill-slot
-                                    .row
-                                        .col Slot 5
-                                    .row
-                                        .col
-                                            button.button.button-full.skill-button(
-                                                ng-class="{'button-stable': !player.skills[4], 'button-balanced': player.skills[4]}",
-                                                ng-click="setSkillInSlot(activeSkill.spellName, 4)")
-                                                span.skill-text {{player.skills[4] || 'none'}}
-                                .col.skill-slot
-                                    .row
-                                        .col Slot 6
-                                    .row
-                                        .col
-                                            button.button.button-full.skill-button(
-                                                ng-class="{'button-stable': !player.skills[5], 'button-balanced': player.skills[5]}",
-                                                ng-click="setSkillInSlot(activeSkill.spellName, 5)")
-                                                span.skill-text {{player.skills[5] || 'none'}}
+                                            button.button.button-full.skill-button.button-block(
+                                                ng-class="{'button-stable': !player.skills[idx], 'button-balanced': player.skills[idx]}",
+                                                ng-click="setSkillInSlot(activeSkill.spellName, idx)")
+                                                span.skill-text {{player.skills[idx] || 'none'}}
