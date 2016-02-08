@@ -78,4 +78,6 @@ script(type="text/ng-template", id="choosetarget.info")
 
                             .row(ng-if="activeSkill.spellTargets === 'All Enemies' || activeSkill.spellTargets === 'All Allies' || activeSkill.spellTargets === 'All' || activeSkill.spellTargets === 'Self'")
                                 .col.col-60.col-offset-20
-                                    button.button.button-assertive.button-block.skill-button.button-full Confirm Target: {{activeSkill.spellTargets}}
+                                    button.button.button-assertive.button-block.skill-button.button-full(
+                                        ng-click="target.other(activeSkill.spellTargets)")
+                                        span.skill-textConfirm Target: {{activeSkill.spellTargets}}
