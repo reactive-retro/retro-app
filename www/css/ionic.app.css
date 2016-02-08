@@ -9715,6 +9715,9 @@ a.button {
 .padding-0 {
   padding: 0 !important; }
 
+.margin-0 {
+  margin: 0 !important; }
+
 .float-right {
   float: right; }
 
@@ -9802,3 +9805,7 @@ map {
 
 .combat .skill-row .skill-grid {
   flex-wrap: wrap; }
+
+.inner-alignment-padding {
+  padding-left: 15px;
+  padding-right: 15px; }

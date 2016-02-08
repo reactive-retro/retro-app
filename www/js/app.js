@@ -228,16 +228,205 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
 }]);
 "use strict";
 
-angular.module("retro").controller("BattleController", ["$scope", "BattleFlow", "Battle", "Player", function ($scope, BattleFlow, Battle, Player) {
+angular.module("retro").constant("CLASSES", {
+    Cleric: "Clerics specialize in healing their companions.",
+    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
+    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!",
+    Thief: "Thieves specialize in quick attacks and physical debuffing."
+});
+"use strict";
+
+angular.module("retro").constant("OAUTH_KEYS", {
+    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
+    reddit: "CKzP2LKr74VwYw",
+    facebook: "102489756752863"
+});
+"use strict";
+
+angular.module("retro").constant("MAP_COLORS", {
+    monster: {
+        outline: "#ff0000",
+        fill: "#aa0000"
+    },
+    poi: {
+        outline: "#ffff00",
+        fill: "#aaaa00"
+    },
+    homepoint: {
+        outline: "#00ff00",
+        fill: "#00aa00"
+    },
+    miasma: {
+        outline: "#000000",
+        fill: "#000000"
+    },
+    hero: {
+        outline: "#0000ff",
+        fill: "#0000aa"
+    },
+    heroRadius: {
+        outline: "#ff00ff",
+        fill: "#ff00ff"
+    }
+});
+"use strict";
+
+angular.module("retro").constant("MAP_STYLE", [{
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
+}, {
+    featureType: "landscape",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#abce83" }]
+}, {
+    featureType: "poi",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
+}, {
+    featureType: "road",
+    elementType: "geometry.fill",
+    stylers: [{ visibility: "simplified" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#5B5B3F" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ABCE83" }]
+}, {
+    featureType: "road",
+    elementType: "labels.icon",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "road.local",
+    elementType: "geometry",
+    stylers: [{ color: "#A4C67D" }]
+}, {
+    featureType: "road.arterial",
+    elementType: "geometry",
+    stylers: [{ color: "#9BBF72" }]
+}, {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#EBF4A4" }]
+}, {
+    featureType: "transit",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#495421" }]
+}, {
+    featureType: "administrative.neighborhood",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.land_parcel",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.locality",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}]);
+"use strict";
+
+angular.module("retro").controller("BattleController", ["$scope", "$ionicModal", "BattleFlow", "Battle", "Dice", "Player", "Skills", function ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills) {
     $scope.battleFlow = BattleFlow;
     $scope.currentPlayerName = Player.get().name;
+    $scope.target = null;
+
+    var me = null;
 
     var setupBattleData = function () {
         $scope.battle = Battle.get();
 
-        var me = _.find($scope.battle.playerData, { name: $scope.currentPlayerName });
-        $scope.uniqueSkills = _.uniq(me.skills);
+        // self shows up last
+        $scope.orderedPlayers = _($scope.battle.players).sortBy(function (player) {
+            return player === $scope.currentPlayerName ? "~" : player;
+        }).map(function (playerName) {
+            return _.find($scope.battle.playerData, { name: playerName });
+        }).value();
+
+        me = _.find($scope.battle.playerData, { name: $scope.currentPlayerName });
+
+        $scope.uniqueSkills = _(me.skills).reject(function (skill) {
+            return skill === "Attack";
+        }).uniq().value();
     };
+
+    $scope.openSkillInfo = function (skill) {
+        $scope.activeSkill = _.find(Skills.get(), { spellName: skill });
+
+        $scope.multiplier = _.filter(me.skills, function (check) {
+            return check === skill;
+        }).length;
+        if (skill === "Attack") {
+            $scope.multiplier += 1;
+        }
+
+        var skillRef = $scope.activeSkill;
+        $scope.activeSkillAttrs = _(skillRef.spellEffects).keys().map(function (key) {
+            var stats = Dice.statistics(skillRef.spellEffects[key].roll, me.stats);
+            return { name: key, value: stats, extra: skillRef.spellEffects[key] };
+        })
+        // Damage always comes first
+        .sortBy(function (obj) {
+            return obj.name === "Damage" ? "*" : obj.name;
+        }).value();
+
+        $scope.modal.show();
+    };
+
+    $scope.target = {
+        monster: function (monster) {
+            return $scope.setTarget({ name: monster.name, id: monster.id, skill: $scope.activeSkill.spellName });
+        },
+        player: function (player) {
+            return $scope.setTarget({ name: player.name, id: player.name, skill: $scope.activeSkill.spellName });
+        },
+        other: function (other) {
+            return $scope.setTarget({ name: other, id: other, skill: $scope.activeSkill.spellName });
+        }
+    };
+
+    $scope.closeSkillInfo = function () {
+        return $scope.modal.hide();
+    };
+
+    $scope.setTarget = function (target) {
+        $scope.target = target;
+        $scope.closeSkillInfo();
+    };
+
+    $ionicModal.fromTemplateUrl("choosetarget.info", {
+        scope: $scope,
+        animation: "slide-in-up"
+    }).then(function (modal) {
+        $scope.modal = modal;
+    });
+
+    // clean up modal b/c memory
+    $scope.$on("$destroy", function () {
+        $scope.modal.remove();
+    });
 
     setupBattleData();
     Battle.observer.then(null, null, setupBattleData);
@@ -417,7 +606,10 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
             return skill.spellLevel = skill.spellClasses[_.keys(skill.spellClasses)[0]];
         }).sortBy(["spellLevel", "spellName"]).groupBy(function (skill) {
             return _.keys(skill.spellClasses)[0];
-        }).value();
+        }).reduce(function (res, val, key) {
+            res.push({ prof: key, profSkills: val });
+            return res;
+        }, []);
     };
 
     $scope.allSkills = getAllSkills(Skills.get());
@@ -475,126 +667,6 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
     Skills.observer.then(null, null, function (skills) {
         return $scope.allSkills = getAllSkills(skills);
     });
-}]);
-"use strict";
-
-angular.module("retro").constant("CLASSES", {
-    Cleric: "Clerics specialize in healing their companions.",
-    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
-    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!",
-    Thief: "Thieves specialize in quick attacks and physical debuffing."
-});
-"use strict";
-
-angular.module("retro").constant("OAUTH_KEYS", {
-    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
-    reddit: "CKzP2LKr74VwYw",
-    facebook: "102489756752863"
-});
-"use strict";
-
-angular.module("retro").constant("MAP_COLORS", {
-    monster: {
-        outline: "#ff0000",
-        fill: "#aa0000"
-    },
-    poi: {
-        outline: "#ffff00",
-        fill: "#aaaa00"
-    },
-    homepoint: {
-        outline: "#00ff00",
-        fill: "#00aa00"
-    },
-    miasma: {
-        outline: "#000000",
-        fill: "#000000"
-    },
-    hero: {
-        outline: "#0000ff",
-        fill: "#0000aa"
-    },
-    heroRadius: {
-        outline: "#ff00ff",
-        fill: "#ff00ff"
-    }
-});
-"use strict";
-
-angular.module("retro").constant("MAP_STYLE", [{
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
-}, {
-    featureType: "landscape",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#abce83" }]
-}, {
-    featureType: "poi",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
-}, {
-    featureType: "road",
-    elementType: "geometry.fill",
-    stylers: [{ visibility: "simplified" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#5B5B3F" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ABCE83" }]
-}, {
-    featureType: "road",
-    elementType: "labels.icon",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "road.local",
-    elementType: "geometry",
-    stylers: [{ color: "#A4C67D" }]
-}, {
-    featureType: "road.arterial",
-    elementType: "geometry",
-    stylers: [{ color: "#9BBF72" }]
-}, {
-    featureType: "road.highway",
-    elementType: "geometry",
-    stylers: [{ color: "#EBF4A4" }]
-}, {
-    featureType: "transit",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.stroke",
-    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#495421" }]
-}, {
-    featureType: "administrative.neighborhood",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.land_parcel",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.locality",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
 }]);
 "use strict";
 
@@ -970,6 +1042,132 @@ angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaT
 }]);
 "use strict";
 
+angular.module("retro").service("Battle", ["$q", "$ionicHistory", "$state", function ($q, $ionicHistory, $state) {
+
+    var defer = $q.defer();
+
+    var battle = "";
+
+    var updateId = function (newBattle) {
+        battle = newBattle;
+        defer.notify(battle);
+
+        if (battle) {
+            $ionicHistory.nextViewOptions({
+                disableBack: true
+            });
+
+            $state.go("battle");
+        }
+    };
+
+    return {
+        observer: defer.promise,
+        apply: function () {
+            defer.notify(battle);
+        },
+        set: updateId,
+        get: function () {
+            return battle;
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("Monsters", ["$q", function ($q) {
+
+    var defer = $q.defer();
+
+    var monsters = [];
+
+    var updateMonsters = function (newMonsters) {
+        monsters = newMonsters;
+        defer.notify(monsters);
+    };
+
+    return {
+        observer: defer.promise,
+        apply: function () {
+            defer.notify(monsters);
+        },
+        set: updateMonsters,
+        get: function () {
+            return monsters;
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("Places", ["$q", function ($q) {
+
+    var defer = $q.defer();
+
+    var places = [];
+
+    var updatePlaces = function (newPlaces) {
+        places = newPlaces;
+        defer.notify(places);
+    };
+
+    return {
+        observer: defer.promise,
+        apply: function () {
+            defer.notify(places);
+        },
+        set: updatePlaces,
+        get: function () {
+            return places;
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("Player", ["$q", function ($q) {
+    //var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
+
+    var defer = $q.defer();
+
+    var player = {};
+
+    var updatePlayer = function (newPlayer) {
+        player = newPlayer;
+        defer.notify(player);
+    };
+
+    return {
+        observer: defer.promise,
+        apply: function () {
+            defer.notify(player);
+        },
+        set: updatePlayer,
+        get: function () {
+            return player;
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("Skills", ["$q", function ($q) {
+
+    var defer = $q.defer();
+
+    var skills = [];
+
+    var getNewSkills = function (newSkills) {
+        skills = newSkills;
+        defer.notify(skills);
+    };
+
+    return {
+        observer: defer.promise,
+        set: getNewSkills,
+        get: function () {
+            return skills;
+        }
+    };
+}]);
+"use strict";
+
 angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory", "Toaster", "$localStorage", "$state", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, $rootScope, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, Config, socket) {
     var flow = {
         toPlayer: function () {
@@ -1093,132 +1291,6 @@ angular.module("retro").service("SkillChangeFlow", ["Toaster", "$state", "Player
 
             var opts = { name: player.name, skillName: skill, skillSlot: slot };
             socket.emit("player:change:skill", opts, Toaster.handleDefault());
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("Battle", ["$q", "$ionicHistory", "$state", function ($q, $ionicHistory, $state) {
-
-    var defer = $q.defer();
-
-    var battle = "";
-
-    var updateId = function (newBattle) {
-        battle = newBattle;
-        defer.notify(battle);
-
-        if (battle) {
-            $ionicHistory.nextViewOptions({
-                disableBack: true
-            });
-
-            $state.go("battle");
-        }
-    };
-
-    return {
-        observer: defer.promise,
-        apply: function () {
-            defer.notify(battle);
-        },
-        set: updateId,
-        get: function () {
-            return battle;
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("Monsters", ["$q", function ($q) {
-
-    var defer = $q.defer();
-
-    var monsters = [];
-
-    var updateMonsters = function (newMonsters) {
-        monsters = newMonsters;
-        defer.notify(monsters);
-    };
-
-    return {
-        observer: defer.promise,
-        apply: function () {
-            defer.notify(monsters);
-        },
-        set: updateMonsters,
-        get: function () {
-            return monsters;
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("Places", ["$q", function ($q) {
-
-    var defer = $q.defer();
-
-    var places = [];
-
-    var updatePlaces = function (newPlaces) {
-        places = newPlaces;
-        defer.notify(places);
-    };
-
-    return {
-        observer: defer.promise,
-        apply: function () {
-            defer.notify(places);
-        },
-        set: updatePlaces,
-        get: function () {
-            return places;
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("Player", ["$q", function ($q) {
-    //var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
-
-    var defer = $q.defer();
-
-    var player = {};
-
-    var updatePlayer = function (newPlayer) {
-        player = newPlayer;
-        defer.notify(player);
-    };
-
-    return {
-        observer: defer.promise,
-        apply: function () {
-            defer.notify(player);
-        },
-        set: updatePlayer,
-        get: function () {
-            return player;
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("Skills", ["$q", function ($q) {
-
-    var defer = $q.defer();
-
-    var skills = [];
-
-    var getNewSkills = function (newSkills) {
-        skills = newSkills;
-        defer.notify(skills);
-    };
-
-    return {
-        observer: defer.promise,
-        set: getNewSkills,
-        get: function () {
-            return skills;
         }
     };
 }]);

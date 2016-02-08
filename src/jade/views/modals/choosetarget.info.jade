@@ -1,0 +1,81 @@
+
+script(type="text/ng-template", id="choosetarget.info")
+    ion-modal-view
+        ion-header-bar.bar-balanced
+            .buttons
+                button.button(ng-click="closeSkillInfo()")
+                    i.icon.ion-close
+            h1.title {{activeSkill.spellName}}
+        ion-content.skill-modal-container(scroll="false")
+            .row.data-area(ng-if="activeSkill")
+                .col
+                    .row
+                        .col.text-center
+                            i.icon.ion-clock
+                            span &nbsp;
+                            ng-pluralize(count="activeSkill.spellCooldown*multiplier", when="{'0': 'instant', 'one': '1 round', 'other': '{} rounds'}")
+                        .col.text-center
+                            i.icon.ion-waterdrop
+                            span &nbsp;
+                            span {{activeSkill.spellCost*multiplier}} mp
+                        .col.text-center
+                            i.icon.ion-android-contact
+                            span &nbsp;
+                            span {{activeSkill.spellTargets}}
+
+            .row.desc-area
+                .col.text-center {{activeSkill.spellDescription}}
+
+            .row.effects-area
+                .col.text-center
+                    .row(ng-repeat="effect in activeSkillAttrs")
+                        .col.col-20.col-offset-20.text-right
+                            strong {{effect.name}}
+                        .col.text-left
+                            span {{effect.value.min_possible*multiplier}}
+                            span(ng-if="effect.value.min_possible !== effect.value.max_possible") -{{effect.value.max_possible*multiplier}}
+                            span &nbsp;
+                            ng-pluralize(ng-if="effect.extra.string", count="effect.value.max_possible*multiplier", when="{'one': effect.extra.string, 'other': effect.extra.string+'s'}")
+                            span &nbsp;
+                            span(ng-if="effect.extra.chance") ({{effect.extra.chance}}% chance)
+
+
+            .row.assign-area
+                .col.col-flex
+                    .row
+                        .col.text-center
+                            h3.title Choose Target
+
+                    .row.skill-container
+                        .col.col-flex
+
+                            .row(ng-if="activeSkill.spellTargets === 'Single Ally'")
+                                .col.col-33.monster-slot(ng-repeat="player in orderedPlayers")
+                                    .row
+                                        .col
+                                            button.button.button-full.skill-button.button-block.button-stable(
+                                                ng-click="target.player(player)")
+                                                span.skill-text {{player.name}}
+
+                                    .row
+                                        .col
+                                            div
+                                                stat-bar(target="player", stat="hp")
+                                            div
+                                                stat-bar(target="player", stat="mp")
+
+                            .row(ng-if="activeSkill.spellTargets === 'Single Enemy'")
+                                .col.col-33.monster-slot(ng-repeat="monster in battle.monsters")
+                                    .row
+                                        .col
+                                            button.button.button-full.skill-button.button-block.button-stable(
+                                                ng-click="target.monster(monster)")
+                                                span.skill-text {{monster.name}}
+
+                                    .row
+                                        .col
+                                            stat-bar(target="monster", stat="hp")
+
+                            .row(ng-if="activeSkill.spellTargets === 'All Enemies' || activeSkill.spellTargets === 'All Allies' || activeSkill.spellTargets === 'All' || activeSkill.spellTargets === 'Self'")
+                                .col.col-60.col-offset-20
+                                    button.button.button-assertive.button-block.skill-button.button-full Confirm Target: {{activeSkill.spellTargets}}

@@ -51,12 +51,12 @@ angular.module('retro').controller('SkillChangeController',
         $ionicModal.fromTemplateUrl('changeskill.info', {
             scope: $scope,
             animation: 'slide-in-up'
-        }).then(function(modal) {
+        }).then((modal) => {
             $scope.modal = modal;
         });
 
         // clean up modal b/c memory
-        $scope.$on('$destroy', function() {
+        $scope.$on('$destroy', () => {
             $scope.modal.remove();
         });
 
