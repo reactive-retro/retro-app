@@ -22,6 +22,7 @@ angular.module('retro').controller('BattleController',
 
             $scope.uniqueSkills = _(me.skills)
                 .reject(skill => skill === 'Attack')
+                .compact()
                 .uniq()
                 .value();
         };

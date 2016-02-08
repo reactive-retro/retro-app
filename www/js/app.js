@@ -3,20 +3,6 @@
 angular.module("retro", ["ionic", "ngCordova", "ngStorage", "auth0", "angular-jwt"]);
 "use strict";
 
-angular.module("retro").constant("Config", {
-    _cfg: "DEV",
-    DEV: {
-        url: "192.168.1.7",
-        port: 8080
-    },
-    PROD: {
-        protocol: "https",
-        url: "reactive-retro.herokuapp.com",
-        port: 80
-    }
-});
-"use strict";
-
 angular.module("retro").config(["authProvider", function (authProvider) {
     authProvider.init({
         domain: "reactive-retro.auth0.com",
@@ -228,124 +214,18 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
 }]);
 "use strict";
 
-angular.module("retro").constant("CLASSES", {
-    Cleric: "Clerics specialize in healing their companions.",
-    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
-    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!",
-    Thief: "Thieves specialize in quick attacks and physical debuffing."
-});
-"use strict";
-
-angular.module("retro").constant("OAUTH_KEYS", {
-    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
-    reddit: "CKzP2LKr74VwYw",
-    facebook: "102489756752863"
-});
-"use strict";
-
-angular.module("retro").constant("MAP_COLORS", {
-    monster: {
-        outline: "#ff0000",
-        fill: "#aa0000"
+angular.module("retro").constant("Config", {
+    _cfg: "DEV",
+    DEV: {
+        url: "192.168.1.7",
+        port: 8080
     },
-    poi: {
-        outline: "#ffff00",
-        fill: "#aaaa00"
-    },
-    homepoint: {
-        outline: "#00ff00",
-        fill: "#00aa00"
-    },
-    miasma: {
-        outline: "#000000",
-        fill: "#000000"
-    },
-    hero: {
-        outline: "#0000ff",
-        fill: "#0000aa"
-    },
-    heroRadius: {
-        outline: "#ff00ff",
-        fill: "#ff00ff"
+    PROD: {
+        protocol: "https",
+        url: "reactive-retro.herokuapp.com",
+        port: 80
     }
 });
-"use strict";
-
-angular.module("retro").constant("MAP_STYLE", [{
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
-}, {
-    featureType: "landscape",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#abce83" }]
-}, {
-    featureType: "poi",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
-}, {
-    featureType: "road",
-    elementType: "geometry.fill",
-    stylers: [{ visibility: "simplified" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#5B5B3F" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ABCE83" }]
-}, {
-    featureType: "road",
-    elementType: "labels.icon",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "road.local",
-    elementType: "geometry",
-    stylers: [{ color: "#A4C67D" }]
-}, {
-    featureType: "road.arterial",
-    elementType: "geometry",
-    stylers: [{ color: "#9BBF72" }]
-}, {
-    featureType: "road.highway",
-    elementType: "geometry",
-    stylers: [{ color: "#EBF4A4" }]
-}, {
-    featureType: "transit",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.stroke",
-    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#495421" }]
-}, {
-    featureType: "administrative.neighborhood",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.land_parcel",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.locality",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}]);
 "use strict";
 
 angular.module("retro").controller("BattleController", ["$scope", "$ionicModal", "BattleFlow", "Battle", "Dice", "Player", "Skills", function ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills) {
@@ -369,7 +249,7 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
 
         $scope.uniqueSkills = _(me.skills).reject(function (skill) {
             return skill === "Attack";
-        }).uniq().value();
+        }).compact().uniq().value();
     };
 
     $scope.openSkillInfo = function (skill) {
@@ -670,81 +550,6 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
 }]);
 "use strict";
 
-angular.module("retro").directive("colorText", function () {
-    return {
-        restrict: "E",
-        scope: {
-            value: "=",
-            preText: "@"
-        },
-        template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            "
-    };
-});
-"use strict";
-
-angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
-    return {
-        restrict: "E",
-        scope: {
-            onCreate: "&",
-            onClick: "&"
-        },
-        link: function ($scope, $element) {
-
-            if (!Google || !Google.maps) {
-                Toaster.show("Could not reach google.");
-                return;
-            }
-
-            // this is the available list of places in the game
-            var init = function () {
-                var mapOptions = {
-                    center: new Google.maps.LatLng(32.3078, -64.7505),
-                    zoom: 17,
-                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
-                    draggable: true,
-                    minZoom: 15,
-                    maxZoom: 17,
-                    styles: MAP_STYLE,
-                    mapTypeControlOptions: { mapTypeIds: [] },
-                    overviewMapControl: false,
-                    streetViewControl: false,
-                    zoomControl: false
-                };
-
-                var map = new Google.maps.Map($element[0], mapOptions);
-
-                $scope.onCreate({ map: map });
-
-                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
-                    $scope.onClick();
-                    e.preventDefault();
-                    return false;
-                });
-            };
-
-            if (document.readyState === "complete") {
-                init();
-            } else {
-                Google.maps.event.addDomListener(window, "load", init);
-            }
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").directive("statBar", function () {
-    return {
-        restrict: "E",
-        scope: {
-            target: "=",
-            stat: "@"
-        },
-        template: "\n                <div class=\"stat-bar-container\">\n                    <div class=\"stat-bar {{stat}}\" style=\"width: {{target.stats[stat].__current/target.stats[stat].maximum*100}}%\"></div>\n                </div>\n            "
-    };
-});
-"use strict";
-
 angular.module("retro").service("Auth", ["$localStorage", "$state", "$ionicHistory", "auth", "AuthFlow", function ($localStorage, $state, $ionicHistory, auth, AuthFlow) {
 
     var localAuth = {
@@ -1042,6 +847,201 @@ angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaT
 }]);
 "use strict";
 
+angular.module("retro").directive("colorText", function () {
+    return {
+        restrict: "E",
+        scope: {
+            value: "=",
+            preText: "@"
+        },
+        template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
+    return {
+        restrict: "E",
+        scope: {
+            onCreate: "&",
+            onClick: "&"
+        },
+        link: function ($scope, $element) {
+
+            if (!Google || !Google.maps) {
+                Toaster.show("Could not reach google.");
+                return;
+            }
+
+            // this is the available list of places in the game
+            var init = function () {
+                var mapOptions = {
+                    center: new Google.maps.LatLng(32.3078, -64.7505),
+                    zoom: 17,
+                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
+                    draggable: true,
+                    minZoom: 15,
+                    maxZoom: 17,
+                    styles: MAP_STYLE,
+                    mapTypeControlOptions: { mapTypeIds: [] },
+                    overviewMapControl: false,
+                    streetViewControl: false,
+                    zoomControl: false
+                };
+
+                var map = new Google.maps.Map($element[0], mapOptions);
+
+                $scope.onCreate({ map: map });
+
+                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
+                    $scope.onClick();
+                    e.preventDefault();
+                    return false;
+                });
+            };
+
+            if (document.readyState === "complete") {
+                init();
+            } else {
+                Google.maps.event.addDomListener(window, "load", init);
+            }
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").directive("statBar", function () {
+    return {
+        restrict: "E",
+        scope: {
+            target: "=",
+            stat: "@"
+        },
+        template: "\n                <div class=\"stat-bar-container\">\n                    <div class=\"stat-bar {{stat}}\" style=\"width: {{target.stats[stat].__current/target.stats[stat].maximum*100}}%\"></div>\n                </div>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").constant("CLASSES", {
+    Cleric: "Clerics specialize in healing their companions.",
+    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
+    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!",
+    Thief: "Thieves specialize in quick attacks and physical debuffing."
+});
+"use strict";
+
+angular.module("retro").constant("OAUTH_KEYS", {
+    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
+    reddit: "CKzP2LKr74VwYw",
+    facebook: "102489756752863"
+});
+"use strict";
+
+angular.module("retro").constant("MAP_COLORS", {
+    monster: {
+        outline: "#ff0000",
+        fill: "#aa0000"
+    },
+    poi: {
+        outline: "#ffff00",
+        fill: "#aaaa00"
+    },
+    homepoint: {
+        outline: "#00ff00",
+        fill: "#00aa00"
+    },
+    miasma: {
+        outline: "#000000",
+        fill: "#000000"
+    },
+    hero: {
+        outline: "#0000ff",
+        fill: "#0000aa"
+    },
+    heroRadius: {
+        outline: "#ff00ff",
+        fill: "#ff00ff"
+    }
+});
+"use strict";
+
+angular.module("retro").constant("MAP_STYLE", [{
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
+}, {
+    featureType: "landscape",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#abce83" }]
+}, {
+    featureType: "poi",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
+}, {
+    featureType: "road",
+    elementType: "geometry.fill",
+    stylers: [{ visibility: "simplified" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#5B5B3F" }]
+}, {
+    featureType: "road",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ABCE83" }]
+}, {
+    featureType: "road",
+    elementType: "labels.icon",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "road.local",
+    elementType: "geometry",
+    stylers: [{ color: "#A4C67D" }]
+}, {
+    featureType: "road.arterial",
+    elementType: "geometry",
+    stylers: [{ color: "#9BBF72" }]
+}, {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#EBF4A4" }]
+}, {
+    featureType: "transit",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
+}, {
+    featureType: "administrative",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
+}, {
+    featureType: "administrative",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#495421" }]
+}, {
+    featureType: "administrative.neighborhood",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.land_parcel",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}, {
+    featureType: "administrative.locality",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }]
+}]);
+"use strict";
+
 angular.module("retro").service("Battle", ["$q", "$ionicHistory", "$state", function ($q, $ionicHistory, $state) {
 
     var defer = $q.defer();
@@ -1163,6 +1163,61 @@ angular.module("retro").service("Skills", ["$q", function ($q) {
         set: getNewSkills,
         get: function () {
             return skills;
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("Dice", ["$window", function ($window) {
+    return $window.dice;
+}]);
+"use strict";
+
+angular.module("retro").service("Google", function () {
+    return window.google;
+});
+"use strict";
+
+angular.module("retro").service("socketCluster", ["$window", function ($window) {
+    return $window.socketCluster;
+}]).service("socket", ["$rootScope", "Config", "Toaster", "socketCluster", "socketManagement", function ($rootScope, Config, Toaster, socketCluster, socketManagement) {
+    $rootScope.canConnect = true;
+
+    var socket = socketCluster.connect({
+        protocol: Config[Config._cfg].protocol,
+        hostname: Config[Config._cfg].url,
+        port: Config[Config._cfg].port
+    });
+
+    var codes = {
+        1006: "Unable to connect to game server."
+    };
+
+    socket.on("error", function (e) {
+        if (!codes[e.code]) {
+            return;
+        }
+        if (e.code === 1006) {
+            $rootScope.canConnect = false;
+        }
+        Toaster.show(codes[e.code]);
+    });
+
+    socket.on("connect", function () {
+        $rootScope.canConnect = true;
+    });
+
+    socketManagement.setUpEvents(socket);
+
+    return socket;
+}]).service("socketManagement", ["Player", "Skills", "Places", "Monsters", "Battle", function (Player, Skills, Places, Monsters, Battle) {
+    return {
+        setUpEvents: function (socket) {
+            socket.on("update:player", Player.set);
+            socket.on("update:skills", Skills.set);
+            socket.on("update:places", Places.set);
+            socket.on("update:monsters", Monsters.set);
+            socket.on("combat:entered", Battle.set);
         }
     };
 }]);
@@ -1291,61 +1346,6 @@ angular.module("retro").service("SkillChangeFlow", ["Toaster", "$state", "Player
 
             var opts = { name: player.name, skillName: skill, skillSlot: slot };
             socket.emit("player:change:skill", opts, Toaster.handleDefault());
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("Dice", ["$window", function ($window) {
-    return $window.dice;
-}]);
-"use strict";
-
-angular.module("retro").service("Google", function () {
-    return window.google;
-});
-"use strict";
-
-angular.module("retro").service("socketCluster", ["$window", function ($window) {
-    return $window.socketCluster;
-}]).service("socket", ["$rootScope", "Config", "Toaster", "socketCluster", "socketManagement", function ($rootScope, Config, Toaster, socketCluster, socketManagement) {
-    $rootScope.canConnect = true;
-
-    var socket = socketCluster.connect({
-        protocol: Config[Config._cfg].protocol,
-        hostname: Config[Config._cfg].url,
-        port: Config[Config._cfg].port
-    });
-
-    var codes = {
-        1006: "Unable to connect to game server."
-    };
-
-    socket.on("error", function (e) {
-        if (!codes[e.code]) {
-            return;
-        }
-        if (e.code === 1006) {
-            $rootScope.canConnect = false;
-        }
-        Toaster.show(codes[e.code]);
-    });
-
-    socket.on("connect", function () {
-        $rootScope.canConnect = true;
-    });
-
-    socketManagement.setUpEvents(socket);
-
-    return socket;
-}]).service("socketManagement", ["Player", "Skills", "Places", "Monsters", "Battle", function (Player, Skills, Places, Monsters, Battle) {
-    return {
-        setUpEvents: function (socket) {
-            socket.on("update:player", Player.set);
-            socket.on("update:skills", Skills.set);
-            socket.on("update:places", Places.set);
-            socket.on("update:monsters", Monsters.set);
-            socket.on("combat:entered", Battle.set);
         }
     };
 }]);
