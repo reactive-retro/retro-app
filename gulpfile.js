@@ -103,7 +103,7 @@ gulp.task('install', ['git-check'], function() {
 });
 
 gulp.task('ionic:start', function(done) {
-    sh.exec('ionic serve -c -l -r', { async: true });
+    sh.exec('ionic serve -c -l -r --address=retro', { async: true });
     done();
 });
 
