@@ -3,10 +3,16 @@ angular.module('retro').service('Battle', ($q, $ionicHistory, $state) => {
     const defer = $q.defer();
 
     let battle = '';
+    let socketRef = null;
 
-    const updateId = (newBattle) => {
+    const update = (newBattle) => {
+
+        if(battle) {
+            battle.actionChannel = null;
+            socketRef.unsubscribe(`battle:${battle._id}:actions`);
+        }
+
         battle = newBattle;
-        defer.notify(battle);
 
         if(battle) {
             $ionicHistory.nextViewOptions({
@@ -14,7 +20,10 @@ angular.module('retro').service('Battle', ($q, $ionicHistory, $state) => {
             });
 
             $state.go('battle');
+            battle.actionChannel = socketRef.subscribe(`battle:${battle._id}:actions`);
         }
+
+        defer.notify(battle);
     };
 
     return {
@@ -22,7 +31,8 @@ angular.module('retro').service('Battle', ($q, $ionicHistory, $state) => {
         apply: () => {
             defer.notify(battle);
         },
-        set: updateId,
+        setSocket: (socket) => socketRef = socket,
+        set: update,
         get: () => battle
     };
 });

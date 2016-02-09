@@ -35,6 +35,8 @@ angular.module('retro')
                 socket.on('update:places', Places.set);
                 socket.on('update:monsters', Monsters.set);
                 socket.on('combat:entered', Battle.set);
+
+                Battle.setSocket(socket);
             }
         };
     });

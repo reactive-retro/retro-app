@@ -8,9 +8,8 @@ script(type="text/ng-template", id="battle")
                         stat-bar(target="monster", stat="hp")
 
             .row.inner-alignment-padding(ng-repeat-start="player in orderedPlayers")
-                .col {{player.name}} / Level {{player.professionLevels[player.profession]}} {{player.profession}}
+                .col {{player.name}} / {{player.slug}}
 
-            .row.inner-alignment-padding
                 .col
                     stat-bar(target="player", stat="hp")
                 .col
@@ -18,13 +17,16 @@ script(type="text/ng-template", id="battle")
 
             .row.inner-alignment-padding
                 .col
-                    span(ng-show="target.skill && target.name") {{target.skill}} > {{target.name}}
+                    span(ng-show="targets[player.name]") {{targets[player.name].skill}} > {{targets[player.name].name}}
+                .col.text-right
+                    span(ng-show="canConfirm")
+                        button.button.button-small.button-balanced(ng-click="confirmAction()") Confirm
 
             .row.skill-row(ng-if="player.name === currentPlayerName", ng-repeat-end)
                 .col
                     .row.text-center
                         .col.text-center
-                            button.button.button-stable.button-block.margin-0(ng-click="openSkillInfo('Attack')") Attack
+                            button.button.button-stable.button-block.margin-0(ng-click="openSkillInfo('Attack')", ng-disabled="disableActions") Attack
 
                         .col.text-center
                             button.button.button-stable.button-block.margin-0(disabled) Item
@@ -34,4 +36,4 @@ script(type="text/ng-template", id="battle")
 
                     .row.text-center.skill-grid
                         .col.col-33(ng-repeat="skill in uniqueSkills")
-                            button.button.button-balanced.skill-button.button-block.margin-0(ng-click="openSkillInfo(skill)") {{skill}}
+                            button.button.button-balanced.skill-button.button-block.margin-0(ng-click="openSkillInfo(skill)", ng-disabled="disableActions") {{skill}}
