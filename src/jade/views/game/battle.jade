@@ -8,11 +8,13 @@ script(type="text/ng-template", id="battle")
                         stat-bar(target="monster", stat="hp")
 
             .row.inner-alignment-padding(ng-repeat-start="player in orderedPlayers")
-                .col {{player.name}} / {{player.slug}}
+                .col.col-center.text-right
+                    div {{player.name}}
+                    div {{player.slug}}
 
-                .col
+                .col.col-center
                     stat-bar(target="player", stat="hp")
-                .col
+                .col.col-center
                     stat-bar(target="player", stat="mp")
 
             .row.inner-alignment-padding

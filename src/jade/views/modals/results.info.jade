@@ -1,0 +1,13 @@
+
+script(type="text/ng-template", id="results.info")
+    ion-modal-view
+        ion-header-bar.bar-balanced
+            .buttons
+                button.button(ng-click="closeModal('resultsModal')")
+                    i.icon.ion-close
+            h1.title Round Results
+
+        ion-content
+            ion-list.list
+                ion-item.item.item-text-wrap(ng-repeat="result in results")
+                    span {{result}}

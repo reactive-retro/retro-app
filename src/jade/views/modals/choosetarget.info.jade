@@ -3,7 +3,7 @@ script(type="text/ng-template", id="choosetarget.info")
     ion-modal-view
         ion-header-bar.bar-balanced
             .buttons
-                button.button(ng-click="closeSkillInfo()")
+                button.button(ng-click="closeModal('targetModal')")
                     i.icon.ion-close
             h1.title {{activeSkill.spellName}}
         ion-content.skill-modal-container(scroll="false")
@@ -39,7 +39,6 @@ script(type="text/ng-template", id="choosetarget.info")
                             span &nbsp;
                             span(ng-if="effect.extra.chance") ({{effect.extra.chance}}% chance)
 
-
             .row.assign-area
                 .col.col-flex
                     .row
@@ -69,7 +68,8 @@ script(type="text/ng-template", id="choosetarget.info")
                                     .row
                                         .col
                                             button.button.button-full.skill-button.button-block.button-stable(
-                                                ng-click="target.monster(monster)")
+                                                ng-click="target.monster(monster)",
+                                                ng-disabled="monster.stats.hp.__current === 0")
                                                 span.skill-text {{monster.name}}
 
                                     .row

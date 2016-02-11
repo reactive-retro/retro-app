@@ -17,6 +17,217 @@ angular.module("retro").constant("Config", {
 });
 "use strict";
 
+angular.module("retro").config(["authProvider", function (authProvider) {
+    authProvider.init({
+        domain: "reactive-retro.auth0.com",
+        clientID: "ucMSnNDYLGdDBL2uppganZv2jKzzJiI0",
+        loginState: "home"
+    });
+}]).run(["auth", "$localStorage", "$rootScope", "$state", "jwtHelper", "AuthFlow", "Config", function (auth, $localStorage, $rootScope, $state, jwtHelper, AuthFlow, Config) {
+    auth.hookEvents();
+
+    if (Config._cfg !== $localStorage.env) {
+        $localStorage.profile = $localStorage.token = $localStorage.refreshingToken = null;
+        return;
+    }
+
+    var autologin = function () {
+        if (!auth.isAuthenticated || !$localStorage.profile || !$localStorage.profile.user_id) {
+            return;
+        } // jshint ignore:line
+
+        $rootScope.attemptAutoLogin = true;
+        AuthFlow.login(_.clone($localStorage), true);
+    };
+
+    var refreshingToken = null;
+    $rootScope.$on("$locationChangeStart", function (e, n, c) {
+        // if you route to the same state and aren't logged in, don't do this event
+        // it causes the login events on the server to fire twice
+        if (n === c) {
+            return;
+        }
+        if (AuthFlow.isLoggedIn) {
+            return;
+        }
+
+        var token = $localStorage.token;
+        var refreshToken = $localStorage.refreshToken;
+        var profile = $localStorage.profile;
+
+        if (!token) {
+            return;
+        }
+
+        if (!jwtHelper.isTokenExpired(token)) {
+            if (!auth.isAuthenticated) {
+                auth.authenticate(profile, token);
+            }
+            autologin();
+        } else {
+            if (refreshToken) {
+                if (refreshingToken === null) {
+                    refreshingToken = auth.refreshIdToken(refreshToken).then(function (idToken) {
+                        $localStorage.token = idToken;
+                        auth.authenticate(profile, idToken);
+                        autologin();
+                    })["finally"](function () {
+                        refreshingToken = null;
+                    });
+                }
+                return refreshingToken;
+            } else {
+                $state.go("home");
+            }
+        }
+    });
+}]);
+"use strict";
+
+angular.module("retro").run(["$rootScope", "$ionicPlatform", function ($rootScope, $ionicPlatform) {
+
+    $rootScope.$on("$stateChangeSuccess", function (event, toState) {
+        $rootScope.hideMenu = toState.name === "home" || toState.name === "create" || toState.name === "battle";
+    });
+
+    $ionicPlatform.registerBackButtonAction(function (e) {
+        e.preventDefault();
+    }, 100);
+
+    $ionicPlatform.ready(function () {
+        if (window.cordova && window.cordova.plugins.Keyboard) {
+            window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+        }
+
+        if (window.StatusBar) {
+            window.StatusBar.styleDefault();
+        }
+    });
+}]);
+"use strict";
+
+angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$stateProvider", function ($ionicConfigProvider, $urlRouterProvider, $stateProvider) {
+
+    $ionicConfigProvider.views.swipeBackEnabled(false);
+
+    $urlRouterProvider.otherwise("/");
+
+    $stateProvider.state("home", {
+        url: "/",
+        templateUrl: "index",
+        controller: "HomeController"
+    }).state("create", {
+        url: "/create",
+        templateUrl: "createchar",
+        controller: "CreateCharacterController",
+        data: { requiresLogin: true }
+    }).state("player", {
+        url: "/player",
+        templateUrl: "player",
+        controller: "PlayerController",
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
+    }).state("changeclass", {
+        url: "/changeclass",
+        templateUrl: "changeclass",
+        controller: "ClassChangeController",
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
+    }).state("changeskills", {
+        url: "/changeskills",
+        templateUrl: "changeskills",
+        controller: "SkillChangeController",
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
+    }).state("inventory", {
+        url: "/inventory",
+        templateUrl: "inventory",
+        controller: "InventoryController",
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
+    }).state("inventory.armor", {
+        url: "/armor",
+        views: {
+            "armor-tab": {
+                templateUrl: "inventory-tab-armor"
+            }
+        },
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
+    }).state("inventory.weapons", {
+        url: "/weapons",
+        views: {
+            "weapons-tab": {
+                templateUrl: "inventory-tab-weapons"
+            }
+        },
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
+    }).state("inventory.items", {
+        url: "/items",
+        views: {
+            "items-tab": {
+                templateUrl: "inventory-tab-items"
+            }
+        },
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
+    }).state("options", {
+        url: "/options",
+        templateUrl: "options",
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
+    }).state("explore", {
+        url: "/explore",
+        templateUrl: "explore",
+        controller: "ExploreController",
+        data: { requiresLogin: true },
+        resolve: {
+            playerLoaded: ["$injector", function ($injector) {
+                return $injector.get("Settings").isReady;
+            }]
+        }
+    }).state("battle", {
+        url: "/battle",
+        templateUrl: "battle",
+        controller: "BattleController",
+        data: { requiresLogin: true }
+    });
+}]);
+"use strict";
+
 angular.module("retro").constant("CLASSES", {
     Cleric: "Clerics specialize in healing their companions.",
     Fighter: "Fighters specialize in making their enemies hurt via physical means.",
@@ -147,6 +358,16 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
     var setupBattleData = function () {
         $scope.battle = Battle.get();
         $scope.battle.actionChannel.watch($scope.setTarget);
+        $scope.battle.resultsChannel.watch(function (_ref) {
+            var battle = _ref.battle;
+            var actions = _ref.actions;
+
+            Battle.set(battle);
+            $scope.disableActions = false;
+            $scope.targets = {};
+            $scope.results = actions;
+            $scope.resultsModal.show();
+        });
 
         // self shows up last
         $scope.orderedPlayers = _($scope.battle.players).sortBy(function (player) {
@@ -182,7 +403,7 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
             return obj.name === "Damage" ? "*" : obj.name;
         }).value();
 
-        $scope.modal.show();
+        $scope.targetModal.show();
     };
 
     $scope.target = {
@@ -197,8 +418,8 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
         }
     };
 
-    $scope.closeSkillInfo = function () {
-        return $scope.modal.hide();
+    $scope.closeModal = function (modal) {
+        return $scope[modal].hide();
     };
 
     $scope.prepareTarget = function (target) {
@@ -206,7 +427,7 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
         $scope.setTarget(target);
         $scope.battle.actionChannel.publish(target);
         $scope.canConfirm = true;
-        $scope.closeSkillInfo();
+        $scope.closeModal("targetModal");
     };
 
     $scope.setTarget = function (target) {
@@ -216,21 +437,27 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
     $scope.confirmAction = function () {
         $scope.canConfirm = false;
         $scope.disableActions = true;
-        BattleFlow.confirmAction($scope.targets[$scope.currentPlayerName], function () {
-            return $scope.disableActions = false;
-        });
+        BattleFlow.confirmAction($scope.targets[$scope.currentPlayerName]);
     };
 
     $ionicModal.fromTemplateUrl("choosetarget.info", {
         scope: $scope,
         animation: "slide-in-up"
     }).then(function (modal) {
-        $scope.modal = modal;
+        $scope.targetModal = modal;
+    });
+
+    $ionicModal.fromTemplateUrl("results.info", {
+        scope: $scope,
+        animation: "slide-in-up"
+    }).then(function (modal) {
+        $scope.resultsModal = modal;
     });
 
     // clean up modal b/c memory
     $scope.$on("$destroy", function () {
-        $scope.modal.remove();
+        $scope.targetModal.remove();
+        $scope.resultsModal.remove();
     });
 
     setupBattleData();
@@ -238,7 +465,7 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
 
     /*
     TODO make buffbar
-        - ion-flash - paralyzed
+        - ion-flash - shocked
         - ion-eye-disabled - blinded
         - ion-fireball - burned
         - ion-ios-snowy - frozen
@@ -550,217 +777,6 @@ angular.module("retro").directive("statBar", function () {
 });
 "use strict";
 
-angular.module("retro").config(["authProvider", function (authProvider) {
-    authProvider.init({
-        domain: "reactive-retro.auth0.com",
-        clientID: "ucMSnNDYLGdDBL2uppganZv2jKzzJiI0",
-        loginState: "home"
-    });
-}]).run(["auth", "$localStorage", "$rootScope", "$state", "jwtHelper", "AuthFlow", "Config", function (auth, $localStorage, $rootScope, $state, jwtHelper, AuthFlow, Config) {
-    auth.hookEvents();
-
-    if (Config._cfg !== $localStorage.env) {
-        $localStorage.profile = $localStorage.token = $localStorage.refreshingToken = null;
-        return;
-    }
-
-    var autologin = function () {
-        if (!auth.isAuthenticated || !$localStorage.profile || !$localStorage.profile.user_id) {
-            return;
-        } // jshint ignore:line
-
-        $rootScope.attemptAutoLogin = true;
-        AuthFlow.login(_.clone($localStorage), true);
-    };
-
-    var refreshingToken = null;
-    $rootScope.$on("$locationChangeStart", function (e, n, c) {
-        // if you route to the same state and aren't logged in, don't do this event
-        // it causes the login events on the server to fire twice
-        if (n === c) {
-            return;
-        }
-        if (AuthFlow.isLoggedIn) {
-            return;
-        }
-
-        var token = $localStorage.token;
-        var refreshToken = $localStorage.refreshToken;
-        var profile = $localStorage.profile;
-
-        if (!token) {
-            return;
-        }
-
-        if (!jwtHelper.isTokenExpired(token)) {
-            if (!auth.isAuthenticated) {
-                auth.authenticate(profile, token);
-            }
-            autologin();
-        } else {
-            if (refreshToken) {
-                if (refreshingToken === null) {
-                    refreshingToken = auth.refreshIdToken(refreshToken).then(function (idToken) {
-                        $localStorage.token = idToken;
-                        auth.authenticate(profile, idToken);
-                        autologin();
-                    })["finally"](function () {
-                        refreshingToken = null;
-                    });
-                }
-                return refreshingToken;
-            } else {
-                $state.go("home");
-            }
-        }
-    });
-}]);
-"use strict";
-
-angular.module("retro").run(["$rootScope", "$ionicPlatform", function ($rootScope, $ionicPlatform) {
-
-    $rootScope.$on("$stateChangeSuccess", function (event, toState) {
-        $rootScope.hideMenu = toState.name === "home" || toState.name === "create" || toState.name === "battle";
-    });
-
-    $ionicPlatform.registerBackButtonAction(function (e) {
-        e.preventDefault();
-    }, 100);
-
-    $ionicPlatform.ready(function () {
-        if (window.cordova && window.cordova.plugins.Keyboard) {
-            window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-        }
-
-        if (window.StatusBar) {
-            window.StatusBar.styleDefault();
-        }
-    });
-}]);
-"use strict";
-
-angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$stateProvider", function ($ionicConfigProvider, $urlRouterProvider, $stateProvider) {
-
-    $ionicConfigProvider.views.swipeBackEnabled(false);
-
-    $urlRouterProvider.otherwise("/");
-
-    $stateProvider.state("home", {
-        url: "/",
-        templateUrl: "index",
-        controller: "HomeController"
-    }).state("create", {
-        url: "/create",
-        templateUrl: "createchar",
-        controller: "CreateCharacterController",
-        data: { requiresLogin: true }
-    }).state("player", {
-        url: "/player",
-        templateUrl: "player",
-        controller: "PlayerController",
-        data: { requiresLogin: true },
-        resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
-            }]
-        }
-    }).state("changeclass", {
-        url: "/changeclass",
-        templateUrl: "changeclass",
-        controller: "ClassChangeController",
-        data: { requiresLogin: true },
-        resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
-            }]
-        }
-    }).state("changeskills", {
-        url: "/changeskills",
-        templateUrl: "changeskills",
-        controller: "SkillChangeController",
-        data: { requiresLogin: true },
-        resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
-            }]
-        }
-    }).state("inventory", {
-        url: "/inventory",
-        templateUrl: "inventory",
-        controller: "InventoryController",
-        data: { requiresLogin: true },
-        resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
-            }]
-        }
-    }).state("inventory.armor", {
-        url: "/armor",
-        views: {
-            "armor-tab": {
-                templateUrl: "inventory-tab-armor"
-            }
-        },
-        data: { requiresLogin: true },
-        resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
-            }]
-        }
-    }).state("inventory.weapons", {
-        url: "/weapons",
-        views: {
-            "weapons-tab": {
-                templateUrl: "inventory-tab-weapons"
-            }
-        },
-        data: { requiresLogin: true },
-        resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
-            }]
-        }
-    }).state("inventory.items", {
-        url: "/items",
-        views: {
-            "items-tab": {
-                templateUrl: "inventory-tab-items"
-            }
-        },
-        data: { requiresLogin: true },
-        resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
-            }]
-        }
-    }).state("options", {
-        url: "/options",
-        templateUrl: "options",
-        data: { requiresLogin: true },
-        resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
-            }]
-        }
-    }).state("explore", {
-        url: "/explore",
-        templateUrl: "explore",
-        controller: "ExploreController",
-        data: { requiresLogin: true },
-        resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
-            }]
-        }
-    }).state("battle", {
-        url: "/battle",
-        templateUrl: "battle",
-        controller: "BattleController",
-        data: { requiresLogin: true }
-    });
-}]);
-"use strict";
-
 angular.module("retro").service("Auth", ["$localStorage", "$state", "$ionicHistory", "auth", "AuthFlow", function ($localStorage, $state, $ionicHistory, auth, AuthFlow) {
 
     var localAuth = {
@@ -1068,8 +1084,12 @@ angular.module("retro").service("Battle", ["$q", "$ionicHistory", "$state", func
     var update = function (newBattle) {
 
         if (battle) {
-            battle.actionChannel = null;
+            battle.actionChannel.unsubscribe();
+            battle.actionChannel.unwatch();
+            battle.resultsChannel.unsubscribe();
+            battle.resultsChannel.unwatch();
             socketRef.unsubscribe("battle:" + battle._id + ":actions");
+            socketRef.unsubscribe("battle:" + battle._id + ":results");
         }
 
         battle = newBattle;
@@ -1081,6 +1101,7 @@ angular.module("retro").service("Battle", ["$q", "$ionicHistory", "$state", func
 
             $state.go("battle");
             battle.actionChannel = socketRef.subscribe("battle:" + battle._id + ":actions");
+            battle.resultsChannel = socketRef.subscribe("battle:" + battle._id + ":results");
         }
 
         defer.notify(battle);
@@ -1279,9 +1300,8 @@ angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$
         var origin = _ref.origin;
         var id = _ref.id;
         var skill = _ref.skill;
-        var callback = arguments[1] === undefined ? function () {} : arguments[1];
 
-        socket.emit("combat:confirmaction", { skill: skill, target: id, name: origin }, Toaster.handleDefault(callback));
+        socket.emit("combat:confirmaction", { skill: skill, target: id, name: origin }, Toaster.handleDefault());
     };
 
     return {

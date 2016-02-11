@@ -8,8 +8,12 @@ angular.module('retro').service('Battle', ($q, $ionicHistory, $state) => {
     const update = (newBattle) => {
 
         if(battle) {
-            battle.actionChannel = null;
+            battle.actionChannel.unsubscribe();
+            battle.actionChannel.unwatch();
+            battle.resultsChannel.unsubscribe();
+            battle.resultsChannel.unwatch();
             socketRef.unsubscribe(`battle:${battle._id}:actions`);
+            socketRef.unsubscribe(`battle:${battle._id}:results`);
         }
 
         battle = newBattle;
@@ -21,6 +25,7 @@ angular.module('retro').service('Battle', ($q, $ionicHistory, $state) => {
 
             $state.go('battle');
             battle.actionChannel = socketRef.subscribe(`battle:${battle._id}:actions`);
+            battle.resultsChannel = socketRef.subscribe(`battle:${battle._id}:results`);
         }
 
         defer.notify(battle);
