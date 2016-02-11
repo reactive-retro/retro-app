@@ -4,18 +4,30 @@ angular.module('retro').controller('BattleController',
         $scope.currentPlayerName = Player.get().name;
         $scope.targets = {};
 
+        const modals = {
+            targetModal: null,
+            resultsModal: null
+        };
         let me = null;
+
+        const resultHandler = ({ battle, actions, isDone }) => {
+            Battle.set(battle);
+            $scope.disableActions = false;
+            $scope.targets = {};
+            $scope.results = actions;
+            $scope.isDone = isDone;
+            modals.resultsModal.show();
+            if(isDone) {
+                Battle.set(null);
+            }
+        };
 
         const setupBattleData = () => {
             $scope.battle = Battle.get();
+            if(!$scope.battle) { return; }
             $scope.battle.actionChannel.watch($scope.setTarget);
-            $scope.battle.resultsChannel.watch(({ battle, actions }) => {
-                Battle.set(battle);
-                $scope.disableActions = false;
-                $scope.targets = {};
-                $scope.results = actions;
-                $scope.resultsModal.show();
-            });
+
+            $scope.battle.resultsChannel.watch(resultHandler);
 
             // self shows up last
             $scope.orderedPlayers = _($scope.battle.players)
@@ -54,7 +66,7 @@ angular.module('retro').controller('BattleController',
                 .sortBy((obj) => obj.name === 'Damage' ? '*' : obj.name)
                 .value();
 
-            $scope.targetModal.show();
+            modals.targetModal.show();
         };
 
         $scope.target = {
@@ -63,7 +75,12 @@ angular.module('retro').controller('BattleController',
             other: (other) => $scope.prepareTarget({ name: other, id: other, skill: $scope.activeSkill.spellName })
         };
 
-        $scope.closeModal = (modal) => $scope[modal].hide();
+        $scope.closeModal = (modal) => {
+            modals[modal].hide();
+            if($scope.isDone) {
+                BattleFlow.toExplore();
+            }
+        };
 
         $scope.prepareTarget = (target) => {
             target.origin = $scope.currentPlayerName;
@@ -87,24 +104,24 @@ angular.module('retro').controller('BattleController',
             scope: $scope,
             animation: 'slide-in-up'
         }).then((modal) => {
-            $scope.targetModal = modal;
+            modals.targetModal = modal;
         });
 
         $ionicModal.fromTemplateUrl('results.info', {
             scope: $scope,
             animation: 'slide-in-up'
         }).then((modal) => {
-            $scope.resultsModal = modal;
+            modals.resultsModal = modal;
         });
 
         // clean up modal b/c memory
         $scope.$on('$destroy', () => {
-            $scope.targetModal.remove();
-            $scope.resultsModal.remove();
+            modals.targetModal.remove();
+            modals.resultsModal.remove();
         });
 
         setupBattleData();
-        Battle.observer.then(null, null, setupBattleData);
+        Battle.observer().then(null, null, setupBattleData);
 
         /*
         TODO make buffbar

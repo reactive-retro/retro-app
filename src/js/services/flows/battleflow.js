@@ -8,8 +8,17 @@ angular.module('retro').service('BattleFlow', (Player, Battle, Toaster, $state, 
         socket.emit('combat:confirmaction', { skill, target: id, name: origin }, Toaster.handleDefault());
     };
 
+    const toExplore = () => {
+        $ionicHistory.nextViewOptions({
+            disableBack: true
+        });
+
+        $state.go('explore');
+    };
+
     return {
         start,
-        confirmAction
+        confirmAction,
+        toExplore
     };
 });

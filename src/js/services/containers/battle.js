@@ -1,6 +1,6 @@
-angular.module('retro').service('Battle', ($q, $ionicHistory, $state) => {
+angular.module('retro').service('Battle', ($q, $ionicHistory, $state, Player) => {
 
-    const defer = $q.defer();
+    let defer = $q.defer();
 
     let battle = '';
     let socketRef = null;
@@ -14,11 +14,25 @@ angular.module('retro').service('Battle', ($q, $ionicHistory, $state) => {
             battle.resultsChannel.unwatch();
             socketRef.unsubscribe(`battle:${battle._id}:actions`);
             socketRef.unsubscribe(`battle:${battle._id}:results`);
+
+            if(!newBattle) {
+                battle.actionChannel.destroy();
+                battle.resultsChannel.destroy();
+
+                // when the battle is over, reset the defer
+                defer.resolve();
+                defer = $q.defer();
+            }
         }
+
 
         battle = newBattle;
 
-        if(battle) {
+        if(newBattle) {
+            const myName = Player.get().name;
+            const me = _.find(battle.playerData, { name: myName });
+            Player.set(me);
+
             $ionicHistory.nextViewOptions({
                 disableBack: true
             });
@@ -32,7 +46,7 @@ angular.module('retro').service('Battle', ($q, $ionicHistory, $state) => {
     };
 
     return {
-        observer: defer.promise,
+        observer: () => defer.promise,
         apply: () => {
             defer.notify(battle);
         },

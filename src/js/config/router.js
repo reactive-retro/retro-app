@@ -101,6 +101,7 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
             templateUrl: 'explore',
             controller: 'ExploreController',
             data: { requiresLogin: true },
+            cache: false,
             resolve: {
                 playerLoaded: ($injector) => $injector.get('Settings').isReady
             }
@@ -109,6 +110,7 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
             url: '/battle',
             templateUrl: 'battle',
             controller: 'BattleController',
+            cache: false,
             data: { requiresLogin: true }
         });
 });
