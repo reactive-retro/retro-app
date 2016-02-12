@@ -37,7 +37,7 @@ script(type="text/ng-template", id="choosetarget.info")
                             span &nbsp;
                             ng-pluralize(ng-if="effect.extra.string", count="effect.value.max_possible*multiplier", when="{'one': effect.extra.string, 'other': effect.extra.string+'s'}")
                             span &nbsp;
-                            span(ng-if="effect.extra.chance") ({{effect.extra.chance}}% chance)
+                            span(ng-if="effect.extra.chance") ({{effect.extra.chance + effect.accuracy}}% chance)
 
             .row.assign-area
                 .col.col-flex

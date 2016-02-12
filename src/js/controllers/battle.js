@@ -60,7 +60,7 @@ angular.module('retro').controller('BattleController',
                 .keys()
                 .map(key => {
                     const stats = Dice.statistics(skillRef.spellEffects[key].roll, me.stats);
-                    return { name: key, value: stats, extra: skillRef.spellEffects[key] };
+                    return { name: key, value: stats, extra: skillRef.spellEffects[key], accuracy: me.stats.acc };
                 })
                 // Damage always comes first
                 .sortBy((obj) => obj.name === 'Damage' ? '*' : obj.name)

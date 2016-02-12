@@ -413,7 +413,7 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
         var skillRef = $scope.activeSkill;
         $scope.activeSkillAttrs = _(skillRef.spellEffects).keys().map(function (key) {
             var stats = Dice.statistics(skillRef.spellEffects[key].roll, me.stats);
-            return { name: key, value: stats, extra: skillRef.spellEffects[key] };
+            return { name: key, value: stats, extra: skillRef.spellEffects[key], accuracy: me.stats.acc };
         })
         // Damage always comes first
         .sortBy(function (obj) {
