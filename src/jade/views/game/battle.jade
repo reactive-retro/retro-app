@@ -44,4 +44,13 @@ script(type="text/ng-template", id="battle")
 
                     .row.text-center.skill-grid
                         .col.col-33(ng-repeat="skill in uniqueSkills")
-                            button.button.button-balanced.skill-button.button-block.margin-0(ng-click="openSkillInfo(skill)", ng-disabled="disableActions") {{skill}}
+                            button.button.button-balanced.skill-button.button-block.margin-0.battle-button(
+                                ng-click="openSkillInfo(skill.spellName)",
+                                ng-disabled="disableActions"
+                                )
+                                .row.padding-0
+                                    .col {{skill.spellName}}
+                                .row.padding-0
+                                    .col.col-center.assertive
+                                        span(ng-if="!canCastSkillMP(skill)")
+                                            i.icon.ion-waterdrop

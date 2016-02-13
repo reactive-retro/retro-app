@@ -3,12 +3,14 @@ angular.module('retro').controller('BattleController',
         $scope.battleFlow = BattleFlow;
         $scope.currentPlayerName = Player.get().name;
         $scope.targets = {};
+        $scope.multiplier = 1;
 
         const modals = {
             targetModal: null,
             resultsModal: null
         };
-        let me = null;
+
+        $scope.me = null;
 
         const resultHandler = ({ battle, actions, isDone }) => {
             Battle.set(battle);
@@ -38,19 +40,23 @@ angular.module('retro').controller('BattleController',
                 })
                 .value();
 
-            me = _.find($scope.battle.playerData, { name: $scope.currentPlayerName });
+            $scope.me = _.find($scope.battle.playerData, { name: $scope.currentPlayerName });
 
-            $scope.uniqueSkills = _(me.skills)
+            $scope.uniqueSkills = _($scope.me.skills)
                 .reject(skill => skill === 'Attack')
                 .compact()
                 .uniq()
+                .map(skill => _.find(Skills.get(), { spellName: skill }))
                 .value();
         };
+
+        $scope.skillCost = (skill) => $scope.multiplier * (skill ? skill.spellCost : 0);
+        $scope.canCastSkillMP = (skill) => $scope.skillCost(skill) <= $scope.me.stats.mp.__current;
 
         $scope.openSkillInfo = (skill) => {
             $scope.activeSkill = _.find(Skills.get(), { spellName: skill });
 
-            $scope.multiplier = _.filter(me.skills, check => check === skill).length;
+            $scope.multiplier = _.filter($scope.me.skills, check => check === skill).length;
             if(skill === 'Attack') {
                 $scope.multiplier += 1;
             }
@@ -59,8 +65,8 @@ angular.module('retro').controller('BattleController',
             $scope.activeSkillAttrs = _(skillRef.spellEffects)
                 .keys()
                 .map(key => {
-                    const stats = Dice.statistics(skillRef.spellEffects[key].roll, me.stats);
-                    return { name: key, value: stats, extra: skillRef.spellEffects[key], accuracy: me.stats.acc };
+                    const stats = Dice.statistics(skillRef.spellEffects[key].roll, $scope.me.stats);
+                    return { name: key, value: stats, extra: skillRef.spellEffects[key], accuracy: $scope.me.stats.acc };
                 })
                 // Damage always comes first
                 .sortBy((obj) => obj.name === 'Damage' ? '*' : obj.name)

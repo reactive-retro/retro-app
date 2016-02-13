@@ -9812,3 +9812,9 @@ map {
 .inner-alignment-padding {
   padding-left: 15px;
   padding-right: 15px; }
+
+.battle-button {
+  height: 80px !important; }
+
+.row-center.text-center {
+  justify-content: center; }

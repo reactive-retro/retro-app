@@ -15,9 +15,9 @@ script(type="text/ng-template", id="choosetarget.info")
                             span &nbsp;
                             ng-pluralize(count="activeSkill.spellCooldown*multiplier", when="{'0': 'instant', 'one': '1 round', 'other': '{} rounds'}")
                         .col.text-center
-                            i.icon.ion-waterdrop
+                            i.icon.ion-waterdrop.positive
                             span &nbsp;
-                            span {{activeSkill.spellCost*multiplier}} mp
+                            span {{skillCost(activeSkill)}} mp
                         .col.text-center
                             i.icon.ion-android-contact
                             span &nbsp;
@@ -45,7 +45,12 @@ script(type="text/ng-template", id="choosetarget.info")
                         .col.text-center
                             h3.title Choose Target
 
-                    .row.skill-container
+                    .row.skill-container(ng-if="!canCastSkillMP(activeSkill)")
+                        .col.col-flex.col-center
+                            .row.row-center.text-center
+                                div You need {{skillCost(activeSkill) - me.stats.mp.__current}} <i class="icon positive ion-waterdrop"></i> to cast this spell.
+
+                    .row.skill-container(ng-if="canCastSkillMP(activeSkill)")
                         .col.col-flex
 
                             .row(ng-if="activeSkill.spellTargets === 'Single Ally'")
