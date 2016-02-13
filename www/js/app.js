@@ -404,8 +404,19 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
         }).value();
     };
 
+    $scope.getMultiplier = function (skill) {
+        return _.filter($scope.me.skills, function (check) {
+            return check === skill;
+        }).length;
+    };
+    $scope.skillCooldown = function (skill) {
+        return $scope.getMultiplier(skill ? skill.spellName : "") * (skill ? skill.spellCooldown : 0);
+    };
+    $scope.canCastSkillCD = function () {
+        return true;
+    };
     $scope.skillCost = function (skill) {
-        return $scope.multiplier * (skill ? skill.spellCost : 0);
+        return $scope.getMultiplier(skill ? skill.spellName : "") * (skill ? skill.spellCost : 0);
     };
     $scope.canCastSkillMP = function (skill) {
         return $scope.skillCost(skill) <= $scope.me.stats.mp.__current;
@@ -414,9 +425,7 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
     $scope.openSkillInfo = function (skill) {
         $scope.activeSkill = _.find(Skills.get(), { spellName: skill });
 
-        $scope.multiplier = _.filter($scope.me.skills, function (check) {
-            return check === skill;
-        }).length;
+        $scope.multiplier = $scope.getMultiplier($scope.activeSkill.spellName);
         if (skill === "Attack") {
             $scope.multiplier += 1;
         }
@@ -1127,6 +1136,152 @@ angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaT
 }]);
 "use strict";
 
+angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory", "Toaster", "$localStorage", "$state", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, $rootScope, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, Config, socket) {
+    var flow = {
+        toPlayer: function () {
+            if (!_.contains(["home", "create"], $state.current.name)) {
+                return;
+            }
+
+            $ionicHistory.nextViewOptions({
+                disableBack: true
+            });
+            $state.go("player");
+        },
+        tryAuth: function () {
+            var fail = function () {
+                return $state.go("create");
+            };
+
+            if ($localStorage.profile.user_id) {
+                // jshint ignore:line
+                flow.login(_.clone($localStorage), true).then(null, fail);
+
+                //only fail to the char create screen if there's a server connection
+            } else if ($rootScope.canConnect) {
+                fail();
+            }
+        },
+        login: function (NewHeroProto) {
+            var swallow = arguments[1] === undefined ? false : arguments[1];
+
+            var defer = $q.defer();
+
+            var NewHero = {
+                name: NewHeroProto.name,
+                profession: NewHeroProto.profession,
+                userId: NewHeroProto.profile.user_id, //jshint ignore:line
+                token: NewHeroProto.token
+            };
+
+            var currentLocation = LocationWatcher.current();
+            if (!currentLocation) {
+                $rootScope.attemptAutoLogin = false;
+                return Toaster.show("No current location. Is your GPS on?");
+            }
+
+            NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
+
+            socket.emit("login", NewHero, function (err, success) {
+                if (err) {
+                    defer.reject();
+                } else {
+                    defer.resolve();
+                    _.extend(Settings, success.settings);
+                    flow.toPlayer();
+                    flow.isLoggedIn = true;
+                    $localStorage.env = Config._cfg;
+                }
+
+                $rootScope.attemptAutoLogin = false;
+
+                if (!swallow) {
+                    var msgObj = err ? err : success;
+                    Toaster.show(msgObj.msg);
+                }
+            });
+
+            Settings.isReady = defer.promise;
+            return Settings.isReady;
+        }
+    };
+    return flow;
+}]);
+"use strict";
+
+angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$state", "$ionicHistory", "socket", function (Player, Battle, Toaster, $state, $ionicHistory, socket) {
+
+    var start = function (monster) {
+        socket.emit("combat:enter", { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
+    };
+
+    var confirmAction = function (_ref) {
+        var origin = _ref.origin;
+        var id = _ref.id;
+        var skill = _ref.skill;
+
+        socket.emit("combat:confirmaction", { skill: skill, target: id, name: origin }, Toaster.handleDefault());
+    };
+
+    var toExplore = function () {
+        $ionicHistory.nextViewOptions({
+            disableBack: true
+        });
+
+        $state.go("explore");
+    };
+
+    return {
+        start: start,
+        confirmAction: confirmAction,
+        toExplore: toExplore
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("ClassChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
+    return {
+        change: function (newProfession) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, newProfession: newProfession };
+            socket.emit("player:change:class", opts, Toaster.handleDefault(function () {
+                return $state.go("player");
+            }));
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("EquipFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
+    return {
+        equip: function (newItem) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, itemId: newItem.itemId };
+            socket.emit("player:change:equipment", opts, Toaster.handleDefault(function () {
+                return $state.go("player");
+            }));
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("SkillChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
+    return {
+        change: function (skill, slot) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, skillName: skill, skillSlot: slot };
+            socket.emit("player:change:skill", opts, Toaster.handleDefault());
+        }
+    };
+}]);
+"use strict";
+
 angular.module("retro").service("Battle", ["$q", "$ionicHistory", "$state", "Player", function ($q, $ionicHistory, $state, Player) {
 
     var defer = $q.defer();
@@ -1280,152 +1435,6 @@ angular.module("retro").service("Skills", ["$q", function ($q) {
         set: getNewSkills,
         get: function () {
             return skills;
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory", "Toaster", "$localStorage", "$state", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, $rootScope, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, Config, socket) {
-    var flow = {
-        toPlayer: function () {
-            if (!_.contains(["home", "create"], $state.current.name)) {
-                return;
-            }
-
-            $ionicHistory.nextViewOptions({
-                disableBack: true
-            });
-            $state.go("player");
-        },
-        tryAuth: function () {
-            var fail = function () {
-                return $state.go("create");
-            };
-
-            if ($localStorage.profile.user_id) {
-                // jshint ignore:line
-                flow.login(_.clone($localStorage), true).then(null, fail);
-
-                //only fail to the char create screen if there's a server connection
-            } else if ($rootScope.canConnect) {
-                fail();
-            }
-        },
-        login: function (NewHeroProto) {
-            var swallow = arguments[1] === undefined ? false : arguments[1];
-
-            var defer = $q.defer();
-
-            var NewHero = {
-                name: NewHeroProto.name,
-                profession: NewHeroProto.profession,
-                userId: NewHeroProto.profile.user_id, //jshint ignore:line
-                token: NewHeroProto.token
-            };
-
-            var currentLocation = LocationWatcher.current();
-            if (!currentLocation) {
-                $rootScope.attemptAutoLogin = false;
-                return Toaster.show("No current location. Is your GPS on?");
-            }
-
-            NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
-
-            socket.emit("login", NewHero, function (err, success) {
-                if (err) {
-                    defer.reject();
-                } else {
-                    defer.resolve();
-                    _.extend(Settings, success.settings);
-                    flow.toPlayer();
-                    flow.isLoggedIn = true;
-                    $localStorage.env = Config._cfg;
-                }
-
-                $rootScope.attemptAutoLogin = false;
-
-                if (!swallow) {
-                    var msgObj = err ? err : success;
-                    Toaster.show(msgObj.msg);
-                }
-            });
-
-            Settings.isReady = defer.promise;
-            return Settings.isReady;
-        }
-    };
-    return flow;
-}]);
-"use strict";
-
-angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$state", "$ionicHistory", "socket", function (Player, Battle, Toaster, $state, $ionicHistory, socket) {
-
-    var start = function (monster) {
-        socket.emit("combat:enter", { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
-    };
-
-    var confirmAction = function (_ref) {
-        var origin = _ref.origin;
-        var id = _ref.id;
-        var skill = _ref.skill;
-
-        socket.emit("combat:confirmaction", { skill: skill, target: id, name: origin }, Toaster.handleDefault());
-    };
-
-    var toExplore = function () {
-        $ionicHistory.nextViewOptions({
-            disableBack: true
-        });
-
-        $state.go("explore");
-    };
-
-    return {
-        start: start,
-        confirmAction: confirmAction,
-        toExplore: toExplore
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("ClassChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
-    return {
-        change: function (newProfession) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, newProfession: newProfession };
-            socket.emit("player:change:class", opts, Toaster.handleDefault(function () {
-                return $state.go("player");
-            }));
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("EquipFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
-    return {
-        equip: function (newItem) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, itemId: newItem.itemId };
-            socket.emit("player:change:equipment", opts, Toaster.handleDefault(function () {
-                return $state.go("player");
-            }));
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("SkillChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
-    return {
-        change: function (skill, slot) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, skillName: skill, skillSlot: slot };
-            socket.emit("player:change:skill", opts, Toaster.handleDefault());
         }
     };
 }]);

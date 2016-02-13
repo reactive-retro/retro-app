@@ -50,13 +50,16 @@ angular.module('retro').controller('BattleController',
                 .value();
         };
 
-        $scope.skillCost = (skill) => $scope.multiplier * (skill ? skill.spellCost : 0);
+        $scope.getMultiplier = (skill) => _.filter($scope.me.skills, check => check === skill).length;
+        $scope.skillCooldown = (skill) => $scope.getMultiplier(skill ? skill.spellName : '') * (skill ? skill.spellCooldown : 0);
+        $scope.canCastSkillCD = () => true;
+        $scope.skillCost = (skill) => $scope.getMultiplier(skill ? skill.spellName : '') * (skill ? skill.spellCost : 0);
         $scope.canCastSkillMP = (skill) => $scope.skillCost(skill) <= $scope.me.stats.mp.__current;
 
         $scope.openSkillInfo = (skill) => {
             $scope.activeSkill = _.find(Skills.get(), { spellName: skill });
 
-            $scope.multiplier = _.filter($scope.me.skills, check => check === skill).length;
+            $scope.multiplier = $scope.getMultiplier($scope.activeSkill.spellName);
             if(skill === 'Attack') {
                 $scope.multiplier += 1;
             }

@@ -13,7 +13,7 @@ script(type="text/ng-template", id="choosetarget.info")
                         .col.text-center
                             i.icon.ion-clock
                             span &nbsp;
-                            ng-pluralize(count="activeSkill.spellCooldown*multiplier", when="{'0': 'instant', 'one': '1 round', 'other': '{} rounds'}")
+                            ng-pluralize(count="skillCooldown(activeSkill)", when="{'0': 'instant', 'one': '1 round', 'other': '{} rounds'}")
                         .col.text-center
                             i.icon.ion-waterdrop.positive
                             span &nbsp;

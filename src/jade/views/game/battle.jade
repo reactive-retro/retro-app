@@ -48,9 +48,9 @@ script(type="text/ng-template", id="battle")
                                 ng-click="openSkillInfo(skill.spellName)",
                                 ng-disabled="disableActions"
                                 )
-                                .row.padding-0
+                                .row.padding-0.skill-name
                                     .col {{skill.spellName}}
-                                .row.padding-0
+                                .row.padding-0.skill-disabled(ng-if="!canCastSkillMP(skill)")
                                     .col.col-center.assertive
                                         span(ng-if="!canCastSkillMP(skill)")
                                             i.icon.ion-waterdrop

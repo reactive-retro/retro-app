@@ -9808,6 +9808,8 @@ map {
 
 .combat .skill-row .skill-grid {
   flex-wrap: wrap; }
+  .combat .skill-row .skill-grid button.battle-button {
+    display: flex; }
 
 .inner-alignment-padding {
   padding-left: 15px;
