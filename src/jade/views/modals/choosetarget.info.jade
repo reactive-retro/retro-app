@@ -48,9 +48,14 @@ script(type="text/ng-template", id="choosetarget.info")
                     .row.skill-container(ng-if="!canCastSkillMP(activeSkill)")
                         .col.col-flex.col-center
                             .row.row-center.text-center
-                                div You need {{skillCost(activeSkill) - me.stats.mp.__current}} <i class="icon positive ion-waterdrop"></i> to cast this spell.
+                                div You need <i class="icon positive ion-waterdrop"></i> {{skillCost(activeSkill) - me.stats.mp.__current}} mp to cast this spell.
 
-                    .row.skill-container(ng-if="canCastSkillMP(activeSkill)")
+                    .row.skill-container(ng-if="!canCastSkillCD(activeSkill)")
+                        .col.col-flex.col-center
+                            .row.row-center.text-center
+                                div You to wait <i class="icon ion-clock"></i> {{me.cooldowns[activeSkill.spellName]}} rounds to cast this spell.
+
+                    .row.skill-container(ng-if="canCastSkillMP(activeSkill) && canCastSkillCD(activeSkill)")
                         .col.col-flex
 
                             .row(ng-if="activeSkill.spellTargets === 'Single Ally'")
