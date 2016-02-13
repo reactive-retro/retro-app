@@ -13,9 +13,15 @@ script(type="text/ng-template", id="battle")
                     div {{player.slug}}
 
                 .col.col-center
-                    health-display(target="player")
+                    div
+                        health-display(target="player")
+                    div
+                        stat-bar(target="player", stat="hp")
                 .col.col-center
-                    mana-display(target="player")
+                    div
+                        mana-display(target="player")
+                    div
+                        stat-bar(target="player", stat="mp")
 
             .row.inner-alignment-padding
                 .col
