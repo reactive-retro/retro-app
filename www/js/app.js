@@ -734,6 +734,28 @@ angular.module("retro").directive("colorText", function () {
 });
 "use strict";
 
+angular.module("retro").directive("healthDisplay", function () {
+    return {
+        restrict: "E",
+        scope: {
+            target: "="
+        },
+        template: "\n                <div>\n                    <i class=\"icon ion-heart assertive\"></i> {{target.stats.hp.__current}} / {{target.stats.hp.maximum}}\n                </div>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").directive("manaDisplay", function () {
+    return {
+        restrict: "E",
+        scope: {
+            target: "="
+        },
+        template: "\n                <div>\n                    <i class=\"icon ion-waterdrop positive\"></i> {{target.stats.mp.__current}} / {{target.stats.mp.maximum}}\n                </div>\n            "
+    };
+});
+"use strict";
+
 angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
     return {
         restrict: "E",

@@ -13,11 +13,11 @@ script(type="text/ng-template", id="player")
 
                 .item.item-body
                     .row
-                        .col
-                            stat-bar(target="player", stat="hp")
-                        .col
-                            stat-bar(target="player", stat="mp")
-                        .col
+                        .col.col-center
+                            health-display(target="player")
+                        .col.col-center
+                            mana-display(target="player")
+                        .col.col-center
                             stat-bar(target="player", stat="xp")
 
                     .row

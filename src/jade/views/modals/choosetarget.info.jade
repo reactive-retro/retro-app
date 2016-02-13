@@ -59,9 +59,9 @@ script(type="text/ng-template", id="choosetarget.info")
                                     .row
                                         .col
                                             div
-                                                stat-bar(target="player", stat="hp")
+                                                health-display(target="player")
                                             div
-                                                stat-bar(target="player", stat="mp")
+                                                mana-display(target="player")
 
                             .row(ng-if="activeSkill.spellTargets === 'Single Enemy'")
                                 .col.col-33.monster-slot(ng-repeat="monster in battle.monsters")
