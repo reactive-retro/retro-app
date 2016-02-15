@@ -1,4 +1,4 @@
-# Reactive Retro App
+# Reactive Retro App [![Build Status](https://travis-ci.org/reactive-retro/retro-app.svg)](https://travis-ci.org/reactive-retro/retro-app)
 
 The Ionic app that runs the game.
 
