@@ -17,6 +17,11 @@ script(type="text/ng-template", id="player")
                             health-display(target="player")
                         .col.col-center
                             mana-display(target="player")
+                        .col.col-center.text-center
+                            i.icon.ion-social-usd
+                            span &nbsp;{{player.stats.gold}}
+
+                    .row
                         .col.col-center
                             stat-bar(target="player", stat="xp")
 
@@ -31,10 +36,6 @@ script(type="text/ng-template", id="player")
                             color-text(pre-text="MNT", value="player.stats.mnt")
                         .col
                             color-text(pre-text="LUK", value="player.stats.luk")
-
-                    .row
-                        .col
-                            span.energized(href) Gold {{player.stats.gold}}
 
             .card
                 .item.item-divider
