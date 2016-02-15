@@ -1,6 +1,4 @@
 angular.module('retro').service('Player', ($q) => {
-    //var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
-
     const defer = $q.defer();
 
     let player = {};

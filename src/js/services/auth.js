@@ -1,6 +1,6 @@
 angular.module('retro').service('Auth', ($localStorage, $state, $ionicHistory, auth, AuthFlow) => {
 
-    var localAuth = {
+    const localAuth = {
         login: () => {
             auth.signin({
                 authParams: {

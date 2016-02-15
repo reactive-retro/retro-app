@@ -9,7 +9,7 @@ angular.module('retro').service('Toaster', ($cordovaToast) => {
     };
 
     const handleDefault = (callback = () => {}) => (err, success) => {
-        var msgObj = err ? err : success;
+        const msgObj = err ? err : success;
         show(msgObj.msg);
 
         callback();

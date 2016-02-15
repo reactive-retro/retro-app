@@ -8,8 +8,7 @@ var minifyCss = require('gulp-minify-css');
 var babel = require('gulp-babel');
 var rename = require('gulp-rename');
 var jade = require('gulp-jade');
-var jshint = require('gulp-jshint');
-var jscs = require('gulp-jscs');
+var eslint = require('gulp-eslint');
 var ngAnnotate = require('gulp-ng-annotate');
 
 var sh = require('shelljs');
@@ -35,6 +34,7 @@ var lib = [
 ];
 
 gulp.task('default', ['sass', 'lib', 'html', 'build', 'ionic:start', 'watch']);
+gulp.task('test', ['build']);
 
 gulp.task('sass', function(done) {
     gulp.src('./src/scss/ionic.app.scss')
@@ -67,27 +67,14 @@ gulp.task('html', function() {
         .pipe(gulp.dest('./www/'));
 });
 
-gulp.task('jshint', function() {
+gulp.task('eslint', function() {
     return gulp.src(paths.js)
-        .pipe(jshint('.jshintrc'))
-        .pipe(jshint.reporter('default'))
-        .on('error', function(data) {
-            gutil.log('jshint', data.message);
-        });
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
 });
 
-gulp.task('jscs', function() {
-    return gulp.src(paths.js)
-        .pipe(jscs({
-            fix: true,
-            esnext: true
-        }))
-        .on('error', function(data) {
-            gutil.log('jshint', data.message);
-        });
-});
-
-gulp.task('build', ['jshint', 'jscs'], function() {
+gulp.task('build', ['eslint'], function() {
     gulp.src(paths.jsB)
         .pipe(babel())
         .pipe(ngAnnotate())

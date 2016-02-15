@@ -8,7 +8,7 @@ angular.module('retro').controller('ExploreController',
 
         $scope.mapCreated = (map) => {
             $scope.map = map;
-            var position = LocationWatcher.current();
+            const position = LocationWatcher.current();
             MapDrawing.drawMe(map, position);
             $scope.centerOn(position);
             MapDrawing.drawHomepoint(map, Player.get().homepoint);
@@ -56,9 +56,9 @@ angular.module('retro').controller('ExploreController',
         };
 
         $scope.centerOn = (coords, centerMap = false) => {
-            if(!$scope.map) { return; }
-            if(!coords.latitude || !coords.longitude) { return; }
-            var position = new Google.maps.LatLng(coords.latitude, coords.longitude);
+            if(!$scope.map) return;
+            if(!coords.latitude || !coords.longitude) return;
+            const position = new Google.maps.LatLng(coords.latitude, coords.longitude);
 
             if(centerMap) { $scope.map.setCenter(position); }
 

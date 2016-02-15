@@ -15,7 +15,7 @@ angular.module('retro')
         }
 
         const autologin = () => {
-            if(!auth.isAuthenticated || !$localStorage.profile || !$localStorage.profile.user_id) { return; } // jshint ignore:line
+            if(!auth.isAuthenticated || !$localStorage.profile || !$localStorage.profile.user_id) return;
 
             $rootScope.attemptAutoLogin = true;
             AuthFlow.login(_.clone($localStorage), true);
@@ -25,10 +25,10 @@ angular.module('retro')
         $rootScope.$on('$locationChangeStart', (e, n, c) => {
             // if you route to the same state and aren't logged in, don't do this event
             // it causes the login events on the server to fire twice
-            if(n === c) { return; }
-            if(AuthFlow.isLoggedIn) { return; }
+            if(n === c) return;
+            if(AuthFlow.isLoggedIn) return;
 
-            const {token, refreshToken, profile} = $localStorage;
+            const { token, refreshToken, profile } = $localStorage;
             if(!token) { return; }
 
             if (!jwtHelper.isTokenExpired(token)) {
@@ -36,21 +36,22 @@ angular.module('retro')
                     auth.authenticate(profile, token);
                 }
                 autologin();
-            } else {
-                if (refreshToken) {
-                    if (refreshingToken === null) {
-                        refreshingToken = auth.refreshIdToken(refreshToken).then((idToken) => {
-                            $localStorage.token = idToken;
-                            auth.authenticate(profile, idToken);
-                            autologin();
-                        }).finally(() => {
-                            refreshingToken = null;
-                        });
-                    }
-                    return refreshingToken;
-                } else {
-                    $state.go('home');
-                }
+                return;
             }
+
+            if (refreshToken) {
+                if (refreshingToken === null) {
+                    refreshingToken = auth.refreshIdToken(refreshToken).then((idToken) => {
+                        $localStorage.token = idToken;
+                        auth.authenticate(profile, idToken);
+                        autologin();
+                    }).finally(() => {
+                        refreshingToken = null;
+                    });
+                }
+                return refreshingToken;
+            }
+
+            $state.go('home');
         });
     });

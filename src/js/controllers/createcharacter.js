@@ -5,7 +5,7 @@ angular.module('retro').controller('CreateCharacterController',
         $scope.baseProfessions = ['Thief', 'Mage', 'Fighter'];
 
         $scope.create = () => {
-            var hero = _.merge(NewHero, $localStorage);
+            const hero = _.merge(NewHero, $localStorage);
             AuthFlow.login(hero);
         };
     }

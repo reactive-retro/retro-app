@@ -2,9 +2,9 @@ angular.module('retro').service('ClassChangeFlow', (Toaster, $state, Player, soc
     return {
         change: (newProfession) => {
 
-            var player = Player.get();
+            const player = Player.get();
 
-            var opts = {name: player.name, newProfession: newProfession};
+            const opts = { name: player.name, newProfession: newProfession };
             socket.emit('player:change:class', opts, Toaster.handleDefault(() => $state.go('player')));
         }
     };

@@ -1,5 +1,5 @@
 angular.module('retro').service('AuthFlow', ($q, $rootScope, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, Config, socket) => {
-    var flow = {
+    const flow = {
         toPlayer: () => {
             if(!_.contains(['home', 'create'], $state.current.name)) { return; }
 
@@ -9,27 +9,27 @@ angular.module('retro').service('AuthFlow', ($q, $rootScope, $ionicHistory, Toas
             $state.go('player');
         },
         tryAuth: () => {
-            var fail = () => $state.go('create');
+            const fail = () => $state.go('create');
 
-            if($localStorage.profile.user_id) { // jshint ignore:line
+            if($localStorage.profile.user_id) {
                 flow.login(_.clone($localStorage), true).then(null, fail);
 
-            //only fail to the char create screen if there's a server connection
+            // only fail to the char create screen if there's a server connection
             } else if($rootScope.canConnect) {
                 fail();
             }
         },
         login: (NewHeroProto, swallow = false) => {
-            var defer = $q.defer();
+            const defer = $q.defer();
 
-            var NewHero = {
+            const NewHero = {
                 name: NewHeroProto.name,
                 profession: NewHeroProto.profession,
-                userId: NewHeroProto.profile.user_id, //jshint ignore:line
+                userId: NewHeroProto.profile.user_id,
                 token: NewHeroProto.token
             };
 
-            var currentLocation = LocationWatcher.current();
+            const currentLocation = LocationWatcher.current();
             if(!currentLocation) {
                 $rootScope.attemptAutoLogin = false;
                 return Toaster.show('No current location. Is your GPS on?');
@@ -51,7 +51,7 @@ angular.module('retro').service('AuthFlow', ($q, $rootScope, $ionicHistory, Toas
                 $rootScope.attemptAutoLogin = false;
 
                 if(!swallow) {
-                    var msgObj = err ? err : success;
+                    const msgObj = err ? err : success;
                     Toaster.show(msgObj.msg);
                 }
             });

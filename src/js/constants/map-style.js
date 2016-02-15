@@ -105,7 +105,7 @@ angular.module('retro').constant('MAP_STYLE', [
         stylers: [
             { color: '#ffffff' },
             { visibility: 'on' },
-            { 'weight': 4.1 }
+            { weight: 4.1 }
         ]
     },
     {

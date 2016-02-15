@@ -32,9 +32,7 @@ angular.module("retro").config(["authProvider", function (authProvider) {
     }
 
     var autologin = function () {
-        if (!auth.isAuthenticated || !$localStorage.profile || !$localStorage.profile.user_id) {
-            return;
-        } // jshint ignore:line
+        if (!auth.isAuthenticated || !$localStorage.profile || !$localStorage.profile.user_id) return;
 
         $rootScope.attemptAutoLogin = true;
         AuthFlow.login(_.clone($localStorage), true);
@@ -44,12 +42,8 @@ angular.module("retro").config(["authProvider", function (authProvider) {
     $rootScope.$on("$locationChangeStart", function (e, n, c) {
         // if you route to the same state and aren't logged in, don't do this event
         // it causes the login events on the server to fire twice
-        if (n === c) {
-            return;
-        }
-        if (AuthFlow.isLoggedIn) {
-            return;
-        }
+        if (n === c) return;
+        if (AuthFlow.isLoggedIn) return;
 
         var token = $localStorage.token;
         var refreshToken = $localStorage.refreshToken;
@@ -64,22 +58,23 @@ angular.module("retro").config(["authProvider", function (authProvider) {
                 auth.authenticate(profile, token);
             }
             autologin();
-        } else {
-            if (refreshToken) {
-                if (refreshingToken === null) {
-                    refreshingToken = auth.refreshIdToken(refreshToken).then(function (idToken) {
-                        $localStorage.token = idToken;
-                        auth.authenticate(profile, idToken);
-                        autologin();
-                    })["finally"](function () {
-                        refreshingToken = null;
-                    });
-                }
-                return refreshingToken;
-            } else {
-                $state.go("home");
-            }
+            return;
         }
+
+        if (refreshToken) {
+            if (refreshingToken === null) {
+                refreshingToken = auth.refreshIdToken(refreshToken).then(function (idToken) {
+                    $localStorage.token = idToken;
+                    auth.authenticate(profile, idToken);
+                    autologin();
+                })["finally"](function () {
+                    refreshingToken = null;
+                });
+            }
+            return refreshingToken;
+        }
+
+        $state.go("home");
     });
 }]);
 "use strict";
@@ -381,9 +376,7 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
 
     var setupBattleData = function () {
         $scope.battle = Battle.get();
-        if (!$scope.battle) {
-            return;
-        }
+        if (!$scope.battle) return;
         $scope.battle.actionChannel.watch($scope.setTarget);
 
         $scope.battle.resultsChannel.watch(resultHandler);
@@ -603,12 +596,8 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
     $scope.centerOn = function (coords) {
         var centerMap = arguments[1] === undefined ? false : arguments[1];
 
-        if (!$scope.map) {
-            return;
-        }
-        if (!coords.latitude || !coords.longitude) {
-            return;
-        }
+        if (!$scope.map) return;
+        if (!coords.latitude || !coords.longitude) return;
         var position = new Google.maps.LatLng(coords.latitude, coords.longitude);
 
         if (centerMap) {
@@ -924,7 +913,7 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
     var homepoint = {};
     var miasma = {};
 
-    var MAX_VIEW_RADIUS = Settings.RADIUS; //meters
+    var MAX_VIEW_RADIUS = Settings.RADIUS; // meters
 
     var bounds = new Google.maps.LatLngBounds();
 
@@ -1029,6 +1018,7 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
                 scale: 5
             }
         });
+        homepoint;
 
         var miasmaOptions = {
             strokeColor: MAP_COLORS.miasma.outline,
@@ -1041,6 +1031,7 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
         };
 
         miasma = new Google.maps.Polygon(miasmaOptions);
+        miasma; // no unused vars
     };
 
     var drawMe = function (map, coords) {
@@ -1252,8 +1243,6 @@ angular.module("retro").service("Places", ["$q", function ($q) {
 "use strict";
 
 angular.module("retro").service("Player", ["$q", function ($q) {
-    //var clamp = (min, cur, max) => Math.max(min, Math.min(max, cur));
-
     var defer = $q.defer();
 
     var player = {};
@@ -1315,10 +1304,9 @@ angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory"
             };
 
             if ($localStorage.profile.user_id) {
-                // jshint ignore:line
                 flow.login(_.clone($localStorage), true).then(null, fail);
 
-                //only fail to the char create screen if there's a server connection
+                // only fail to the char create screen if there's a server connection
             } else if ($rootScope.canConnect) {
                 fail();
             }
@@ -1331,7 +1319,7 @@ angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory"
             var NewHero = {
                 name: NewHeroProto.name,
                 profession: NewHeroProto.profession,
-                userId: NewHeroProto.profile.user_id, //jshint ignore:line
+                userId: NewHeroProto.profile.user_id,
                 token: NewHeroProto.token
             };
 

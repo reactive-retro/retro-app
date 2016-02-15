@@ -13,7 +13,7 @@ angular.module('retro').directive('map', (MAP_STYLE, Toaster, Google) => {
             }
 
             // this is the available list of places in the game
-            var init = () => {
+            const init = () => {
                 const mapOptions = {
                     center: new Google.maps.LatLng(32.3078, -64.7505),
                     zoom: 17,
@@ -22,15 +22,15 @@ angular.module('retro').directive('map', (MAP_STYLE, Toaster, Google) => {
                     minZoom: 15,
                     maxZoom: 17,
                     styles: MAP_STYLE,
-                    mapTypeControlOptions: {mapTypeIds: []},
+                    mapTypeControlOptions: { mapTypeIds: [] },
                     overviewMapControl: false,
                     streetViewControl: false,
                     zoomControl: false
                 };
 
-                var map = new Google.maps.Map($element[0], mapOptions);
+                const map = new Google.maps.Map($element[0], mapOptions);
 
-                $scope.onCreate({map: map});
+                $scope.onCreate({ map: map });
 
                 Google.maps.event.addDomListener($element[0], 'mousedown', (e) => {
                     $scope.onClick();

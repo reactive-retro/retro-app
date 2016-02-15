@@ -26,7 +26,7 @@ angular.module('retro').controller('BattleController',
 
         const setupBattleData = () => {
             $scope.battle = Battle.get();
-            if(!$scope.battle) { return; }
+            if(!$scope.battle) return;
             $scope.battle.actionChannel.watch($scope.setTarget);
 
             $scope.battle.resultsChannel.watch(resultHandler);
@@ -36,7 +36,7 @@ angular.module('retro').controller('BattleController',
                 .sortBy((player) => {
                     return player === $scope.currentPlayerName ? '~' : player;
                 }).map(playerName => {
-                    return _.find($scope.battle.playerData, {name: playerName});
+                    return _.find($scope.battle.playerData, { name: playerName });
                 })
                 .value();
 
