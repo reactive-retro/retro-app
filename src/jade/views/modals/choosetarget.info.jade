@@ -11,9 +11,7 @@ script(type="text/ng-template", id="choosetarget.info")
                 .col
                     .row
                         .col.text-center
-                            i.icon.ion-clock
-                            span &nbsp;
-                            ng-pluralize(count="skillCooldown(activeSkill)", when="{'0': 'Instant', 'one': '1 round', 'other': '{} rounds'}")
+                            cooldown(turns="skillCooldown(activeSkill)")
                         .col.text-center
                             mp-cost(cost="skillCost(activeSkill)")
                         .col.text-center
@@ -51,7 +49,7 @@ script(type="text/ng-template", id="choosetarget.info")
                     .row.skill-container(ng-if="!canCastSkillCD(activeSkill)")
                         .col.col-flex.col-center
                             .row.row-center.text-center
-                                div You to wait <i class="icon ion-clock"></i> {{me.cooldowns[activeSkill.spellName]}} rounds to cast this spell.
+                                div You to wait <cooldown turns="me.cooldowns[activeSkill.spellName]"></cooldown> to cast this spell.
 
                     .row.skill-container(ng-if="canCastSkillMP(activeSkill) && canCastSkillCD(activeSkill)")
                         .col.col-flex

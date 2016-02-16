@@ -345,6 +345,125 @@ angular.module("retro").constant("MAP_STYLE", [{
 }]);
 "use strict";
 
+angular.module("retro").directive("colorText", function () {
+    return {
+        restrict: "E",
+        scope: {
+            value: "=",
+            preText: "@"
+        },
+        template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").directive("cooldown", function () {
+    return {
+        restrict: "E",
+        scope: {
+            turns: "="
+        },
+        template: "\n                <span>\n                    <i class=\"icon ion-clock\"></i> <ng-pluralize count=\"turns\", when=\"{'0': 'Instant', 'one': '1 round', 'other': '{} rounds'}\"></ng-pluralize>\n                </span>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").directive("healthDisplay", function () {
+    return {
+        restrict: "E",
+        scope: {
+            target: "="
+        },
+        template: "\n                <div>\n                    <i class=\"icon ion-heart assertive\"></i> {{target.stats.hp.__current}} / {{target.stats.hp.maximum}}\n                </div>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").directive("manaDisplay", function () {
+    return {
+        restrict: "E",
+        scope: {
+            target: "="
+        },
+        template: "\n                <div>\n                    <i class=\"icon ion-waterdrop positive\"></i> {{target.stats.mp.__current}} / {{target.stats.mp.maximum}}\n                </div>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
+    return {
+        restrict: "E",
+        scope: {
+            onCreate: "&",
+            onClick: "&"
+        },
+        link: function ($scope, $element) {
+
+            if (!Google || !Google.maps) {
+                Toaster.show("Could not reach google.");
+                return;
+            }
+
+            // this is the available list of places in the game
+            var init = function () {
+                var mapOptions = {
+                    center: new Google.maps.LatLng(32.3078, -64.7505),
+                    zoom: 17,
+                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
+                    draggable: true,
+                    minZoom: 15,
+                    maxZoom: 17,
+                    styles: MAP_STYLE,
+                    mapTypeControlOptions: { mapTypeIds: [] },
+                    overviewMapControl: false,
+                    streetViewControl: false,
+                    zoomControl: false
+                };
+
+                var map = new Google.maps.Map($element[0], mapOptions);
+
+                $scope.onCreate({ map: map });
+
+                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
+                    $scope.onClick();
+                    e.preventDefault();
+                    return false;
+                });
+            };
+
+            if (document.readyState === "complete") {
+                init();
+            } else {
+                Google.maps.event.addDomListener(window, "load", init);
+            }
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").directive("mpCost", function () {
+    return {
+        restrict: "E",
+        scope: {
+            cost: "="
+        },
+        template: "\n                <span>\n                    <i class=\"icon ion-waterdrop positive\"></i> {{cost}} mp\n                </span>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").directive("statBar", function () {
+    return {
+        restrict: "E",
+        scope: {
+            target: "=",
+            stat: "@"
+        },
+        template: "\n                <div class=\"stat-bar-container\">\n                    <div class=\"stat-bar {{stat}}\" style=\"width: {{target.stats[stat].__current/target.stats[stat].maximum*100}}%\"></div>\n                </div>\n            "
+    };
+});
+"use strict";
+
 angular.module("retro").controller("BattleController", ["$scope", "$ionicModal", "BattleFlow", "Battle", "Dice", "Player", "Skills", function ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills) {
     $scope.battleFlow = BattleFlow;
     $scope.currentPlayerName = Player.get().name;
@@ -732,114 +851,6 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
         return $scope.allSkills = getAllSkills(skills);
     });
 }]);
-"use strict";
-
-angular.module("retro").directive("colorText", function () {
-    return {
-        restrict: "E",
-        scope: {
-            value: "=",
-            preText: "@"
-        },
-        template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            "
-    };
-});
-"use strict";
-
-angular.module("retro").directive("healthDisplay", function () {
-    return {
-        restrict: "E",
-        scope: {
-            target: "="
-        },
-        template: "\n                <div>\n                    <i class=\"icon ion-heart assertive\"></i> {{target.stats.hp.__current}} / {{target.stats.hp.maximum}}\n                </div>\n            "
-    };
-});
-"use strict";
-
-angular.module("retro").directive("manaDisplay", function () {
-    return {
-        restrict: "E",
-        scope: {
-            target: "="
-        },
-        template: "\n                <div>\n                    <i class=\"icon ion-waterdrop positive\"></i> {{target.stats.mp.__current}} / {{target.stats.mp.maximum}}\n                </div>\n            "
-    };
-});
-"use strict";
-
-angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
-    return {
-        restrict: "E",
-        scope: {
-            onCreate: "&",
-            onClick: "&"
-        },
-        link: function ($scope, $element) {
-
-            if (!Google || !Google.maps) {
-                Toaster.show("Could not reach google.");
-                return;
-            }
-
-            // this is the available list of places in the game
-            var init = function () {
-                var mapOptions = {
-                    center: new Google.maps.LatLng(32.3078, -64.7505),
-                    zoom: 17,
-                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
-                    draggable: true,
-                    minZoom: 15,
-                    maxZoom: 17,
-                    styles: MAP_STYLE,
-                    mapTypeControlOptions: { mapTypeIds: [] },
-                    overviewMapControl: false,
-                    streetViewControl: false,
-                    zoomControl: false
-                };
-
-                var map = new Google.maps.Map($element[0], mapOptions);
-
-                $scope.onCreate({ map: map });
-
-                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
-                    $scope.onClick();
-                    e.preventDefault();
-                    return false;
-                });
-            };
-
-            if (document.readyState === "complete") {
-                init();
-            } else {
-                Google.maps.event.addDomListener(window, "load", init);
-            }
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").directive("mpCost", function () {
-    return {
-        restrict: "E",
-        scope: {
-            cost: "="
-        },
-        template: "\n                <span>\n                    <i class=\"icon ion-waterdrop positive\"></i> {{cost}} mp\n                </span>\n            "
-    };
-});
-"use strict";
-
-angular.module("retro").directive("statBar", function () {
-    return {
-        restrict: "E",
-        scope: {
-            target: "=",
-            stat: "@"
-        },
-        template: "\n                <div class=\"stat-bar-container\">\n                    <div class=\"stat-bar {{stat}}\" style=\"width: {{target.stats[stat].__current/target.stats[stat].maximum*100}}%\"></div>\n                </div>\n            "
-    };
-});
 "use strict";
 
 angular.module("retro").service("Auth", ["$localStorage", "$state", "$ionicHistory", "auth", "AuthFlow", function ($localStorage, $state, $ionicHistory, auth, AuthFlow) {
