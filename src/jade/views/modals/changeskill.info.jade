@@ -15,9 +15,7 @@ script(type="text/ng-template", id="changeskill.info")
                             span &nbsp;
                             ng-pluralize(count="activeSkill.spellCooldown", when="{'0': 'Instant', 'one': '1 round', 'other': '{} rounds'}")
                         .col.text-center
-                            i.icon.ion-waterdrop
-                            span &nbsp;
-                            span {{activeSkill.spellCost}} mp
+                            mp-cost(cost="activeSkill.spellCost")
                         .col.text-center
                             i.icon.ion-android-contact
                             span &nbsp;

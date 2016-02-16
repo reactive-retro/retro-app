@@ -15,9 +15,7 @@ script(type="text/ng-template", id="choosetarget.info")
                             span &nbsp;
                             ng-pluralize(count="skillCooldown(activeSkill)", when="{'0': 'Instant', 'one': '1 round', 'other': '{} rounds'}")
                         .col.text-center
-                            i.icon.ion-waterdrop.positive
-                            span &nbsp;
-                            span {{skillCost(activeSkill)}} mp
+                            mp-cost(cost="skillCost(activeSkill)")
                         .col.text-center
                             i.icon.ion-android-contact
                             span &nbsp;
@@ -48,7 +46,7 @@ script(type="text/ng-template", id="choosetarget.info")
                     .row.skill-container(ng-if="!canCastSkillMP(activeSkill)")
                         .col.col-flex.col-center
                             .row.row-center.text-center
-                                div You need <i class="icon positive ion-waterdrop"></i> {{skillCost(activeSkill) - me.stats.mp.__current}} mp to cast this spell.
+                                div You need <mp-cost cost="skillCost(activeSkill) - me.stats.mp.__current"></mp-cost> to cast this spell.
 
                     .row.skill-container(ng-if="!canCastSkillCD(activeSkill)")
                         .col.col-flex.col-center
