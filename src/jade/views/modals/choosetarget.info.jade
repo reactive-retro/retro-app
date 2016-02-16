@@ -24,16 +24,7 @@ script(type="text/ng-template", id="choosetarget.info")
 
             .row.effects-area
                 .col.text-center
-                    .row(ng-repeat="effect in activeSkillAttrs")
-                        .col.col-20.col-offset-20.text-right
-                            strong {{effect.name}}
-                        .col.text-left
-                            span {{effect.value.min_possible*multiplier}}
-                            span(ng-if="effect.value.min_possible !== effect.value.max_possible") -{{effect.value.max_possible*multiplier}}
-                            span &nbsp;
-                            ng-pluralize(ng-if="effect.extra.string", count="effect.value.max_possible*multiplier", when="{'one': effect.extra.string, 'other': effect.extra.string+'s'}")
-                            span &nbsp;
-                            span(ng-if="effect.extra.chance") ({{effect.extra.chance + effect.accuracy}}% chance)
+                    skill-effect-display(effects="activeSkillAttrs", multiplier="multiplier")
 
             .row.assign-area
                 .col.col-flex

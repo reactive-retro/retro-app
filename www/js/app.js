@@ -345,125 +345,6 @@ angular.module("retro").constant("MAP_STYLE", [{
 }]);
 "use strict";
 
-angular.module("retro").directive("colorText", function () {
-    return {
-        restrict: "E",
-        scope: {
-            value: "=",
-            preText: "@"
-        },
-        template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            "
-    };
-});
-"use strict";
-
-angular.module("retro").directive("cooldown", function () {
-    return {
-        restrict: "E",
-        scope: {
-            turns: "="
-        },
-        template: "\n                <span>\n                    <i class=\"icon ion-clock\"></i> <ng-pluralize count=\"turns\", when=\"{'0': 'Instant', 'one': '1 round', 'other': '{} rounds'}\"></ng-pluralize>\n                </span>\n            "
-    };
-});
-"use strict";
-
-angular.module("retro").directive("healthDisplay", function () {
-    return {
-        restrict: "E",
-        scope: {
-            target: "="
-        },
-        template: "\n                <div>\n                    <i class=\"icon ion-heart assertive\"></i> {{target.stats.hp.__current}} / {{target.stats.hp.maximum}}\n                </div>\n            "
-    };
-});
-"use strict";
-
-angular.module("retro").directive("manaDisplay", function () {
-    return {
-        restrict: "E",
-        scope: {
-            target: "="
-        },
-        template: "\n                <div>\n                    <i class=\"icon ion-waterdrop positive\"></i> {{target.stats.mp.__current}} / {{target.stats.mp.maximum}}\n                </div>\n            "
-    };
-});
-"use strict";
-
-angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
-    return {
-        restrict: "E",
-        scope: {
-            onCreate: "&",
-            onClick: "&"
-        },
-        link: function ($scope, $element) {
-
-            if (!Google || !Google.maps) {
-                Toaster.show("Could not reach google.");
-                return;
-            }
-
-            // this is the available list of places in the game
-            var init = function () {
-                var mapOptions = {
-                    center: new Google.maps.LatLng(32.3078, -64.7505),
-                    zoom: 17,
-                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
-                    draggable: true,
-                    minZoom: 15,
-                    maxZoom: 17,
-                    styles: MAP_STYLE,
-                    mapTypeControlOptions: { mapTypeIds: [] },
-                    overviewMapControl: false,
-                    streetViewControl: false,
-                    zoomControl: false
-                };
-
-                var map = new Google.maps.Map($element[0], mapOptions);
-
-                $scope.onCreate({ map: map });
-
-                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
-                    $scope.onClick();
-                    e.preventDefault();
-                    return false;
-                });
-            };
-
-            if (document.readyState === "complete") {
-                init();
-            } else {
-                Google.maps.event.addDomListener(window, "load", init);
-            }
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").directive("mpCost", function () {
-    return {
-        restrict: "E",
-        scope: {
-            cost: "="
-        },
-        template: "\n                <span>\n                    <i class=\"icon ion-waterdrop positive\"></i> {{cost}} mp\n                </span>\n            "
-    };
-});
-"use strict";
-
-angular.module("retro").directive("statBar", function () {
-    return {
-        restrict: "E",
-        scope: {
-            target: "=",
-            stat: "@"
-        },
-        template: "\n                <div class=\"stat-bar-container\">\n                    <div class=\"stat-bar {{stat}}\" style=\"width: {{target.stats[stat].__current/target.stats[stat].maximum*100}}%\"></div>\n                </div>\n            "
-    };
-});
-"use strict";
-
 angular.module("retro").controller("BattleController", ["$scope", "$ionicModal", "BattleFlow", "Battle", "Dice", "Player", "Skills", function ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills) {
     $scope.battleFlow = BattleFlow;
     $scope.currentPlayerName = Player.get().name;
@@ -853,6 +734,140 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
 }]);
 "use strict";
 
+angular.module("retro").directive("colorText", function () {
+    return {
+        restrict: "E",
+        scope: {
+            value: "=",
+            preText: "@"
+        },
+        template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").directive("cooldown", function () {
+    return {
+        restrict: "E",
+        scope: {
+            turns: "="
+        },
+        template: "\n                <span>\n                    <i class=\"icon ion-clock\"></i> <ng-pluralize count=\"turns\", when=\"{'0': 'Instant', 'one': '1 round', 'other': '{} rounds'}\"></ng-pluralize>\n                </span>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").directive("healthDisplay", function () {
+    return {
+        restrict: "E",
+        scope: {
+            target: "="
+        },
+        template: "\n                <div>\n                    <i class=\"icon ion-heart assertive\"></i> {{target.stats.hp.__current}} / {{target.stats.hp.maximum}}\n                </div>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").directive("manaDisplay", function () {
+    return {
+        restrict: "E",
+        scope: {
+            target: "="
+        },
+        template: "\n                <div>\n                    <i class=\"icon ion-waterdrop positive\"></i> {{target.stats.mp.__current}} / {{target.stats.mp.maximum}}\n                </div>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
+    return {
+        restrict: "E",
+        scope: {
+            onCreate: "&",
+            onClick: "&"
+        },
+        link: function ($scope, $element) {
+
+            if (!Google || !Google.maps) {
+                Toaster.show("Could not reach google.");
+                return;
+            }
+
+            // this is the available list of places in the game
+            var init = function () {
+                var mapOptions = {
+                    center: new Google.maps.LatLng(32.3078, -64.7505),
+                    zoom: 17,
+                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
+                    draggable: true,
+                    minZoom: 15,
+                    maxZoom: 17,
+                    styles: MAP_STYLE,
+                    mapTypeControlOptions: { mapTypeIds: [] },
+                    overviewMapControl: false,
+                    streetViewControl: false,
+                    zoomControl: false
+                };
+
+                var map = new Google.maps.Map($element[0], mapOptions);
+
+                $scope.onCreate({ map: map });
+
+                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
+                    $scope.onClick();
+                    e.preventDefault();
+                    return false;
+                });
+            };
+
+            if (document.readyState === "complete") {
+                init();
+            } else {
+                Google.maps.event.addDomListener(window, "load", init);
+            }
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").directive("mpCost", function () {
+    return {
+        restrict: "E",
+        scope: {
+            cost: "="
+        },
+        template: "\n                <span>\n                    <i class=\"icon ion-waterdrop positive\"></i> {{cost}} mp\n                </span>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").directive("skillEffectDisplay", function () {
+    return {
+        restrict: "E",
+        scope: {
+            effects: "=",
+            multiplier: "="
+        },
+        link: function (scope) {
+            console.log(scope);
+        },
+        template: "\n                <div class=\"row\" ng-repeat=\"effect in effects\">\n                    <div class=\"col col-20 col-offset-20 text-right\">\n                        <strong>{{effect.name}}</strong>\n                    </div>\n\n                    <div class=\"col text-left\">\n                        <span>{{effect.value.min_possible * multiplier}}</span>\n                        <span ng-if=\"effect.value.min_possible !== effect.value.max_possible\">- {{effect.value.max_possible*multiplier}}</span>\n                        <ng-pluralize ng-if=\"effect.extra.string\" count=\"effect.value.max_possible*multiplier\" when=\"{'one': ' '+effect.extra.string, 'other': ' '+effect.extra.string+'s'}\"></ng-pluralize>\n                        <span ng-if=\"effect.extra.chance\"> ({{effect.extra.chance + effect.accuracy}}% chance)</span>\n                    </div>\n                </div>\n            "
+    };
+});
+"use strict";
+
+angular.module("retro").directive("statBar", function () {
+    return {
+        restrict: "E",
+        scope: {
+            target: "=",
+            stat: "@"
+        },
+        template: "\n                <div class=\"stat-bar-container\">\n                    <div class=\"stat-bar {{stat}}\" style=\"width: {{target.stats[stat].__current/target.stats[stat].maximum*100}}%\"></div>\n                </div>\n            "
+    };
+});
+"use strict";
+
 angular.module("retro").service("Auth", ["$localStorage", "$state", "$ionicHistory", "auth", "AuthFlow", function ($localStorage, $state, $ionicHistory, auth, AuthFlow) {
 
     var localAuth = {
@@ -1152,151 +1167,6 @@ angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaT
 }]);
 "use strict";
 
-angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory", "Toaster", "$localStorage", "$state", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, $rootScope, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, Config, socket) {
-    var flow = {
-        toPlayer: function () {
-            if (!_.contains(["home", "create"], $state.current.name)) {
-                return;
-            }
-
-            $ionicHistory.nextViewOptions({
-                disableBack: true
-            });
-            $state.go("player");
-        },
-        tryAuth: function () {
-            var fail = function () {
-                return $state.go("create");
-            };
-
-            if ($localStorage.profile.user_id) {
-                flow.login(_.clone($localStorage), true).then(null, fail);
-
-                // only fail to the char create screen if there's a server connection
-            } else if ($rootScope.canConnect) {
-                fail();
-            }
-        },
-        login: function (NewHeroProto) {
-            var swallow = arguments[1] === undefined ? false : arguments[1];
-
-            var defer = $q.defer();
-
-            var NewHero = {
-                name: NewHeroProto.name,
-                profession: NewHeroProto.profession,
-                userId: NewHeroProto.profile.user_id,
-                token: NewHeroProto.token
-            };
-
-            var currentLocation = LocationWatcher.current();
-            if (!currentLocation) {
-                $rootScope.attemptAutoLogin = false;
-                return Toaster.show("No current location. Is your GPS on?");
-            }
-
-            NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
-
-            socket.emit("login", NewHero, function (err, success) {
-                if (err) {
-                    defer.reject();
-                } else {
-                    defer.resolve();
-                    _.extend(Settings, success.settings);
-                    flow.toPlayer();
-                    flow.isLoggedIn = true;
-                    $localStorage.env = Config._cfg;
-                }
-
-                $rootScope.attemptAutoLogin = false;
-
-                if (!swallow) {
-                    var msgObj = err ? err : success;
-                    Toaster.show(msgObj.msg);
-                }
-            });
-
-            Settings.isReady = defer.promise;
-            return Settings.isReady;
-        }
-    };
-    return flow;
-}]);
-"use strict";
-
-angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$state", "$ionicHistory", "socket", function (Player, Battle, Toaster, $state, $ionicHistory, socket) {
-
-    var start = function (monster) {
-        socket.emit("combat:enter", { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
-    };
-
-    var confirmAction = function (_ref) {
-        var origin = _ref.origin;
-        var id = _ref.id;
-        var skill = _ref.skill;
-
-        socket.emit("combat:confirmaction", { skill: skill, target: id, name: origin }, Toaster.handleDefault());
-    };
-
-    var toExplore = function () {
-        $ionicHistory.nextViewOptions({
-            disableBack: true
-        });
-
-        $state.go("explore");
-    };
-
-    return {
-        start: start,
-        confirmAction: confirmAction,
-        toExplore: toExplore
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("ClassChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
-    return {
-        change: function (newProfession) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, newProfession: newProfession };
-            socket.emit("player:change:class", opts, Toaster.handleDefault(function () {
-                return $state.go("player");
-            }));
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("EquipFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
-    return {
-        equip: function (newItem) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, itemId: newItem.itemId };
-            socket.emit("player:change:equipment", opts, Toaster.handleDefault(function () {
-                return $state.go("player");
-            }));
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("SkillChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
-    return {
-        change: function (skill, slot) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, skillName: skill, skillSlot: slot };
-            socket.emit("player:change:skill", opts, Toaster.handleDefault());
-        }
-    };
-}]);
-"use strict";
-
 angular.module("retro").service("Battle", ["$q", "$ionicHistory", "$state", "Player", function ($q, $ionicHistory, $state, Player) {
 
     var defer = $q.defer();
@@ -1448,6 +1318,151 @@ angular.module("retro").service("Skills", ["$q", function ($q) {
         set: getNewSkills,
         get: function () {
             return skills;
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory", "Toaster", "$localStorage", "$state", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, $rootScope, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, Config, socket) {
+    var flow = {
+        toPlayer: function () {
+            if (!_.contains(["home", "create"], $state.current.name)) {
+                return;
+            }
+
+            $ionicHistory.nextViewOptions({
+                disableBack: true
+            });
+            $state.go("player");
+        },
+        tryAuth: function () {
+            var fail = function () {
+                return $state.go("create");
+            };
+
+            if ($localStorage.profile.user_id) {
+                flow.login(_.clone($localStorage), true).then(null, fail);
+
+                // only fail to the char create screen if there's a server connection
+            } else if ($rootScope.canConnect) {
+                fail();
+            }
+        },
+        login: function (NewHeroProto) {
+            var swallow = arguments[1] === undefined ? false : arguments[1];
+
+            var defer = $q.defer();
+
+            var NewHero = {
+                name: NewHeroProto.name,
+                profession: NewHeroProto.profession,
+                userId: NewHeroProto.profile.user_id,
+                token: NewHeroProto.token
+            };
+
+            var currentLocation = LocationWatcher.current();
+            if (!currentLocation) {
+                $rootScope.attemptAutoLogin = false;
+                return Toaster.show("No current location. Is your GPS on?");
+            }
+
+            NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
+
+            socket.emit("login", NewHero, function (err, success) {
+                if (err) {
+                    defer.reject();
+                } else {
+                    defer.resolve();
+                    _.extend(Settings, success.settings);
+                    flow.toPlayer();
+                    flow.isLoggedIn = true;
+                    $localStorage.env = Config._cfg;
+                }
+
+                $rootScope.attemptAutoLogin = false;
+
+                if (!swallow) {
+                    var msgObj = err ? err : success;
+                    Toaster.show(msgObj.msg);
+                }
+            });
+
+            Settings.isReady = defer.promise;
+            return Settings.isReady;
+        }
+    };
+    return flow;
+}]);
+"use strict";
+
+angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$state", "$ionicHistory", "socket", function (Player, Battle, Toaster, $state, $ionicHistory, socket) {
+
+    var start = function (monster) {
+        socket.emit("combat:enter", { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
+    };
+
+    var confirmAction = function (_ref) {
+        var origin = _ref.origin;
+        var id = _ref.id;
+        var skill = _ref.skill;
+
+        socket.emit("combat:confirmaction", { skill: skill, target: id, name: origin }, Toaster.handleDefault());
+    };
+
+    var toExplore = function () {
+        $ionicHistory.nextViewOptions({
+            disableBack: true
+        });
+
+        $state.go("explore");
+    };
+
+    return {
+        start: start,
+        confirmAction: confirmAction,
+        toExplore: toExplore
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("ClassChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
+    return {
+        change: function (newProfession) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, newProfession: newProfession };
+            socket.emit("player:change:class", opts, Toaster.handleDefault(function () {
+                return $state.go("player");
+            }));
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("EquipFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
+    return {
+        equip: function (newItem) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, itemId: newItem.itemId };
+            socket.emit("player:change:equipment", opts, Toaster.handleDefault(function () {
+                return $state.go("player");
+            }));
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("SkillChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
+    return {
+        change: function (skill, slot) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, skillName: skill, skillSlot: slot };
+            socket.emit("player:change:skill", opts, Toaster.handleDefault());
         }
     };
 }]);
