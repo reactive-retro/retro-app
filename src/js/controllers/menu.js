@@ -22,6 +22,6 @@ angular.module('retro').controller('MenuController',
             { icon: 'ion-android-exit', name: 'Logout', call: logoutCheck }
         ];
 
-        $scope.travel = $stateWrapper.goBreakCache;
+        $scope.travel = $stateWrapper.noGoingBackAndNoCache;
     }
 );
