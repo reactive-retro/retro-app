@@ -1,21 +1,25 @@
-angular.module('retro').service('AuthFlow', ($q, $rootScope, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, Config, socket) => {
+angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, LocationWatcher, Config, socket) => {
     const flow = {
         toPlayer: () => {
             if(!_.contains(['home', 'create'], $state.current.name)) { return; }
 
-            $ionicHistory.nextViewOptions({
-                disableBack: true
-            });
-            $state.go('player');
+            $stateWrapper.noGoingBack('player');
+        },
+        tryAutoLogin: () => {
+            if(!$localStorage.profile || !$localStorage.profile.user_id) return;
+
+            AuthData.update({ attemptAutoLogin: true });
+            flow.login(_.clone($localStorage), true);
+            AuthData.update({ attemptAutoLogin: false });
         },
         tryAuth: () => {
-            const fail = () => $state.go('create');
+            const fail = () => $stateWrapper.go('create');
 
             if($localStorage.profile.user_id) {
                 flow.login(_.clone($localStorage), true).then(null, fail);
 
             // only fail to the char create screen if there's a server connection
-            } else if($rootScope.canConnect) {
+            } else if(AuthData.get().canConnect) {
                 fail();
             }
         },
@@ -31,7 +35,7 @@ angular.module('retro').service('AuthFlow', ($q, $rootScope, $ionicHistory, Toas
 
             const currentLocation = LocationWatcher.current();
             if(!currentLocation) {
-                $rootScope.attemptAutoLogin = false;
+                AuthData.update({ attemptAutoLogin: false });
                 return Toaster.show('No current location. Is your GPS on?');
             }
 
@@ -48,7 +52,7 @@ angular.module('retro').service('AuthFlow', ($q, $rootScope, $ionicHistory, Toas
                     $localStorage.env = Config._cfg;
                 }
 
-                $rootScope.attemptAutoLogin = false;
+                AuthData.update({ attemptAutoLogin: true });
 
                 if(!swallow) {
                     const msgObj = err ? err : success;
@@ -60,5 +64,6 @@ angular.module('retro').service('AuthFlow', ($q, $rootScope, $ionicHistory, Toas
             return Settings.isReady;
         }
     };
+
     return flow;
 });

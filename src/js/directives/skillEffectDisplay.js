@@ -5,9 +5,6 @@ angular.module('retro').directive('skillEffectDisplay', () => {
             effects: '=',
             multiplier: '='
         },
-        link: (scope) => {
-            console.log(scope);
-        },
         template: `
                 <div class="row" ng-repeat="effect in effects">
                     <div class="col col-20 col-offset-20 text-right">

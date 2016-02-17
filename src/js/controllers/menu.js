@@ -1,5 +1,5 @@
 angular.module('retro').controller('MenuController',
-    ($scope, $state, $ionicPopup, Auth) => {
+    ($scope, $state, $stateWrapper, $ionicPopup, Auth) => {
 
         const logoutCheck = () => {
             $ionicPopup.confirm({
@@ -22,6 +22,6 @@ angular.module('retro').controller('MenuController',
             { icon: 'ion-android-exit', name: 'Logout', call: logoutCheck }
         ];
 
-        $scope.travel = (state) => $state.go(state, { timestamp: Date.now() });
+        $scope.travel = $stateWrapper.goBreakCache;
     }
 );

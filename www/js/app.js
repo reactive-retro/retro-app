@@ -3,27 +3,13 @@
 angular.module("retro", ["ionic", "ngCordova", "ngStorage", "auth0", "angular-jwt"]);
 "use strict";
 
-angular.module("retro").constant("Config", {
-    _cfg: "DEV",
-    DEV: {
-        url: "127.0.0.1",
-        port: 8080
-    },
-    PROD: {
-        protocol: "https",
-        url: "reactive-retro.herokuapp.com",
-        port: 80
-    }
-});
-"use strict";
-
 angular.module("retro").config(["authProvider", function (authProvider) {
     authProvider.init({
         domain: "reactive-retro.auth0.com",
         clientID: "ucMSnNDYLGdDBL2uppganZv2jKzzJiI0",
         loginState: "home"
     });
-}]).run(["auth", "$localStorage", "$rootScope", "$state", "jwtHelper", "AuthFlow", "Config", function (auth, $localStorage, $rootScope, $state, jwtHelper, AuthFlow, Config) {
+}]).run(["auth", "$localStorage", "$rootScope", "$stateWrapper", "jwtHelper", "AuthData", "AuthFlow", "Config", function (auth, $localStorage, $rootScope, $stateWrapper, jwtHelper, AuthData, AuthFlow, Config) {
     auth.hookEvents();
 
     if (Config._cfg !== $localStorage.env) {
@@ -32,10 +18,8 @@ angular.module("retro").config(["authProvider", function (authProvider) {
     }
 
     var autologin = function () {
-        if (!auth.isAuthenticated || !$localStorage.profile || !$localStorage.profile.user_id) return;
-
-        $rootScope.attemptAutoLogin = true;
-        AuthFlow.login(_.clone($localStorage), true);
+        if (!auth.isAuthenticated) return;
+        AuthFlow.tryAutoLogin();
     };
 
     var refreshingToken = null;
@@ -74,7 +58,7 @@ angular.module("retro").config(["authProvider", function (authProvider) {
             return refreshingToken;
         }
 
-        $state.go("home");
+        $stateWrapper.go("home");
     });
 }]);
 "use strict";
@@ -223,6 +207,20 @@ angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$
         data: { requiresLogin: true }
     });
 }]);
+"use strict";
+
+angular.module("retro").constant("Config", {
+    _cfg: "DEV",
+    DEV: {
+        url: "127.0.0.1",
+        port: 8080
+    },
+    PROD: {
+        protocol: "https",
+        url: "reactive-retro.herokuapp.com",
+        port: 80
+    }
+});
 "use strict";
 
 angular.module("retro").constant("CLASSES", {
@@ -609,8 +607,16 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
 }]);
 "use strict";
 
-angular.module("retro").controller("HomeController", ["$scope", "LocationWatcher", "Auth", function ($scope, LocationWatcher, Auth) {
+angular.module("retro").controller("HomeController", ["$scope", "LocationWatcher", "Auth", "AuthData", function ($scope, LocationWatcher, Auth, AuthData) {
     $scope.auth = Auth;
+    $scope.authData = AuthData.get();
+
+    AuthData.observer.then(null, null, function (val) {
+        $scope.authData = val;
+        if (val.attemptAutoLogin) {
+            Auth.autoLogin();
+        }
+    });
 }]);
 "use strict";
 
@@ -625,7 +631,7 @@ angular.module("retro").controller("InventoryController", ["$scope", "Player", "
 }]);
 "use strict";
 
-angular.module("retro").controller("MenuController", ["$scope", "$state", "$ionicPopup", "Auth", function ($scope, $state, $ionicPopup, Auth) {
+angular.module("retro").controller("MenuController", ["$scope", "$state", "$stateWrapper", "$ionicPopup", "Auth", function ($scope, $state, $stateWrapper, $ionicPopup, Auth) {
 
     var logoutCheck = function () {
         $ionicPopup.confirm({
@@ -643,22 +649,18 @@ angular.module("retro").controller("MenuController", ["$scope", "$state", "$ioni
 
     $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore" }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-university", name: "Skills", state: "changeskills" }, { icon: "ion-gear-b", name: "Options", state: "options" }, { icon: "ion-android-exit", name: "Logout", call: logoutCheck }];
 
-    $scope.travel = function (state) {
-        return $state.go(state, { timestamp: Date.now() });
-    };
+    $scope.travel = $stateWrapper.goBreakCache;
 }]);
 "use strict";
 
-angular.module("retro").controller("PlayerController", ["$scope", "$state", "Player", function ($scope, $state, Player) {
+angular.module("retro").controller("PlayerController", ["$scope", "$stateWrapper", "Player", function ($scope, $stateWrapper, Player) {
     $scope.player = Player.get();
     Player.observer.then(null, null, function (player) {
         return $scope.player = player;
     });
     $scope.isEmpty = _.isEmpty;
 
-    $scope.go = function (to) {
-        $state.go(to);
-    };
+    $scope.go = $stateWrapper.go;
 }]);
 "use strict";
 
@@ -848,9 +850,6 @@ angular.module("retro").directive("skillEffectDisplay", function () {
             effects: "=",
             multiplier: "="
         },
-        link: function (scope) {
-            console.log(scope);
-        },
         template: "\n                <div class=\"row\" ng-repeat=\"effect in effects\">\n                    <div class=\"col col-20 col-offset-20 text-right\">\n                        <strong>{{effect.name}}</strong>\n                    </div>\n\n                    <div class=\"col text-left\">\n                        <span>{{effect.value.min_possible * multiplier}}</span>\n                        <span ng-if=\"effect.value.min_possible !== effect.value.max_possible\">- {{effect.value.max_possible*multiplier}}</span>\n                        <ng-pluralize ng-if=\"effect.extra.string\" count=\"effect.value.max_possible*multiplier\" when=\"{'one': ' '+effect.extra.string, 'other': ' '+effect.extra.string+'s'}\"></ng-pluralize>\n                        <span ng-if=\"effect.extra.chance\"> ({{effect.extra.chance + effect.accuracy}}% chance)</span>\n                    </div>\n                </div>\n            "
     };
 });
@@ -868,9 +867,12 @@ angular.module("retro").directive("statBar", function () {
 });
 "use strict";
 
-angular.module("retro").service("Auth", ["$localStorage", "$state", "$ionicHistory", "auth", "AuthFlow", function ($localStorage, $state, $ionicHistory, auth, AuthFlow) {
+angular.module("retro").service("Auth", ["$localStorage", "$stateWrapper", "auth", "AuthFlow", function ($localStorage, $stateWrapper, auth, AuthFlow) {
 
     var localAuth = {
+        autoLogin: function () {
+            return AuthFlow.tryAutoLogin();
+        },
         login: function () {
             auth.signin({
                 authParams: {
@@ -892,11 +894,7 @@ angular.module("retro").service("Auth", ["$localStorage", "$state", "$ionicHisto
             $localStorage.profile = null;
             $localStorage.token = null;
 
-            $ionicHistory.nextViewOptions({
-                disableBack: true
-            });
-
-            $state.go("home");
+            $stateWrapper.noGoingBack("home");
         }
     };
 
@@ -1167,7 +1165,31 @@ angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaT
 }]);
 "use strict";
 
-angular.module("retro").service("Battle", ["$q", "$ionicHistory", "$state", "Player", function ($q, $ionicHistory, $state, Player) {
+angular.module("retro").service("AuthData", ["$q", function ($q) {
+
+    var defer = $q.defer();
+
+    var value = {
+        canConnect: false,
+        attemptAutoConnect: false
+    };
+
+    var update = function (opts) {
+        _.extend(value, opts);
+        defer.notify(value);
+    };
+
+    return {
+        observer: defer.promise,
+        update: update,
+        get: function () {
+            return value;
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("Battle", ["$q", "$stateWrapper", "Player", function ($q, $stateWrapper, Player) {
 
     var defer = $q.defer();
 
@@ -1201,11 +1223,7 @@ angular.module("retro").service("Battle", ["$q", "$ionicHistory", "$state", "Pla
             var me = _.find(battle.playerData, { name: myName });
             Player.set(me);
 
-            $ionicHistory.nextViewOptions({
-                disableBack: true
-            });
-
-            $state.go("battle");
+            $stateWrapper.noGoingBack("battle");
             battle.actionChannel = socketRef.subscribe("battle:" + battle._id + ":actions");
             battle.resultsChannel = socketRef.subscribe("battle:" + battle._id + ":results");
         }
@@ -1323,28 +1341,32 @@ angular.module("retro").service("Skills", ["$q", function ($q) {
 }]);
 "use strict";
 
-angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory", "Toaster", "$localStorage", "$state", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, $rootScope, $ionicHistory, Toaster, $localStorage, $state, Player, Settings, LocationWatcher, Config, socket) {
+angular.module("retro").service("AuthFlow", ["$q", "AuthData", "Toaster", "$localStorage", "$state", "$stateWrapper", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, LocationWatcher, Config, socket) {
     var flow = {
         toPlayer: function () {
             if (!_.contains(["home", "create"], $state.current.name)) {
                 return;
             }
 
-            $ionicHistory.nextViewOptions({
-                disableBack: true
-            });
-            $state.go("player");
+            $stateWrapper.noGoingBack("player");
+        },
+        tryAutoLogin: function () {
+            if (!$localStorage.profile || !$localStorage.profile.user_id) return;
+
+            AuthData.update({ attemptAutoLogin: true });
+            flow.login(_.clone($localStorage), true);
+            AuthData.update({ attemptAutoLogin: false });
         },
         tryAuth: function () {
             var fail = function () {
-                return $state.go("create");
+                return $stateWrapper.go("create");
             };
 
             if ($localStorage.profile.user_id) {
                 flow.login(_.clone($localStorage), true).then(null, fail);
 
                 // only fail to the char create screen if there's a server connection
-            } else if ($rootScope.canConnect) {
+            } else if (AuthData.get().canConnect) {
                 fail();
             }
         },
@@ -1362,7 +1384,7 @@ angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory"
 
             var currentLocation = LocationWatcher.current();
             if (!currentLocation) {
-                $rootScope.attemptAutoLogin = false;
+                AuthData.update({ attemptAutoLogin: false });
                 return Toaster.show("No current location. Is your GPS on?");
             }
 
@@ -1379,7 +1401,7 @@ angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory"
                     $localStorage.env = Config._cfg;
                 }
 
-                $rootScope.attemptAutoLogin = false;
+                AuthData.update({ attemptAutoLogin: true });
 
                 if (!swallow) {
                     var msgObj = err ? err : success;
@@ -1391,11 +1413,12 @@ angular.module("retro").service("AuthFlow", ["$q", "$rootScope", "$ionicHistory"
             return Settings.isReady;
         }
     };
+
     return flow;
 }]);
 "use strict";
 
-angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$state", "$ionicHistory", "socket", function (Player, Battle, Toaster, $state, $ionicHistory, socket) {
+angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$stateWrapper", "socket", function (Player, Battle, Toaster, $stateWrapper, socket) {
 
     var start = function (monster) {
         socket.emit("combat:enter", { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
@@ -1410,11 +1433,7 @@ angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$
     };
 
     var toExplore = function () {
-        $ionicHistory.nextViewOptions({
-            disableBack: true
-        });
-
-        $state.go("explore");
+        $stateWrapper.noGoingBack("explore");
     };
 
     return {
@@ -1425,7 +1444,7 @@ angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$
 }]);
 "use strict";
 
-angular.module("retro").service("ClassChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
+angular.module("retro").service("ClassChangeFlow", ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
     return {
         change: function (newProfession) {
 
@@ -1433,14 +1452,14 @@ angular.module("retro").service("ClassChangeFlow", ["Toaster", "$state", "Player
 
             var opts = { name: player.name, newProfession: newProfession };
             socket.emit("player:change:class", opts, Toaster.handleDefault(function () {
-                return $state.go("player");
+                return $stateWrapper.go("player");
             }));
         }
     };
 }]);
 "use strict";
 
-angular.module("retro").service("EquipFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
+angular.module("retro").service("EquipFlow", ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
     return {
         equip: function (newItem) {
 
@@ -1448,7 +1467,7 @@ angular.module("retro").service("EquipFlow", ["Toaster", "$state", "Player", "so
 
             var opts = { name: player.name, itemId: newItem.itemId };
             socket.emit("player:change:equipment", opts, Toaster.handleDefault(function () {
-                return $state.go("player");
+                return $stateWrapper.go("player");
             }));
         }
     };
@@ -1480,8 +1499,8 @@ angular.module("retro").service("Google", function () {
 
 angular.module("retro").service("socketCluster", ["$window", function ($window) {
     return $window.socketCluster;
-}]).service("socket", ["$rootScope", "Config", "Toaster", "socketCluster", "socketManagement", function ($rootScope, Config, Toaster, socketCluster, socketManagement) {
-    $rootScope.canConnect = true;
+}]).service("socket", ["AuthData", "$stateWrapper", "Config", "Toaster", "socketCluster", "socketManagement", function (AuthData, $stateWrapper, Config, Toaster, socketCluster, socketManagement) {
+    AuthData.update({ canConnect: true });
 
     var socket = socketCluster.connect({
         protocol: Config[Config._cfg].protocol,
@@ -1494,17 +1513,19 @@ angular.module("retro").service("socketCluster", ["$window", function ($window) 
     };
 
     socket.on("error", function (e) {
-        if (!codes[e.code]) {
-            return;
-        }
+        if (!codes[e.code]) return;
         if (e.code === 1006) {
-            $rootScope.canConnect = false;
+            AuthData.update({ canConnect: false, attemptAutoLogin: false });
         }
         Toaster.show(codes[e.code]);
     });
 
     socket.on("connect", function () {
-        $rootScope.canConnect = true;
+        AuthData.update({ canConnect: true });
+    });
+
+    socket.on("disconnect", function () {
+        $stateWrapper.noGoingBack("home");
     });
 
     socketManagement.setUpEvents(socket);
@@ -1520,6 +1541,22 @@ angular.module("retro").service("socketCluster", ["$window", function ($window) 
             socket.on("combat:entered", Battle.set);
 
             Battle.setSocket(socket);
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("$stateWrapper", ["$state", "$ionicHistory", function ($state, $ionicHistory) {
+    return {
+        go: $state.go,
+        goBreakCache: function (state) {
+            $state.go(state, { timestamp: Date.now() });
+        },
+        noGoingBack: function (state) {
+            $ionicHistory.nextViewOptions({
+                disableBack: true
+            });
+            $state.go(state);
         }
     };
 }]);

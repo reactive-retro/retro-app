@@ -11,8 +11,9 @@ script(type="text/ng-template", id="index")
                 .col This is a very early version of the game.
 
             .row.row-bottom
-                .col
-                    button.button.button-balanced.button-block(ng-click="auth.login()", ng-disabled="!canConnect", ng-show="!attemptAutoLogin") Login
-                    button.button.button-balanced.button-block.button-clear(ng-if="attemptAutoLogin", disabled)
+                .col.text-center
+                    div(ng-if="!authData.canConnect") The game appears to be offline.
+                    button.button.button-balanced.button-block(ng-click="auth.login()", ng-disabled="!authData.canConnect", ng-show="!authData.attemptAutoLogin") Login
+                    button.button.button-balanced.button-block.button-clear(ng-if="authData.attemptAutoLogin", disabled)
                         ion-spinner
                         | &nbsp;Logging you in...

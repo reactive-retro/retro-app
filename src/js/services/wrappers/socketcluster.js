@@ -1,7 +1,7 @@
 angular.module('retro')
     .service('socketCluster', ($window) => $window.socketCluster)
-    .service('socket', ($rootScope, Config, Toaster, socketCluster, socketManagement) => {
-        $rootScope.canConnect = true;
+    .service('socket', (AuthData, $stateWrapper, Config, Toaster, socketCluster, socketManagement) => {
+        AuthData.update({ canConnect: true });
 
         const socket = socketCluster.connect({
             protocol: Config[Config._cfg].protocol,
@@ -14,13 +14,17 @@ angular.module('retro')
         };
 
         socket.on('error', e => {
-            if(!codes[e.code]) { return; }
-            if(e.code === 1006) { $rootScope.canConnect = false; }
+            if(!codes[e.code]) return;
+            if(e.code === 1006) { AuthData.update({ canConnect: false, attemptAutoLogin: false }); }
             Toaster.show(codes[e.code]);
         });
 
         socket.on('connect', () => {
-            $rootScope.canConnect = true;
+            AuthData.update({ canConnect: true });
+        });
+
+        socket.on('disconnect', () => {
+            $stateWrapper.noGoingBack('home');
         });
 
         socketManagement.setUpEvents(socket);

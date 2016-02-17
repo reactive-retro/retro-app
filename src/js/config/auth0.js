@@ -6,7 +6,7 @@ angular.module('retro')
             loginState: 'home'
         });
     })
-    .run((auth, $localStorage, $rootScope, $state, jwtHelper, AuthFlow, Config) => {
+    .run((auth, $localStorage, $rootScope, $stateWrapper, jwtHelper, AuthData, AuthFlow, Config) => {
         auth.hookEvents();
 
         if(Config._cfg !== $localStorage.env) {
@@ -15,10 +15,8 @@ angular.module('retro')
         }
 
         const autologin = () => {
-            if(!auth.isAuthenticated || !$localStorage.profile || !$localStorage.profile.user_id) return;
-
-            $rootScope.attemptAutoLogin = true;
-            AuthFlow.login(_.clone($localStorage), true);
+            if(!auth.isAuthenticated) return;
+            AuthFlow.tryAutoLogin();
         };
 
         let refreshingToken = null;
@@ -52,6 +50,6 @@ angular.module('retro')
                 return refreshingToken;
             }
 
-            $state.go('home');
+            $stateWrapper.go('home');
         });
     });

@@ -1,4 +1,4 @@
-angular.module('retro').service('Battle', ($q, $ionicHistory, $state, Player) => {
+angular.module('retro').service('Battle', ($q, $stateWrapper, Player) => {
 
     let defer = $q.defer();
 
@@ -33,11 +33,7 @@ angular.module('retro').service('Battle', ($q, $ionicHistory, $state, Player) =>
             const me = _.find(battle.playerData, { name: myName });
             Player.set(me);
 
-            $ionicHistory.nextViewOptions({
-                disableBack: true
-            });
-
-            $state.go('battle');
+            $stateWrapper.noGoingBack('battle');
             battle.actionChannel = socketRef.subscribe(`battle:${battle._id}:actions`);
             battle.resultsChannel = socketRef.subscribe(`battle:${battle._id}:results`);
         }

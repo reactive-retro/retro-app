@@ -1,6 +1,7 @@
-angular.module('retro').service('Auth', ($localStorage, $state, $ionicHistory, auth, AuthFlow) => {
+angular.module('retro').service('Auth', ($localStorage, $stateWrapper, auth, AuthFlow) => {
 
     const localAuth = {
+        autoLogin: () => AuthFlow.tryAutoLogin(),
         login: () => {
             auth.signin({
                 authParams: {
@@ -22,11 +23,7 @@ angular.module('retro').service('Auth', ($localStorage, $state, $ionicHistory, a
             $localStorage.profile = null;
             $localStorage.token = null;
 
-            $ionicHistory.nextViewOptions({
-                disableBack: true
-            });
-
-            $state.go('home');
+            $stateWrapper.noGoingBack('home');
         }
     };
 

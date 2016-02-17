@@ -1,4 +1,4 @@
-angular.module('retro').service('BattleFlow', (Player, Battle, Toaster, $state, $ionicHistory, socket) => {
+angular.module('retro').service('BattleFlow', (Player, Battle, Toaster, $stateWrapper, socket) => {
 
     const start = (monster) => {
         socket.emit('combat:enter', { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
@@ -9,11 +9,7 @@ angular.module('retro').service('BattleFlow', (Player, Battle, Toaster, $state, 
     };
 
     const toExplore = () => {
-        $ionicHistory.nextViewOptions({
-            disableBack: true
-        });
-
-        $state.go('explore');
+        $stateWrapper.noGoingBack('explore');
     };
 
     return {
