@@ -5,6 +5,10 @@ $ionicons-font-path: "../lib/ionic/release/fonts" !default;
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
 
+.pull-right {
+  float: right;
+}
+
 .padding-0 {
   padding: 0 !important;
 }

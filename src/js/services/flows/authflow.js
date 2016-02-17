@@ -1,19 +1,23 @@
 angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, LocationWatcher, Config, socket) => {
     const flow = {
         toPlayer: () => {
-            if(!_.contains(['home', 'create'], $state.current.name)) { return; }
+            if(!_.contains(['home', 'create'], $state.current.name)) return;
 
             $stateWrapper.noGoingBack('player');
         },
         tryAutoLogin: () => {
-            if(!$localStorage.profile || !$localStorage.profile.user_id) return;
-
-            AuthData.update({ attemptAutoLogin: true });
+            if(!$localStorage.profile || !$localStorage.profile.user_id) {
+                AuthData.update({ attemptAutoLogin: false });
+                return;
+            }
             flow.login(_.clone($localStorage), true);
-            AuthData.update({ attemptAutoLogin: false });
         },
         tryAuth: () => {
-            const fail = () => $stateWrapper.go('create');
+            const fail = (val) => {
+                // TODO Fail to login but have a token, unset attemptautologin - also, maybe send back a charDoesNotExist bool from the server
+                if(!val) return;
+                $stateWrapper.go('create');
+            };
 
             if($localStorage.profile.user_id) {
                 flow.login(_.clone($localStorage), true).then(null, fail);
@@ -35,15 +39,16 @@ angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorag
 
             const currentLocation = LocationWatcher.current();
             if(!currentLocation) {
-                AuthData.update({ attemptAutoLogin: false });
-                return Toaster.show('No current location. Is your GPS on?');
+                Toaster.show('No current location. Is your GPS on?');
+                defer.reject(false);
+                return defer.promise;
             }
 
             NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
 
             socket.emit('login', NewHero, (err, success) => {
                 if(err) {
-                    defer.reject();
+                    defer.reject(true);
                 } else {
                     defer.resolve();
                     _.extend(Settings, success.settings);
@@ -51,8 +56,6 @@ angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorag
                     flow.isLoggedIn = true;
                     $localStorage.env = Config._cfg;
                 }
-
-                AuthData.update({ attemptAutoLogin: true });
 
                 if(!swallow) {
                     const msgObj = err ? err : success;

@@ -9712,6 +9712,9 @@ a.button {
   -webkit-transition-duration: 0s;
   transition-duration: 0s; }
 
+.pull-right {
+  float: right; }
+
 .padding-0 {
   padding: 0 !important; }
 

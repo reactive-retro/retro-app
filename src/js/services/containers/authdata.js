@@ -4,7 +4,7 @@ angular.module('retro').service('AuthData', ($q) => {
 
     const value = {
         canConnect: false,
-        attemptAutoConnect: false
+        attemptAutoLogin: true
     };
 
     const update = opts => {

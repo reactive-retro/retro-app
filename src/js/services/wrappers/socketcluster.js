@@ -20,7 +20,7 @@ angular.module('retro')
         });
 
         socket.on('connect', () => {
-            AuthData.update({ canConnect: true });
+            AuthData.update({ canConnect: true, attemptAutoLogin: true });
         });
 
         socket.on('disconnect', () => {

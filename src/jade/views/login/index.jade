@@ -12,8 +12,11 @@ script(type="text/ng-template", id="index")
 
             .row.row-bottom
                 .col.text-center
-                    div(ng-if="!authData.canConnect") The game appears to be offline.
-                    button.button.button-balanced.button-block(ng-click="auth.login()", ng-disabled="!authData.canConnect", ng-show="!authData.attemptAutoLogin") Login
-                    button.button.button-balanced.button-block.button-clear(ng-if="authData.attemptAutoLogin", disabled)
+                    div(ng-if="!authData.canConnect") The game appears to be offline (or you lost connection).
+                    div(ng-if="!coords")
+                        div Attempting to get your location.
+                        div Please ensure your GPS is on!
+                    button.button.button-balanced.button-block(ng-click="auth.login()", ng-disabled="!coords || !authData.canConnect", ng-show="!coords || !authData.attemptAutoLogin") Login
+                    button.button.button-balanced.button-block.button-clear(ng-if="coords && authData.attemptAutoLogin", disabled)
                         ion-spinner
                         | &nbsp;Logging you in...

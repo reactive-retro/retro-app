@@ -1,5 +1,5 @@
 angular.module('retro').controller('MenuController',
-    ($scope, $state, $stateWrapper, $ionicPopup, Auth) => {
+    ($scope, $state, $stateWrapper, $ionicPopup, Auth, LocationWatcher, Toaster) => {
 
         const logoutCheck = () => {
             $ionicPopup.confirm({
@@ -15,13 +15,20 @@ angular.module('retro').controller('MenuController',
 
         $scope.menu = [
             { icon: 'ion-person', name: 'Player', state: 'player' },
-            { icon: 'ion-earth', name: 'Explore', state: 'explore' },
+            { icon: 'ion-earth', name: 'Explore', state: 'explore', requiresLocation: true },
             { icon: 'ion-briefcase', name: 'Inventory', state: 'inventory' },
             { icon: 'ion-university', name: 'Skills', state: 'changeskills' },
             { icon: 'ion-gear-b', name: 'Options', state: 'options' },
             { icon: 'ion-android-exit', name: 'Logout', call: logoutCheck }
         ];
 
-        $scope.travel = $stateWrapper.noGoingBackAndNoCache;
+        $scope.doMenuAction = (menuObj) => {
+            if(menuObj.call) return menuObj.call();
+            if(menuObj.requiresLocation && !$scope.coords) return Toaster.show('Your GPS needs to be enabled to see this.');
+            $stateWrapper.noGoingBackAndNoCache(menuObj.state);
+        };
+
+        $scope.coords = LocationWatcher.current();
+        LocationWatcher.watch.then(null, null, (coords) => $scope.coords = coords);
     }
 );

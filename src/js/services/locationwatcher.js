@@ -7,7 +7,7 @@ angular.module('retro').service('LocationWatcher', ($q) => {
         console.log('GPS turned off, or connection errored.');
     };
 
-    let currentCoords = {};
+    let currentCoords = null;
 
     const watcher = {
         current: () => currentCoords,
