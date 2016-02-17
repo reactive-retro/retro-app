@@ -76,7 +76,9 @@ gulp.task('eslint', function() {
 
 gulp.task('build', ['eslint'], function() {
     gulp.src(paths.jsB)
-        .pipe(babel())
+        .pipe(babel({
+            presets: ['es2015']
+        }))
         .pipe(ngAnnotate())
         .pipe(concat('app.js'))
         .pipe(gulp.dest('./www/js'));

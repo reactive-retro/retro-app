@@ -1,27 +1,147 @@
-"use strict";
+'use strict';
 
-angular.module("retro", ["ionic", "ngCordova", "ngStorage", "auth0", "angular-jwt"]);
-"use strict";
+angular.module('retro', ['ionic', 'ngCordova', 'ngStorage', 'auth0', 'angular-jwt']);
+'use strict';
 
-angular.module("retro").constant("Config", {
-    _cfg: "DEV",
+angular.module('retro').constant('Config', {
+    _cfg: 'DEV',
     DEV: {
-        url: "127.0.0.1",
+        url: '127.0.0.1',
         port: 8080
     },
     PROD: {
-        protocol: "https",
-        url: "reactive-retro.herokuapp.com",
+        protocol: 'https',
+        url: 'reactive-retro.herokuapp.com',
         port: 80
     }
 });
-"use strict";
+'use strict';
 
-angular.module("retro").config(["authProvider", function (authProvider) {
+angular.module('retro').constant('CLASSES', {
+    Cleric: 'Clerics specialize in healing their companions.',
+    Fighter: 'Fighters specialize in making their enemies hurt via physical means.',
+    Mage: 'Mages specialize in flinging magic at their enemies -- sometimes multiple at once!',
+    Thief: 'Thieves specialize in quick attacks and physical debuffing.'
+});
+'use strict';
+
+angular.module('retro').constant('OAUTH_KEYS', {
+    google: '195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com',
+    reddit: 'CKzP2LKr74VwYw',
+    facebook: '102489756752863'
+});
+'use strict';
+
+angular.module('retro').constant('MAP_COLORS', {
+    monster: {
+        outline: '#ff0000',
+        fill: '#aa0000'
+    },
+    poi: {
+        outline: '#ffff00',
+        fill: '#aaaa00'
+    },
+    homepoint: {
+        outline: '#00ff00',
+        fill: '#00aa00'
+    },
+    miasma: {
+        outline: '#000000',
+        fill: '#000000'
+    },
+    hero: {
+        outline: '#0000ff',
+        fill: '#0000aa'
+    },
+    heroRadius: {
+        outline: '#ff00ff',
+        fill: '#ff00ff'
+    }
+});
+'use strict';
+
+angular.module('retro').constant('MAP_STYLE', [{
+    featureType: 'water',
+    elementType: 'geometry',
+    stylers: [{ visibility: 'on' }, { color: '#aee2e0' }]
+}, {
+    featureType: 'landscape',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#abce83' }]
+}, {
+    featureType: 'poi',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'poi.park',
+    elementType: 'geometry',
+    stylers: [{ visibility: 'simplified' }, { color: '#8dab68' }]
+}, {
+    featureType: 'road',
+    elementType: 'geometry.fill',
+    stylers: [{ visibility: 'simplified' }]
+}, {
+    featureType: 'road',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#5B5B3F' }]
+}, {
+    featureType: 'road',
+    elementType: 'labels.text.stroke',
+    stylers: [{ color: '#ABCE83' }]
+}, {
+    featureType: 'road',
+    elementType: 'labels.icon',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'road.local',
+    elementType: 'geometry',
+    stylers: [{ color: '#A4C67D' }]
+}, {
+    featureType: 'road.arterial',
+    elementType: 'geometry',
+    stylers: [{ color: '#9BBF72' }]
+}, {
+    featureType: 'road.highway',
+    elementType: 'geometry',
+    stylers: [{ color: '#EBF4A4' }]
+}, {
+    featureType: 'transit',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'administrative',
+    elementType: 'geometry.stroke',
+    stylers: [{ visibility: 'on' }, { color: '#87ae79' }]
+}, {
+    featureType: 'administrative',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#7f2200' }, { visibility: 'off' }]
+}, {
+    featureType: 'administrative',
+    elementType: 'labels.text.stroke',
+    stylers: [{ color: '#ffffff' }, { visibility: 'on' }, { weight: 4.1 }]
+}, {
+    featureType: 'administrative',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#495421' }]
+}, {
+    featureType: 'administrative.neighborhood',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'administrative.land_parcel',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'administrative.locality',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+}]);
+'use strict';
+
+angular.module('retro').config(["authProvider", function (authProvider) {
     authProvider.init({
-        domain: "reactive-retro.auth0.com",
-        clientID: "ucMSnNDYLGdDBL2uppganZv2jKzzJiI0",
-        loginState: "home"
+        domain: 'reactive-retro.auth0.com',
+        clientID: 'ucMSnNDYLGdDBL2uppganZv2jKzzJiI0',
+        loginState: 'home'
     });
 }]).run(["auth", "$localStorage", "$rootScope", "$stateWrapper", "jwtHelper", "AuthData", "AuthFlow", "Config", function (auth, $localStorage, $rootScope, $stateWrapper, jwtHelper, AuthData, AuthFlow, Config) {
     auth.hookEvents();
@@ -31,13 +151,13 @@ angular.module("retro").config(["authProvider", function (authProvider) {
         return;
     }
 
-    var autologin = function () {
+    var autologin = function autologin() {
         if (!auth.isAuthenticated) return;
         AuthFlow.tryAutoLogin();
     };
 
     var refreshingToken = null;
-    $rootScope.$on("$locationChangeStart", function (e, n, c) {
+    $rootScope.$on('$locationChangeStart', function (e, n, c) {
         // if you route to the same state and aren't logged in, don't do this event
         // it causes the login events on the server to fire twice
         if (n === c) return;
@@ -65,22 +185,22 @@ angular.module("retro").config(["authProvider", function (authProvider) {
                     $localStorage.token = idToken;
                     auth.authenticate(profile, idToken);
                     autologin();
-                })["finally"](function () {
+                }).finally(function () {
                     refreshingToken = null;
                 });
             }
             return refreshingToken;
         }
 
-        $stateWrapper.go("home");
+        $stateWrapper.go('home');
     });
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").run(["$rootScope", "$ionicPlatform", function ($rootScope, $ionicPlatform) {
+angular.module('retro').run(["$rootScope", "$ionicPlatform", function ($rootScope, $ionicPlatform) {
 
-    $rootScope.$on("$stateChangeSuccess", function (event, toState) {
-        $rootScope.hideMenu = toState.name === "home" || toState.name === "create" || toState.name === "battle";
+    $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+        $rootScope.hideMenu = toState.name === 'home' || toState.name === 'create' || toState.name === 'battle';
     });
 
     $ionicPlatform.registerBackButtonAction(function (e) {
@@ -97,253 +217,133 @@ angular.module("retro").run(["$rootScope", "$ionicPlatform", function ($rootScop
         }
     });
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").config(["$ionicConfigProvider", "$urlRouterProvider", "$stateProvider", function ($ionicConfigProvider, $urlRouterProvider, $stateProvider) {
+angular.module('retro').config(["$ionicConfigProvider", "$urlRouterProvider", "$stateProvider", function ($ionicConfigProvider, $urlRouterProvider, $stateProvider) {
 
     $ionicConfigProvider.views.swipeBackEnabled(false);
 
-    $urlRouterProvider.otherwise("/");
+    $urlRouterProvider.otherwise('/');
 
-    $stateProvider.state("home", {
-        url: "/",
-        templateUrl: "index",
-        controller: "HomeController"
-    }).state("create", {
-        url: "/create",
-        templateUrl: "createchar",
-        controller: "CreateCharacterController",
+    $stateProvider.state('home', {
+        url: '/',
+        templateUrl: 'index',
+        controller: 'HomeController'
+    }).state('create', {
+        url: '/create',
+        templateUrl: 'createchar',
+        controller: 'CreateCharacterController',
         data: { requiresLogin: true }
-    }).state("player", {
-        url: "/player",
-        templateUrl: "player",
-        controller: "PlayerController",
+    }).state('player', {
+        url: '/player',
+        templateUrl: 'player',
+        controller: 'PlayerController',
         data: { requiresLogin: true },
         resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
+            playerLoaded: ["$injector", function playerLoaded($injector) {
+                return $injector.get('Settings').isReady;
             }]
         }
-    }).state("changeclass", {
-        url: "/changeclass",
-        templateUrl: "changeclass",
-        controller: "ClassChangeController",
+    }).state('changeclass', {
+        url: '/changeclass',
+        templateUrl: 'changeclass',
+        controller: 'ClassChangeController',
         data: { requiresLogin: true },
         resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
+            playerLoaded: ["$injector", function playerLoaded($injector) {
+                return $injector.get('Settings').isReady;
             }]
         }
-    }).state("changeskills", {
-        url: "/changeskills",
-        templateUrl: "changeskills",
-        controller: "SkillChangeController",
+    }).state('changeskills', {
+        url: '/changeskills',
+        templateUrl: 'changeskills',
+        controller: 'SkillChangeController',
         data: { requiresLogin: true },
         resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
+            playerLoaded: ["$injector", function playerLoaded($injector) {
+                return $injector.get('Settings').isReady;
             }]
         }
-    }).state("inventory", {
-        url: "/inventory",
-        templateUrl: "inventory",
-        controller: "InventoryController",
+    }).state('inventory', {
+        url: '/inventory',
+        templateUrl: 'inventory',
+        controller: 'InventoryController',
         data: { requiresLogin: true },
         resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
+            playerLoaded: ["$injector", function playerLoaded($injector) {
+                return $injector.get('Settings').isReady;
             }]
         }
-    }).state("inventory.armor", {
-        url: "/armor",
+    }).state('inventory.armor', {
+        url: '/armor',
         views: {
-            "armor-tab": {
-                templateUrl: "inventory-tab-armor"
+            'armor-tab': {
+                templateUrl: 'inventory-tab-armor'
             }
         },
         data: { requiresLogin: true },
         resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
+            playerLoaded: ["$injector", function playerLoaded($injector) {
+                return $injector.get('Settings').isReady;
             }]
         }
-    }).state("inventory.weapons", {
-        url: "/weapons",
+    }).state('inventory.weapons', {
+        url: '/weapons',
         views: {
-            "weapons-tab": {
-                templateUrl: "inventory-tab-weapons"
+            'weapons-tab': {
+                templateUrl: 'inventory-tab-weapons'
             }
         },
         data: { requiresLogin: true },
         resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
+            playerLoaded: ["$injector", function playerLoaded($injector) {
+                return $injector.get('Settings').isReady;
             }]
         }
-    }).state("inventory.items", {
-        url: "/items",
+    }).state('inventory.items', {
+        url: '/items',
         views: {
-            "items-tab": {
-                templateUrl: "inventory-tab-items"
+            'items-tab': {
+                templateUrl: 'inventory-tab-items'
             }
         },
         data: { requiresLogin: true },
         resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
+            playerLoaded: ["$injector", function playerLoaded($injector) {
+                return $injector.get('Settings').isReady;
             }]
         }
-    }).state("options", {
-        url: "/options",
-        templateUrl: "options",
+    }).state('options', {
+        url: '/options',
+        templateUrl: 'options',
         data: { requiresLogin: true },
         resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
+            playerLoaded: ["$injector", function playerLoaded($injector) {
+                return $injector.get('Settings').isReady;
             }]
         }
-    }).state("explore", {
-        url: "/explore",
-        templateUrl: "explore",
-        controller: "ExploreController",
+    }).state('explore', {
+        url: '/explore',
+        templateUrl: 'explore',
+        controller: 'ExploreController',
         data: { requiresLogin: true },
         cache: false,
         resolve: {
-            playerLoaded: ["$injector", function ($injector) {
-                return $injector.get("Settings").isReady;
+            playerLoaded: ["$injector", function playerLoaded($injector) {
+                return $injector.get('Settings').isReady;
             }]
         }
-    }).state("battle", {
-        url: "/battle",
-        templateUrl: "battle",
-        controller: "BattleController",
+    }).state('battle', {
+        url: '/battle',
+        templateUrl: 'battle',
+        controller: 'BattleController',
         cache: false,
         data: { requiresLogin: true }
     });
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").constant("CLASSES", {
-    Cleric: "Clerics specialize in healing their companions.",
-    Fighter: "Fighters specialize in making their enemies hurt via physical means.",
-    Mage: "Mages specialize in flinging magic at their enemies -- sometimes multiple at once!",
-    Thief: "Thieves specialize in quick attacks and physical debuffing."
-});
-"use strict";
-
-angular.module("retro").constant("OAUTH_KEYS", {
-    google: "195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com",
-    reddit: "CKzP2LKr74VwYw",
-    facebook: "102489756752863"
-});
-"use strict";
-
-angular.module("retro").constant("MAP_COLORS", {
-    monster: {
-        outline: "#ff0000",
-        fill: "#aa0000"
-    },
-    poi: {
-        outline: "#ffff00",
-        fill: "#aaaa00"
-    },
-    homepoint: {
-        outline: "#00ff00",
-        fill: "#00aa00"
-    },
-    miasma: {
-        outline: "#000000",
-        fill: "#000000"
-    },
-    hero: {
-        outline: "#0000ff",
-        fill: "#0000aa"
-    },
-    heroRadius: {
-        outline: "#ff00ff",
-        fill: "#ff00ff"
-    }
-});
-"use strict";
-
-angular.module("retro").constant("MAP_STYLE", [{
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ visibility: "on" }, { color: "#aee2e0" }]
-}, {
-    featureType: "landscape",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#abce83" }]
-}, {
-    featureType: "poi",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{ visibility: "simplified" }, { color: "#8dab68" }]
-}, {
-    featureType: "road",
-    elementType: "geometry.fill",
-    stylers: [{ visibility: "simplified" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#5B5B3F" }]
-}, {
-    featureType: "road",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ABCE83" }]
-}, {
-    featureType: "road",
-    elementType: "labels.icon",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "road.local",
-    elementType: "geometry",
-    stylers: [{ color: "#A4C67D" }]
-}, {
-    featureType: "road.arterial",
-    elementType: "geometry",
-    stylers: [{ color: "#9BBF72" }]
-}, {
-    featureType: "road.highway",
-    elementType: "geometry",
-    stylers: [{ color: "#EBF4A4" }]
-}, {
-    featureType: "transit",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.stroke",
-    stylers: [{ visibility: "on" }, { color: "#87ae79" }]
-}, {
-    featureType: "administrative",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#7f2200" }, { visibility: "off" }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ffffff" }, { visibility: "on" }, { weight: 4.1 }]
-}, {
-    featureType: "administrative",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#495421" }]
-}, {
-    featureType: "administrative.neighborhood",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.land_parcel",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}, {
-    featureType: "administrative.locality",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }]
-}]);
-"use strict";
-
-angular.module("retro").controller("BattleController", ["$scope", "$ionicModal", "BattleFlow", "Battle", "Dice", "Player", "Skills", function ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills) {
+angular.module('retro').controller('BattleController', ["$scope", "$ionicModal", "BattleFlow", "Battle", "Dice", "Player", "Skills", function ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills) {
     $scope.battleFlow = BattleFlow;
     $scope.currentPlayerName = Player.get().name;
     $scope.targets = {};
@@ -356,7 +356,7 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
 
     $scope.me = null;
 
-    var resultHandler = function (_ref) {
+    var resultHandler = function resultHandler(_ref) {
         var battle = _ref.battle;
         var actions = _ref.actions;
         var isDone = _ref.isDone;
@@ -372,7 +372,7 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
         }
     };
 
-    var setupBattleData = function () {
+    var setupBattleData = function setupBattleData() {
         $scope.battle = Battle.get();
         if (!$scope.battle) return;
         $scope.battle.actionChannel.watch($scope.setTarget);
@@ -381,7 +381,7 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
 
         // self shows up last
         $scope.orderedPlayers = _($scope.battle.players).sortBy(function (player) {
-            return player === $scope.currentPlayerName ? "~" : player;
+            return player === $scope.currentPlayerName ? '~' : player;
         }).map(function (playerName) {
             return _.find($scope.battle.playerData, { name: playerName });
         }).value();
@@ -389,7 +389,7 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
         $scope.me = _.find($scope.battle.playerData, { name: $scope.currentPlayerName });
 
         $scope.uniqueSkills = _($scope.me.skills).reject(function (skill) {
-            return skill === "Attack";
+            return skill === 'Attack';
         }).compact().uniq().map(function (skill) {
             return _.find(Skills.get(), { spellName: skill });
         }).value();
@@ -402,15 +402,15 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
     };
 
     $scope.skillCooldown = function (skill) {
-        return $scope.getMultiplier(skill ? skill.spellName : "") * (skill ? skill.spellCooldown : 0);
+        return $scope.getMultiplier(skill ? skill.spellName : '') * (skill ? skill.spellCooldown : 0);
     };
     $scope.canCastSkillCD = function (skill) {
-        var skillName = skill ? skill.spellName : "";
+        var skillName = skill ? skill.spellName : '';
         return !$scope.me.cooldowns[skillName] || $scope.me.cooldowns[skillName] <= 0;
     };
 
     $scope.skillCost = function (skill) {
-        return $scope.getMultiplier(skill ? skill.spellName : "") * (skill ? skill.spellCost : 0);
+        return $scope.getMultiplier(skill ? skill.spellName : '') * (skill ? skill.spellCost : 0);
     };
     $scope.canCastSkillMP = function (skill) {
         return $scope.skillCost(skill) <= $scope.me.stats.mp.__current;
@@ -420,7 +420,7 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
         $scope.activeSkill = _.find(Skills.get(), { spellName: skill });
 
         $scope.multiplier = $scope.getMultiplier($scope.activeSkill.spellName);
-        if (skill === "Attack") {
+        if (skill === 'Attack') {
             $scope.multiplier += 1;
         }
 
@@ -431,21 +431,21 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
         })
         // Damage always comes first
         .sortBy(function (obj) {
-            return obj.name === "Damage" ? "*" : obj.name;
+            return obj.name === 'Damage' ? '*' : obj.name;
         }).value();
 
         modals.targetModal.show();
     };
 
     $scope.target = {
-        monster: function (monster) {
-            return $scope.prepareTarget({ name: monster.name, id: monster.id, skill: $scope.activeSkill.spellName });
+        monster: function monster(_monster) {
+            return $scope.prepareTarget({ name: _monster.name, id: _monster.id, skill: $scope.activeSkill.spellName });
         },
-        player: function (player) {
-            return $scope.prepareTarget({ name: player.name, id: player.name, skill: $scope.activeSkill.spellName });
+        player: function player(_player) {
+            return $scope.prepareTarget({ name: _player.name, id: _player.name, skill: $scope.activeSkill.spellName });
         },
-        other: function (other) {
-            return $scope.prepareTarget({ name: other, id: other, skill: $scope.activeSkill.spellName });
+        other: function other(_other) {
+            return $scope.prepareTarget({ name: _other, id: _other, skill: $scope.activeSkill.spellName });
         }
     };
 
@@ -461,7 +461,7 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
         $scope.setTarget(target);
         $scope.battle.actionChannel.publish(target);
         $scope.canConfirm = true;
-        $scope.closeModal("targetModal");
+        $scope.closeModal('targetModal');
     };
 
     $scope.setTarget = function (target) {
@@ -474,22 +474,22 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
         BattleFlow.confirmAction($scope.targets[$scope.currentPlayerName]);
     };
 
-    $ionicModal.fromTemplateUrl("choosetarget.info", {
+    $ionicModal.fromTemplateUrl('choosetarget.info', {
         scope: $scope,
-        animation: "slide-in-up"
+        animation: 'slide-in-up'
     }).then(function (modal) {
         modals.targetModal = modal;
     });
 
-    $ionicModal.fromTemplateUrl("results.info", {
+    $ionicModal.fromTemplateUrl('results.info', {
         scope: $scope,
-        animation: "slide-in-up"
+        animation: 'slide-in-up'
     }).then(function (modal) {
         modals.resultsModal = modal;
     });
 
     // clean up modal b/c memory
-    $scope.$on("$destroy", function () {
+    $scope.$on('$destroy', function () {
         modals.targetModal.remove();
         modals.resultsModal.remove();
     });
@@ -506,9 +506,9 @@ angular.module("retro").controller("BattleController", ["$scope", "$ionicModal",
         - ion-load-b - stunned
      */
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").controller("ClassChangeController", ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
+angular.module('retro').controller('ClassChangeController', ["$scope", "Player", "CLASSES", "ClassChangeFlow", function ($scope, Player, CLASSES, ClassChangeFlow) {
     $scope.player = Player.get();
     $scope.CLASSES = CLASSES;
     $scope.ClassChangeFlow = ClassChangeFlow;
@@ -517,26 +517,26 @@ angular.module("retro").controller("ClassChangeController", ["$scope", "Player",
         return $scope.player = player;
     });
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").controller("CreateCharacterController", ["$scope", "NewHero", "CLASSES", "AuthFlow", "$localStorage", function ($scope, NewHero, CLASSES, AuthFlow, $localStorage) {
+angular.module('retro').controller('CreateCharacterController', ["$scope", "NewHero", "CLASSES", "AuthFlow", "$localStorage", function ($scope, NewHero, CLASSES, AuthFlow, $localStorage) {
     $scope.NewHero = NewHero;
     $scope.CLASSES = CLASSES;
-    $scope.baseProfessions = ["Thief", "Mage", "Fighter"];
+    $scope.baseProfessions = ['Thief', 'Mage', 'Fighter'];
 
     $scope.create = function () {
         var hero = _.merge(NewHero, $localStorage);
         AuthFlow.login(hero);
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "MapDrawing", "Places", "Monsters", "BattleFlow", function ($scope, $ionicLoading, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, BattleFlow) {
+angular.module('retro').controller('ExploreController', ["$scope", "$ionicLoading", "Player", "LocationWatcher", "Google", "MapDrawing", "Places", "Monsters", "BattleFlow", function ($scope, $ionicLoading, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, BattleFlow) {
 
     $scope.currentlySelected = null;
     $scope.centered = true;
 
-    var unCenter = function () {
+    var unCenter = function unCenter() {
         return $scope.centered = false;
     };
 
@@ -562,7 +562,7 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
         $scope.centered = true;
     };
 
-    var _setSelected = function (opts) {
+    var _setSelected = function _setSelected(opts) {
         $scope.currentlySelected = opts;
         $scope.$apply();
     };
@@ -592,7 +592,7 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
     };
 
     $scope.centerOn = function (coords) {
-        var centerMap = arguments[1] === undefined ? false : arguments[1];
+        var centerMap = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
         if (!$scope.map) return;
         if (!coords.latitude || !coords.longitude) return;
@@ -605,9 +605,9 @@ angular.module("retro").controller("ExploreController", ["$scope", "$ionicLoadin
         MapDrawing.setCurrentPosition(position);
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").controller("HomeController", ["$scope", "LocationWatcher", "Auth", "AuthData", function ($scope, LocationWatcher, Auth, AuthData) {
+angular.module('retro').controller('HomeController', ["$scope", "LocationWatcher", "Auth", "AuthData", function ($scope, LocationWatcher, Auth, AuthData) {
     $scope.auth = Auth;
     $scope.authData = AuthData.get();
 
@@ -626,9 +626,9 @@ angular.module("retro").controller("HomeController", ["$scope", "LocationWatcher
         }
     });
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").controller("InventoryController", ["$scope", "Player", "EquipFlow", function ($scope, Player, EquipFlow) {
+angular.module('retro').controller('InventoryController', ["$scope", "Player", "EquipFlow", function ($scope, Player, EquipFlow) {
     $scope.player = Player.get();
     Player.observer.then(null, null, function (player) {
         return $scope.player = player;
@@ -637,14 +637,14 @@ angular.module("retro").controller("InventoryController", ["$scope", "Player", "
 
     $scope.EquipFlow = EquipFlow;
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").controller("MenuController", ["$scope", "$state", "$stateWrapper", "$ionicPopup", "Auth", "LocationWatcher", "Toaster", function ($scope, $state, $stateWrapper, $ionicPopup, Auth, LocationWatcher, Toaster) {
+angular.module('retro').controller('MenuController', ["$scope", "$state", "$stateWrapper", "$ionicPopup", "Auth", "LocationWatcher", "Toaster", function ($scope, $state, $stateWrapper, $ionicPopup, Auth, LocationWatcher, Toaster) {
 
-    var logoutCheck = function () {
+    var logoutCheck = function logoutCheck() {
         $ionicPopup.confirm({
-            title: "Log out?",
-            template: "Are you sure you want to log out?"
+            title: 'Log out?',
+            template: 'Are you sure you want to log out?'
         }).then(function (res) {
             if (!res) {
                 return;
@@ -655,11 +655,11 @@ angular.module("retro").controller("MenuController", ["$scope", "$state", "$stat
 
     $scope.stateHref = $state.href;
 
-    $scope.menu = [{ icon: "ion-person", name: "Player", state: "player" }, { icon: "ion-earth", name: "Explore", state: "explore", requiresLocation: true }, { icon: "ion-briefcase", name: "Inventory", state: "inventory" }, { icon: "ion-university", name: "Skills", state: "changeskills" }, { icon: "ion-gear-b", name: "Options", state: "options" }, { icon: "ion-android-exit", name: "Logout", call: logoutCheck }];
+    $scope.menu = [{ icon: 'ion-person', name: 'Player', state: 'player' }, { icon: 'ion-earth', name: 'Explore', state: 'explore', requiresLocation: true }, { icon: 'ion-briefcase', name: 'Inventory', state: 'inventory' }, { icon: 'ion-university', name: 'Skills', state: 'changeskills' }, { icon: 'ion-gear-b', name: 'Options', state: 'options' }, { icon: 'ion-android-exit', name: 'Logout', call: logoutCheck }];
 
     $scope.doMenuAction = function (menuObj) {
         if (menuObj.call) return menuObj.call();
-        if (menuObj.requiresLocation && !$scope.coords) return Toaster.show("Your GPS needs to be enabled to see this.");
+        if (menuObj.requiresLocation && !$scope.coords) return Toaster.show('Your GPS needs to be enabled to see this.');
         $stateWrapper.noGoingBackAndNoCache(menuObj.state);
     };
 
@@ -668,9 +668,9 @@ angular.module("retro").controller("MenuController", ["$scope", "$state", "$stat
         return $scope.coords = coords;
     });
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").controller("PlayerController", ["$scope", "$stateWrapper", "Player", function ($scope, $stateWrapper, Player) {
+angular.module('retro').controller('PlayerController', ["$scope", "$stateWrapper", "Player", function ($scope, $stateWrapper, Player) {
     $scope.player = Player.get();
     Player.observer.then(null, null, function (player) {
         return $scope.player = player;
@@ -679,15 +679,15 @@ angular.module("retro").controller("PlayerController", ["$scope", "$stateWrapper
 
     $scope.go = $stateWrapper.go;
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicModal", "Player", "Skills", "SkillChangeFlow", "Dice", function ($scope, $ionicModal, Player, Skills, SkillChangeFlow, Dice) {
+angular.module('retro').controller('SkillChangeController', ["$scope", "$ionicModal", "Player", "Skills", "SkillChangeFlow", "Dice", function ($scope, $ionicModal, Player, Skills, SkillChangeFlow, Dice) {
     $scope.player = Player.get();
 
-    var getAllSkills = function (baseSkills) {
+    var getAllSkills = function getAllSkills(baseSkills) {
         return _(baseSkills).each(function (skill) {
             return skill.spellLevel = skill.spellClasses[_.keys(skill.spellClasses)[0]];
-        }).sortBy(["spellLevel", "spellName"]).groupBy(function (skill) {
+        }).sortBy(['spellLevel', 'spellName']).groupBy(function (skill) {
             return _.keys(skill.spellClasses)[0];
         }).reduce(function (res, val, key) {
             res.push({ prof: key, profSkills: val });
@@ -705,7 +705,7 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
         })
         // Damage always comes first
         .sortBy(function (obj) {
-            return obj.name === "Damage" ? "*" : obj.name;
+            return obj.name === 'Damage' ? '*' : obj.name;
         }).value();
 
         $scope.modal.show();
@@ -732,15 +732,15 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
         return $scope.modal.hide();
     };
 
-    $ionicModal.fromTemplateUrl("changeskill.info", {
+    $ionicModal.fromTemplateUrl('changeskill.info', {
         scope: $scope,
-        animation: "slide-in-up"
+        animation: 'slide-in-up'
     }).then(function (modal) {
         $scope.modal = modal;
     });
 
     // clean up modal b/c memory
-    $scope.$on("$destroy", function () {
+    $scope.$on('$destroy', function () {
         $scope.modal.remove();
     });
 
@@ -751,69 +751,69 @@ angular.module("retro").controller("SkillChangeController", ["$scope", "$ionicMo
         return $scope.allSkills = getAllSkills(skills);
     });
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").directive("colorText", function () {
+angular.module('retro').directive('colorText', function () {
     return {
-        restrict: "E",
+        restrict: 'E',
         scope: {
-            value: "=",
-            preText: "@"
+            value: '=',
+            preText: '@'
         },
-        template: "\n                <span ng-class=\"{assertive: value < 0, balanced: value > 0}\">{{preText}} {{value}}</span>\n            "
+        template: '\n                <span ng-class="{assertive: value < 0, balanced: value > 0}">{{preText}} {{value}}</span>\n            '
     };
 });
-"use strict";
+'use strict';
 
-angular.module("retro").directive("cooldown", function () {
+angular.module('retro').directive('cooldown', function () {
     return {
-        restrict: "E",
+        restrict: 'E',
         scope: {
-            turns: "="
+            turns: '='
         },
-        template: "\n                <span>\n                    <i class=\"icon ion-clock\"></i> <ng-pluralize count=\"turns\", when=\"{'0': 'Instant', 'one': '1 round', 'other': '{} rounds'}\"></ng-pluralize>\n                </span>\n            "
+        template: '\n                <span>\n                    <i class="icon ion-clock"></i> <ng-pluralize count="turns", when="{\'0\': \'Instant\', \'one\': \'1 round\', \'other\': \'{} rounds\'}"></ng-pluralize>\n                </span>\n            '
     };
 });
-"use strict";
+'use strict';
 
-angular.module("retro").directive("healthDisplay", function () {
+angular.module('retro').directive('healthDisplay', function () {
     return {
-        restrict: "E",
+        restrict: 'E',
         scope: {
-            target: "="
+            target: '='
         },
-        template: "\n                <div>\n                    <i class=\"icon ion-heart assertive\"></i> {{target.stats.hp.__current}} / {{target.stats.hp.maximum}}\n                </div>\n            "
+        template: '\n                <div>\n                    <i class="icon ion-heart assertive"></i> {{target.stats.hp.__current}} / {{target.stats.hp.maximum}}\n                </div>\n            '
     };
 });
-"use strict";
+'use strict';
 
-angular.module("retro").directive("manaDisplay", function () {
+angular.module('retro').directive('manaDisplay', function () {
     return {
-        restrict: "E",
+        restrict: 'E',
         scope: {
-            target: "="
+            target: '='
         },
-        template: "\n                <div>\n                    <i class=\"icon ion-waterdrop positive\"></i> {{target.stats.mp.__current}} / {{target.stats.mp.maximum}}\n                </div>\n            "
+        template: '\n                <div>\n                    <i class="icon ion-waterdrop positive"></i> {{target.stats.mp.__current}} / {{target.stats.mp.maximum}}\n                </div>\n            '
     };
 });
-"use strict";
+'use strict';
 
-angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
+angular.module('retro').directive('map', ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
     return {
-        restrict: "E",
+        restrict: 'E',
         scope: {
-            onCreate: "&",
-            onClick: "&"
+            onCreate: '&',
+            onClick: '&'
         },
-        link: function ($scope, $element) {
+        link: function link($scope, $element) {
 
             if (!Google || !Google.maps) {
-                Toaster.show("Could not reach google.");
+                Toaster.show('Could not reach google.');
                 return;
             }
 
             // this is the available list of places in the game
-            var init = function () {
+            var init = function init() {
                 var mapOptions = {
                     center: new Google.maps.LatLng(32.3078, -64.7505),
                     zoom: 17,
@@ -832,69 +832,69 @@ angular.module("retro").directive("map", ["MAP_STYLE", "Toaster", "Google", func
 
                 $scope.onCreate({ map: map });
 
-                Google.maps.event.addDomListener($element[0], "mousedown", function (e) {
+                Google.maps.event.addDomListener($element[0], 'mousedown', function (e) {
                     $scope.onClick();
                     e.preventDefault();
                     return false;
                 });
             };
 
-            if (document.readyState === "complete") {
+            if (document.readyState === 'complete') {
                 init();
             } else {
-                Google.maps.event.addDomListener(window, "load", init);
+                Google.maps.event.addDomListener(window, 'load', init);
             }
         }
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").directive("mpCost", function () {
+angular.module('retro').directive('mpCost', function () {
     return {
-        restrict: "E",
+        restrict: 'E',
         scope: {
-            cost: "="
+            cost: '='
         },
-        template: "\n                <span>\n                    <i class=\"icon ion-waterdrop positive\"></i> {{cost}} mp\n                </span>\n            "
+        template: '\n                <span>\n                    <i class="icon ion-waterdrop positive"></i> {{cost}} mp\n                </span>\n            '
     };
 });
-"use strict";
+'use strict';
 
-angular.module("retro").directive("skillEffectDisplay", function () {
+angular.module('retro').directive('skillEffectDisplay', function () {
     return {
-        restrict: "E",
+        restrict: 'E',
         scope: {
-            effects: "=",
-            multiplier: "="
+            effects: '=',
+            multiplier: '='
         },
-        template: "\n                <div class=\"row\" ng-repeat=\"effect in effects\">\n                    <div class=\"col col-20 col-offset-20 text-right\">\n                        <strong>{{effect.name}}</strong>\n                    </div>\n\n                    <div class=\"col text-left\">\n                        <span>{{effect.value.min_possible * multiplier}}</span>\n                        <span ng-if=\"effect.value.min_possible !== effect.value.max_possible\">- {{effect.value.max_possible*multiplier}}</span>\n                        <ng-pluralize ng-if=\"effect.extra.string\" count=\"effect.value.max_possible*multiplier\" when=\"{'one': ' '+effect.extra.string, 'other': ' '+effect.extra.string+'s'}\"></ng-pluralize>\n                        <span ng-if=\"effect.extra.chance\"> ({{effect.extra.chance + effect.accuracy}}% chance)</span>\n                    </div>\n                </div>\n            "
+        template: '\n                <div class="row" ng-repeat="effect in effects">\n                    <div class="col col-20 col-offset-20 text-right">\n                        <strong>{{effect.name}}</strong>\n                    </div>\n\n                    <div class="col text-left">\n                        <span>{{effect.value.min_possible * multiplier}}</span>\n                        <span ng-if="effect.value.min_possible !== effect.value.max_possible">- {{effect.value.max_possible*multiplier}}</span>\n                        <ng-pluralize ng-if="effect.extra.string" count="effect.value.max_possible*multiplier" when="{\'one\': \' \'+effect.extra.string, \'other\': \' \'+effect.extra.string+\'s\'}"></ng-pluralize>\n                        <span ng-if="effect.extra.chance"> ({{effect.extra.chance + effect.accuracy}}% chance)</span>\n                    </div>\n                </div>\n            '
     };
 });
-"use strict";
+'use strict';
 
-angular.module("retro").directive("statBar", function () {
+angular.module('retro').directive('statBar', function () {
     return {
-        restrict: "E",
+        restrict: 'E',
         scope: {
-            target: "=",
-            stat: "@"
+            target: '=',
+            stat: '@'
         },
-        template: "\n                <div class=\"stat-bar-container\">\n                    <div class=\"stat-bar {{stat}}\" style=\"width: {{target.stats[stat].__current/target.stats[stat].maximum*100}}%\"></div>\n                </div>\n            "
+        template: '\n                <div class="stat-bar-container">\n                    <div class="stat-bar {{stat}}" style="width: {{target.stats[stat].__current/target.stats[stat].maximum*100}}%"></div>\n                </div>\n            '
     };
 });
-"use strict";
+'use strict';
 
-angular.module("retro").service("Auth", ["$localStorage", "$stateWrapper", "auth", "AuthFlow", function ($localStorage, $stateWrapper, auth, AuthFlow) {
+angular.module('retro').service('Auth', ["$localStorage", "$stateWrapper", "auth", "AuthFlow", function ($localStorage, $stateWrapper, auth, AuthFlow) {
 
     var localAuth = {
-        autoLogin: function () {
+        autoLogin: function autoLogin() {
             return AuthFlow.tryAutoLogin();
         },
-        login: function () {
+        login: function login() {
             auth.signin({
                 authParams: {
-                    scope: "openid offline_access email",
-                    device: "Mobile device"
+                    scope: 'openid offline_access email',
+                    device: 'Mobile device'
                 }
             }, function (profile, token, accessToken, state, refreshToken) {
                 $localStorage.profile = profile;
@@ -903,38 +903,38 @@ angular.module("retro").service("Auth", ["$localStorage", "$stateWrapper", "auth
 
                 AuthFlow.tryAuth();
             }, function (err) {
-                console.log("failed", JSON.stringify(err));
+                console.log('failed', JSON.stringify(err));
             });
         },
-        logout: function () {
+        logout: function logout() {
             auth.signout();
             $localStorage.profile = null;
             $localStorage.token = null;
 
-            $stateWrapper.noGoingBack("home");
+            $stateWrapper.noGoingBack('home');
         }
     };
 
     return localAuth;
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("LocationWatcher", ["$q", function ($q) {
+angular.module('retro').service('LocationWatcher', ["$q", function ($q) {
 
     var defer = $q.defer();
     var ready = $q.defer();
 
-    var error = function () {
-        console.log("GPS turned off, or connection errored.");
+    var error = function error() {
+        console.log('GPS turned off, or connection errored.');
     };
 
     var currentCoords = null;
 
     var watcher = {
-        current: function () {
+        current: function current() {
             return currentCoords;
         },
-        start: function () {
+        start: function start() {
             navigator.geolocation.getCurrentPosition(function (position) {
                 currentCoords = position.coords;
                 defer.notify(currentCoords);
@@ -955,9 +955,9 @@ angular.module("retro").service("LocationWatcher", ["$q", function ($q) {
 
     return watcher;
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS", function (Google, Settings, MAP_COLORS) {
+angular.module('retro').service('MapDrawing', ["Google", "Settings", "MAP_COLORS", function (Google, Settings, MAP_COLORS) {
 
     var savedPlaces = [];
     var savedMonsters = [];
@@ -972,7 +972,7 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
     var mercatorWorldBounds = [new Google.maps.LatLng(85, 180), new Google.maps.LatLng(85, 90), new Google.maps.LatLng(85, 0), new Google.maps.LatLng(85, -90), new Google.maps.LatLng(85, -180), new Google.maps.LatLng(0, -180), new Google.maps.LatLng(-85, -180), new Google.maps.LatLng(-85, -90), new Google.maps.LatLng(-85, 0), new Google.maps.LatLng(-85, 90), new Google.maps.LatLng(-85, 180), new Google.maps.LatLng(0, 180), new Google.maps.LatLng(85, 180)];
 
     // radius in meters
-    var drawCircle = function (point, radius) {
+    var drawCircle = function drawCircle(point, radius) {
         var d2r = Math.PI / 180; // degrees to radians
         var r2d = 180 / Math.PI; // radians to degrees
         var earthsradius = 3963; // 3963 is the radius of the earth in miles
@@ -997,7 +997,7 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
         return extp;
     };
 
-    var drawPlaces = function (map, places) {
+    var drawPlaces = function drawPlaces(map, places) {
         _.each(savedPlaces, function (place) {
             return place.setMap(null);
         });
@@ -1018,8 +1018,8 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
         });
     };
 
-    var drawMonsters = function (map, monsters) {
-        var click = arguments[2] === undefined ? function () {} : arguments[2];
+    var drawMonsters = function drawMonsters(map, monsters) {
+        var click = arguments.length <= 2 || arguments[2] === undefined ? function () {} : arguments[2];
 
         _.each(savedMonsters, function (monster) {
             return monster.setMap(null);
@@ -1039,7 +1039,7 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
                 }
             });
 
-            monsterMarker.addListener("click", function () {
+            monsterMarker.addListener('click', function () {
 
                 var infoWindow = new Google.maps.InfoWindow({
                     content: monster.name
@@ -1054,7 +1054,7 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
         });
     };
 
-    var drawHomepoint = function (map, coords) {
+    var drawHomepoint = function drawHomepoint(map, coords) {
         var homepointCenter = new Google.maps.LatLng(coords.lat, coords.lon);
 
         homepoint = new Google.maps.Marker({
@@ -1086,7 +1086,7 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
         miasma; // no unused vars
     };
 
-    var drawMe = function (map, coords) {
+    var drawMe = function drawMe(map, coords) {
         curPos = new Google.maps.Marker({
             position: new Google.maps.LatLng(coords.latitude, coords.longitude),
             map: map,
@@ -1109,17 +1109,17 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
             map: map
         });
 
-        affectRadius.bindTo("center", curPos, "position");
+        affectRadius.bindTo('center', curPos, 'position');
     };
 
-    var addMapEvents = function (map) {
-        var dragCallback = arguments[1] === undefined ? function () {} : arguments[1];
+    var addMapEvents = function addMapEvents(map) {
+        var dragCallback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
 
         var lastValidCenter = null;
 
-        Google.maps.event.addListener(map, "drag", dragCallback);
+        Google.maps.event.addListener(map, 'drag', dragCallback);
 
-        Google.maps.event.addListener(map, "center_changed", function () {
+        Google.maps.event.addListener(map, 'center_changed', function () {
             if (bounds.contains(map.getCenter())) {
                 lastValidCenter = map.getCenter();
                 return;
@@ -1129,7 +1129,7 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
         });
     };
 
-    var setCurrentPosition = function (pos) {
+    var setCurrentPosition = function setCurrentPosition(pos) {
         return curPos.setPosition(pos);
     };
 
@@ -1143,21 +1143,21 @@ angular.module("retro").service("MapDrawing", ["Google", "Settings", "MAP_COLORS
         setCurrentPosition: setCurrentPosition
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("NewHero", function () {
+angular.module('retro').service('NewHero', function () {
     return {
-        profession: "Fighter"
+        profession: 'Fighter'
     };
 });
-"use strict";
+'use strict';
 
-angular.module("retro").service("Settings", function () {});
-"use strict";
+angular.module('retro').service('Settings', function () {});
+'use strict';
 
-angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaToast) {
+angular.module('retro').service('Toaster', ["$cordovaToast", function ($cordovaToast) {
 
-    var show = function (msg) {
+    var show = function show(msg) {
         try {
             $cordovaToast.showLongBottom(msg);
         } catch (e) {
@@ -1165,8 +1165,8 @@ angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaT
         }
     };
 
-    var handleDefault = function () {
-        var callback = arguments[0] === undefined ? function () {} : arguments[0];
+    var handleDefault = function handleDefault() {
+        var callback = arguments.length <= 0 || arguments[0] === undefined ? function () {} : arguments[0];
         return function (err, success) {
             var msgObj = err ? err : success;
             show(msgObj.msg);
@@ -1180,26 +1180,26 @@ angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaT
         handleDefault: handleDefault
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("AuthFlow", ["$q", "AuthData", "Toaster", "$localStorage", "$state", "$stateWrapper", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, LocationWatcher, Config, socket) {
+angular.module('retro').service('AuthFlow', ["$q", "AuthData", "Toaster", "$localStorage", "$state", "$stateWrapper", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, LocationWatcher, Config, socket) {
     var flow = {
-        toPlayer: function () {
-            if (!_.contains(["home", "create"], $state.current.name)) return;
+        toPlayer: function toPlayer() {
+            if (!_.contains(['home', 'create'], $state.current.name)) return;
 
-            $stateWrapper.noGoingBack("player");
+            $stateWrapper.noGoingBack('player');
         },
-        tryAutoLogin: function () {
+        tryAutoLogin: function tryAutoLogin() {
             if (!$localStorage.profile || !$localStorage.profile.user_id) {
                 AuthData.update({ attemptAutoLogin: false });
                 return;
             }
             flow.login(_.clone($localStorage), true);
         },
-        tryAuth: function () {
-            var fail = function (val) {
+        tryAuth: function tryAuth() {
+            var fail = function fail(val) {
                 if (!val) return;
-                $stateWrapper.go("create");
+                $stateWrapper.go('create');
             };
 
             if ($localStorage.profile.user_id) {
@@ -1207,11 +1207,11 @@ angular.module("retro").service("AuthFlow", ["$q", "AuthData", "Toaster", "$loca
 
                 // only fail to the char create screen if there's a server connection
             } else if (AuthData.get().canConnect) {
-                fail();
-            }
+                    fail();
+                }
         },
-        login: function (NewHeroProto) {
-            var swallow = arguments[1] === undefined ? false : arguments[1];
+        login: function login(NewHeroProto) {
+            var swallow = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
             var defer = $q.defer();
 
@@ -1224,14 +1224,14 @@ angular.module("retro").service("AuthFlow", ["$q", "AuthData", "Toaster", "$loca
 
             var currentLocation = LocationWatcher.current();
             if (!currentLocation) {
-                Toaster.show("No current location. Is your GPS on?");
+                Toaster.show('No current location. Is your GPS on?');
                 defer.reject(false);
                 return defer.promise;
             }
 
             NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
 
-            socket.emit("login", NewHero, function (err, success) {
+            socket.emit('login', NewHero, function (err, success) {
                 if (err) {
                     defer.reject(true);
                 } else {
@@ -1255,24 +1255,24 @@ angular.module("retro").service("AuthFlow", ["$q", "AuthData", "Toaster", "$loca
 
     return flow;
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$stateWrapper", "socket", function (Player, Battle, Toaster, $stateWrapper, socket) {
+angular.module('retro').service('BattleFlow', ["Player", "Battle", "Toaster", "$stateWrapper", "socket", function (Player, Battle, Toaster, $stateWrapper, socket) {
 
-    var start = function (monster) {
-        socket.emit("combat:enter", { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
+    var start = function start(monster) {
+        socket.emit('combat:enter', { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
     };
 
-    var confirmAction = function (_ref) {
+    var confirmAction = function confirmAction(_ref) {
         var origin = _ref.origin;
         var id = _ref.id;
         var skill = _ref.skill;
 
-        socket.emit("combat:confirmaction", { skill: skill, target: id, name: origin }, Toaster.handleDefault());
+        socket.emit('combat:confirmaction', { skill: skill, target: id, name: origin }, Toaster.handleDefault());
     };
 
-    var toExplore = function () {
-        $stateWrapper.noGoingBack("explore");
+    var toExplore = function toExplore() {
+        $stateWrapper.noGoingBack('explore');
     };
 
     return {
@@ -1281,52 +1281,52 @@ angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$
         toExplore: toExplore
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("ClassChangeFlow", ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
+angular.module('retro').service('ClassChangeFlow', ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
     return {
-        change: function (newProfession) {
+        change: function change(newProfession) {
 
             var player = Player.get();
 
             var opts = { name: player.name, newProfession: newProfession };
-            socket.emit("player:change:class", opts, Toaster.handleDefault(function () {
-                return $stateWrapper.go("player");
+            socket.emit('player:change:class', opts, Toaster.handleDefault(function () {
+                return $stateWrapper.go('player');
             }));
         }
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("EquipFlow", ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
+angular.module('retro').service('EquipFlow', ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
     return {
-        equip: function (newItem) {
+        equip: function equip(newItem) {
 
             var player = Player.get();
 
             var opts = { name: player.name, itemId: newItem.itemId };
-            socket.emit("player:change:equipment", opts, Toaster.handleDefault(function () {
-                return $stateWrapper.go("player");
+            socket.emit('player:change:equipment', opts, Toaster.handleDefault(function () {
+                return $stateWrapper.go('player');
             }));
         }
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("SkillChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
+angular.module('retro').service('SkillChangeFlow', ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
     return {
-        change: function (skill, slot) {
+        change: function change(skill, slot) {
 
             var player = Player.get();
 
             var opts = { name: player.name, skillName: skill, skillSlot: slot };
-            socket.emit("player:change:skill", opts, Toaster.handleDefault());
+            socket.emit('player:change:skill', opts, Toaster.handleDefault());
         }
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("AuthData", ["$q", function ($q) {
+angular.module('retro').service('AuthData', ["$q", function ($q) {
 
     var defer = $q.defer();
 
@@ -1335,7 +1335,7 @@ angular.module("retro").service("AuthData", ["$q", function ($q) {
         attemptAutoLogin: true
     };
 
-    var update = function (opts) {
+    var update = function update(opts) {
         _.extend(value, opts);
         defer.notify(value);
     };
@@ -1343,29 +1343,29 @@ angular.module("retro").service("AuthData", ["$q", function ($q) {
     return {
         observer: defer.promise,
         update: update,
-        get: function () {
+        get: function get() {
             return value;
         }
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("Battle", ["$q", "$stateWrapper", "Player", function ($q, $stateWrapper, Player) {
+angular.module('retro').service('Battle', ["$q", "$stateWrapper", "Player", function ($q, $stateWrapper, Player) {
 
     var defer = $q.defer();
 
-    var battle = "";
+    var battle = '';
     var socketRef = null;
 
-    var update = function (newBattle) {
+    var update = function update(newBattle) {
 
         if (battle) {
             battle.actionChannel.unsubscribe();
             battle.actionChannel.unwatch();
             battle.resultsChannel.unsubscribe();
             battle.resultsChannel.unwatch();
-            socketRef.unsubscribe("battle:" + battle._id + ":actions");
-            socketRef.unsubscribe("battle:" + battle._id + ":results");
+            socketRef.unsubscribe('battle:' + battle._id + ':actions');
+            socketRef.unsubscribe('battle:' + battle._id + ':results');
 
             if (!newBattle) {
                 battle.actionChannel.destroy();
@@ -1384,110 +1384,110 @@ angular.module("retro").service("Battle", ["$q", "$stateWrapper", "Player", func
             var me = _.find(battle.playerData, { name: myName });
             Player.set(me);
 
-            $stateWrapper.noGoingBack("battle");
-            battle.actionChannel = socketRef.subscribe("battle:" + battle._id + ":actions");
-            battle.resultsChannel = socketRef.subscribe("battle:" + battle._id + ":results");
+            $stateWrapper.noGoingBack('battle');
+            battle.actionChannel = socketRef.subscribe('battle:' + battle._id + ':actions');
+            battle.resultsChannel = socketRef.subscribe('battle:' + battle._id + ':results');
         }
 
         defer.notify(battle);
     };
 
     return {
-        observer: function () {
+        observer: function observer() {
             return defer.promise;
         },
-        apply: function () {
+        apply: function apply() {
             defer.notify(battle);
         },
-        setSocket: function (socket) {
+        setSocket: function setSocket(socket) {
             return socketRef = socket;
         },
         set: update,
-        get: function () {
+        get: function get() {
             return battle;
         }
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("Monsters", ["$q", function ($q) {
+angular.module('retro').service('Monsters', ["$q", function ($q) {
 
     var defer = $q.defer();
 
     var monsters = [];
 
-    var updateMonsters = function (newMonsters) {
+    var updateMonsters = function updateMonsters(newMonsters) {
         monsters = newMonsters;
         defer.notify(monsters);
     };
 
     return {
         observer: defer.promise,
-        apply: function () {
+        apply: function apply() {
             defer.notify(monsters);
         },
         set: updateMonsters,
-        get: function () {
+        get: function get() {
             return monsters;
         }
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("Places", ["$q", function ($q) {
+angular.module('retro').service('Places', ["$q", function ($q) {
 
     var defer = $q.defer();
 
     var places = [];
 
-    var updatePlaces = function (newPlaces) {
+    var updatePlaces = function updatePlaces(newPlaces) {
         places = newPlaces;
         defer.notify(places);
     };
 
     return {
         observer: defer.promise,
-        apply: function () {
+        apply: function apply() {
             defer.notify(places);
         },
         set: updatePlaces,
-        get: function () {
+        get: function get() {
             return places;
         }
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("Player", ["$q", function ($q) {
+angular.module('retro').service('Player', ["$q", function ($q) {
     var defer = $q.defer();
 
     var player = {};
 
-    var updatePlayer = function (newPlayer) {
+    var updatePlayer = function updatePlayer(newPlayer) {
         player = newPlayer;
         defer.notify(player);
     };
 
     return {
         observer: defer.promise,
-        apply: function () {
+        apply: function apply() {
             defer.notify(player);
         },
         set: updatePlayer,
-        get: function () {
+        get: function get() {
             return player;
         }
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("Skills", ["$q", function ($q) {
+angular.module('retro').service('Skills', ["$q", function ($q) {
 
     var defer = $q.defer();
 
     var skills = [];
 
-    var getNewSkills = function (newSkills) {
+    var getNewSkills = function getNewSkills(newSkills) {
         skills = newSkills;
         defer.notify(skills);
     };
@@ -1495,26 +1495,26 @@ angular.module("retro").service("Skills", ["$q", function ($q) {
     return {
         observer: defer.promise,
         set: getNewSkills,
-        get: function () {
+        get: function get() {
             return skills;
         }
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("Dice", ["$window", function ($window) {
+angular.module('retro').service('Dice', ["$window", function ($window) {
     return $window.dice;
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("Google", function () {
+angular.module('retro').service('Google', function () {
     return window.google;
 });
-"use strict";
+'use strict';
 
-angular.module("retro").service("socketCluster", ["$window", function ($window) {
+angular.module('retro').service('socketCluster', ["$window", function ($window) {
     return $window.socketCluster;
-}]).service("socket", ["AuthData", "$stateWrapper", "Config", "Toaster", "socketCluster", "socketManagement", function (AuthData, $stateWrapper, Config, Toaster, socketCluster, socketManagement) {
+}]).service('socket', ["AuthData", "$stateWrapper", "Config", "Toaster", "socketCluster", "socketManagement", function (AuthData, $stateWrapper, Config, Toaster, socketCluster, socketManagement) {
     AuthData.update({ canConnect: true });
 
     var socket = socketCluster.connect({
@@ -1524,10 +1524,10 @@ angular.module("retro").service("socketCluster", ["$window", function ($window) 
     });
 
     var codes = {
-        1006: "Unable to connect to game server."
+        1006: 'Unable to connect to game server.'
     };
 
-    socket.on("error", function (e) {
+    socket.on('error', function (e) {
         if (!codes[e.code]) return;
         if (e.code === 1006) {
             AuthData.update({ canConnect: false, attemptAutoLogin: false });
@@ -1535,45 +1535,45 @@ angular.module("retro").service("socketCluster", ["$window", function ($window) 
         Toaster.show(codes[e.code]);
     });
 
-    socket.on("connect", function () {
+    socket.on('connect', function () {
         AuthData.update({ canConnect: true, attemptAutoLogin: true });
     });
 
-    socket.on("disconnect", function () {
-        $stateWrapper.noGoingBack("home");
+    socket.on('disconnect', function () {
+        $stateWrapper.noGoingBack('home');
     });
 
     socketManagement.setUpEvents(socket);
 
     return socket;
-}]).service("socketManagement", ["Player", "Skills", "Places", "Monsters", "Battle", function (Player, Skills, Places, Monsters, Battle) {
+}]).service('socketManagement', ["Player", "Skills", "Places", "Monsters", "Battle", function (Player, Skills, Places, Monsters, Battle) {
     return {
-        setUpEvents: function (socket) {
-            socket.on("update:player", Player.set);
-            socket.on("update:skills", Skills.set);
-            socket.on("update:places", Places.set);
-            socket.on("update:monsters", Monsters.set);
-            socket.on("combat:entered", Battle.set);
+        setUpEvents: function setUpEvents(socket) {
+            socket.on('update:player', Player.set);
+            socket.on('update:skills', Skills.set);
+            socket.on('update:places', Places.set);
+            socket.on('update:monsters', Monsters.set);
+            socket.on('combat:entered', Battle.set);
 
             Battle.setSocket(socket);
         }
     };
 }]);
-"use strict";
+'use strict';
 
-angular.module("retro").service("$stateWrapper", ["$state", "$ionicHistory", function ($state, $ionicHistory) {
+angular.module('retro').service('$stateWrapper', ["$state", "$ionicHistory", function ($state, $ionicHistory) {
     return {
         go: $state.go,
-        noGoingBackAndNoCache: function (state) {
+        noGoingBackAndNoCache: function noGoingBackAndNoCache(state) {
             $ionicHistory.nextViewOptions({
                 disableBack: true
             });
             $state.go(state, { timestamp: Date.now() });
         },
-        goBreakCache: function (state) {
+        goBreakCache: function goBreakCache(state) {
             $state.go(state, { timestamp: Date.now() });
         },
-        noGoingBack: function (state) {
+        noGoingBack: function noGoingBack(state) {
             $ionicHistory.nextViewOptions({
                 disableBack: true
             });
