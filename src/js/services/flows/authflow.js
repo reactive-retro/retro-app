@@ -14,7 +14,6 @@ angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorag
         },
         tryAuth: () => {
             const fail = (val) => {
-                // TODO Fail to login but have a token, unset attemptautologin - also, maybe send back a charDoesNotExist bool from the server
                 if(!val) return;
                 $stateWrapper.go('create');
             };

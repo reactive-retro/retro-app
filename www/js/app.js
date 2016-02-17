@@ -1182,6 +1182,150 @@ angular.module("retro").service("Toaster", ["$cordovaToast", function ($cordovaT
 }]);
 "use strict";
 
+angular.module("retro").service("AuthFlow", ["$q", "AuthData", "Toaster", "$localStorage", "$state", "$stateWrapper", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, LocationWatcher, Config, socket) {
+    var flow = {
+        toPlayer: function () {
+            if (!_.contains(["home", "create"], $state.current.name)) return;
+
+            $stateWrapper.noGoingBack("player");
+        },
+        tryAutoLogin: function () {
+            if (!$localStorage.profile || !$localStorage.profile.user_id) {
+                AuthData.update({ attemptAutoLogin: false });
+                return;
+            }
+            flow.login(_.clone($localStorage), true);
+        },
+        tryAuth: function () {
+            var fail = function (val) {
+                if (!val) return;
+                $stateWrapper.go("create");
+            };
+
+            if ($localStorage.profile.user_id) {
+                flow.login(_.clone($localStorage), true).then(null, fail);
+
+                // only fail to the char create screen if there's a server connection
+            } else if (AuthData.get().canConnect) {
+                fail();
+            }
+        },
+        login: function (NewHeroProto) {
+            var swallow = arguments[1] === undefined ? false : arguments[1];
+
+            var defer = $q.defer();
+
+            var NewHero = {
+                name: NewHeroProto.name,
+                profession: NewHeroProto.profession,
+                userId: NewHeroProto.profile.user_id,
+                token: NewHeroProto.token
+            };
+
+            var currentLocation = LocationWatcher.current();
+            if (!currentLocation) {
+                Toaster.show("No current location. Is your GPS on?");
+                defer.reject(false);
+                return defer.promise;
+            }
+
+            NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
+
+            socket.emit("login", NewHero, function (err, success) {
+                if (err) {
+                    defer.reject(true);
+                } else {
+                    defer.resolve();
+                    _.extend(Settings, success.settings);
+                    flow.toPlayer();
+                    flow.isLoggedIn = true;
+                    $localStorage.env = Config._cfg;
+                }
+
+                if (!swallow) {
+                    var msgObj = err ? err : success;
+                    Toaster.show(msgObj.msg);
+                }
+            });
+
+            Settings.isReady = defer.promise;
+            return Settings.isReady;
+        }
+    };
+
+    return flow;
+}]);
+"use strict";
+
+angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$stateWrapper", "socket", function (Player, Battle, Toaster, $stateWrapper, socket) {
+
+    var start = function (monster) {
+        socket.emit("combat:enter", { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
+    };
+
+    var confirmAction = function (_ref) {
+        var origin = _ref.origin;
+        var id = _ref.id;
+        var skill = _ref.skill;
+
+        socket.emit("combat:confirmaction", { skill: skill, target: id, name: origin }, Toaster.handleDefault());
+    };
+
+    var toExplore = function () {
+        $stateWrapper.noGoingBack("explore");
+    };
+
+    return {
+        start: start,
+        confirmAction: confirmAction,
+        toExplore: toExplore
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("ClassChangeFlow", ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
+    return {
+        change: function (newProfession) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, newProfession: newProfession };
+            socket.emit("player:change:class", opts, Toaster.handleDefault(function () {
+                return $stateWrapper.go("player");
+            }));
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("EquipFlow", ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
+    return {
+        equip: function (newItem) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, itemId: newItem.itemId };
+            socket.emit("player:change:equipment", opts, Toaster.handleDefault(function () {
+                return $stateWrapper.go("player");
+            }));
+        }
+    };
+}]);
+"use strict";
+
+angular.module("retro").service("SkillChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
+    return {
+        change: function (skill, slot) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, skillName: skill, skillSlot: slot };
+            socket.emit("player:change:skill", opts, Toaster.handleDefault());
+        }
+    };
+}]);
+"use strict";
+
 angular.module("retro").service("AuthData", ["$q", function ($q) {
 
     var defer = $q.defer();
@@ -1353,151 +1497,6 @@ angular.module("retro").service("Skills", ["$q", function ($q) {
         set: getNewSkills,
         get: function () {
             return skills;
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("AuthFlow", ["$q", "AuthData", "Toaster", "$localStorage", "$state", "$stateWrapper", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, LocationWatcher, Config, socket) {
-    var flow = {
-        toPlayer: function () {
-            if (!_.contains(["home", "create"], $state.current.name)) return;
-
-            $stateWrapper.noGoingBack("player");
-        },
-        tryAutoLogin: function () {
-            if (!$localStorage.profile || !$localStorage.profile.user_id) {
-                AuthData.update({ attemptAutoLogin: false });
-                return;
-            }
-            flow.login(_.clone($localStorage), true);
-        },
-        tryAuth: function () {
-            var fail = function (val) {
-                // TODO Fail to login but have a token, unset attemptautologin - also, maybe send back a charDoesNotExist bool from the server
-                if (!val) return;
-                $stateWrapper.go("create");
-            };
-
-            if ($localStorage.profile.user_id) {
-                flow.login(_.clone($localStorage), true).then(null, fail);
-
-                // only fail to the char create screen if there's a server connection
-            } else if (AuthData.get().canConnect) {
-                fail();
-            }
-        },
-        login: function (NewHeroProto) {
-            var swallow = arguments[1] === undefined ? false : arguments[1];
-
-            var defer = $q.defer();
-
-            var NewHero = {
-                name: NewHeroProto.name,
-                profession: NewHeroProto.profession,
-                userId: NewHeroProto.profile.user_id,
-                token: NewHeroProto.token
-            };
-
-            var currentLocation = LocationWatcher.current();
-            if (!currentLocation) {
-                Toaster.show("No current location. Is your GPS on?");
-                defer.reject(false);
-                return defer.promise;
-            }
-
-            NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
-
-            socket.emit("login", NewHero, function (err, success) {
-                if (err) {
-                    defer.reject(true);
-                } else {
-                    defer.resolve();
-                    _.extend(Settings, success.settings);
-                    flow.toPlayer();
-                    flow.isLoggedIn = true;
-                    $localStorage.env = Config._cfg;
-                }
-
-                if (!swallow) {
-                    var msgObj = err ? err : success;
-                    Toaster.show(msgObj.msg);
-                }
-            });
-
-            Settings.isReady = defer.promise;
-            return Settings.isReady;
-        }
-    };
-
-    return flow;
-}]);
-"use strict";
-
-angular.module("retro").service("BattleFlow", ["Player", "Battle", "Toaster", "$stateWrapper", "socket", function (Player, Battle, Toaster, $stateWrapper, socket) {
-
-    var start = function (monster) {
-        socket.emit("combat:enter", { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
-    };
-
-    var confirmAction = function (_ref) {
-        var origin = _ref.origin;
-        var id = _ref.id;
-        var skill = _ref.skill;
-
-        socket.emit("combat:confirmaction", { skill: skill, target: id, name: origin }, Toaster.handleDefault());
-    };
-
-    var toExplore = function () {
-        $stateWrapper.noGoingBack("explore");
-    };
-
-    return {
-        start: start,
-        confirmAction: confirmAction,
-        toExplore: toExplore
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("ClassChangeFlow", ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
-    return {
-        change: function (newProfession) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, newProfession: newProfession };
-            socket.emit("player:change:class", opts, Toaster.handleDefault(function () {
-                return $stateWrapper.go("player");
-            }));
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("EquipFlow", ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
-    return {
-        equip: function (newItem) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, itemId: newItem.itemId };
-            socket.emit("player:change:equipment", opts, Toaster.handleDefault(function () {
-                return $stateWrapper.go("player");
-            }));
-        }
-    };
-}]);
-"use strict";
-
-angular.module("retro").service("SkillChangeFlow", ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
-    return {
-        change: function (skill, slot) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, skillName: skill, skillSlot: slot };
-            socket.emit("player:change:skill", opts, Toaster.handleDefault());
         }
     };
 }]);
