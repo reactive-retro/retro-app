@@ -17,126 +17,6 @@ angular.module('retro').constant('Config', {
 });
 'use strict';
 
-angular.module('retro').constant('CLASSES', {
-    Cleric: 'Clerics specialize in healing their companions.',
-    Fighter: 'Fighters specialize in making their enemies hurt via physical means.',
-    Mage: 'Mages specialize in flinging magic at their enemies -- sometimes multiple at once!',
-    Thief: 'Thieves specialize in quick attacks and physical debuffing.'
-});
-'use strict';
-
-angular.module('retro').constant('OAUTH_KEYS', {
-    google: '195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com',
-    reddit: 'CKzP2LKr74VwYw',
-    facebook: '102489756752863'
-});
-'use strict';
-
-angular.module('retro').constant('MAP_COLORS', {
-    monster: {
-        outline: '#ff0000',
-        fill: '#aa0000'
-    },
-    poi: {
-        outline: '#ffff00',
-        fill: '#aaaa00'
-    },
-    homepoint: {
-        outline: '#00ff00',
-        fill: '#00aa00'
-    },
-    miasma: {
-        outline: '#000000',
-        fill: '#000000'
-    },
-    hero: {
-        outline: '#0000ff',
-        fill: '#0000aa'
-    },
-    heroRadius: {
-        outline: '#ff00ff',
-        fill: '#ff00ff'
-    }
-});
-'use strict';
-
-angular.module('retro').constant('MAP_STYLE', [{
-    featureType: 'water',
-    elementType: 'geometry',
-    stylers: [{ visibility: 'on' }, { color: '#aee2e0' }]
-}, {
-    featureType: 'landscape',
-    elementType: 'geometry.fill',
-    stylers: [{ color: '#abce83' }]
-}, {
-    featureType: 'poi',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'poi.park',
-    elementType: 'geometry',
-    stylers: [{ visibility: 'simplified' }, { color: '#8dab68' }]
-}, {
-    featureType: 'road',
-    elementType: 'geometry.fill',
-    stylers: [{ visibility: 'simplified' }]
-}, {
-    featureType: 'road',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#5B5B3F' }]
-}, {
-    featureType: 'road',
-    elementType: 'labels.text.stroke',
-    stylers: [{ color: '#ABCE83' }]
-}, {
-    featureType: 'road',
-    elementType: 'labels.icon',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'road.local',
-    elementType: 'geometry',
-    stylers: [{ color: '#A4C67D' }]
-}, {
-    featureType: 'road.arterial',
-    elementType: 'geometry',
-    stylers: [{ color: '#9BBF72' }]
-}, {
-    featureType: 'road.highway',
-    elementType: 'geometry',
-    stylers: [{ color: '#EBF4A4' }]
-}, {
-    featureType: 'transit',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'administrative',
-    elementType: 'geometry.stroke',
-    stylers: [{ visibility: 'on' }, { color: '#87ae79' }]
-}, {
-    featureType: 'administrative',
-    elementType: 'geometry.fill',
-    stylers: [{ color: '#7f2200' }, { visibility: 'off' }]
-}, {
-    featureType: 'administrative',
-    elementType: 'labels.text.stroke',
-    stylers: [{ color: '#ffffff' }, { visibility: 'on' }, { weight: 4.1 }]
-}, {
-    featureType: 'administrative',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#495421' }]
-}, {
-    featureType: 'administrative.neighborhood',
-    elementType: 'labels',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'administrative.land_parcel',
-    elementType: 'labels',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'administrative.locality',
-    elementType: 'labels',
-    stylers: [{ visibility: 'off' }]
-}]);
-'use strict';
-
 angular.module('retro').config(["authProvider", function (authProvider) {
     authProvider.init({
         domain: 'reactive-retro.auth0.com',
@@ -340,6 +220,126 @@ angular.module('retro').config(["$ionicConfigProvider", "$urlRouterProvider", "$
         cache: false,
         data: { requiresLogin: true }
     });
+}]);
+'use strict';
+
+angular.module('retro').constant('CLASSES', {
+    Cleric: 'Clerics specialize in healing their companions.',
+    Fighter: 'Fighters specialize in making their enemies hurt via physical means.',
+    Mage: 'Mages specialize in flinging magic at their enemies -- sometimes multiple at once!',
+    Thief: 'Thieves specialize in quick attacks and physical debuffing.'
+});
+'use strict';
+
+angular.module('retro').constant('OAUTH_KEYS', {
+    google: '195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com',
+    reddit: 'CKzP2LKr74VwYw',
+    facebook: '102489756752863'
+});
+'use strict';
+
+angular.module('retro').constant('MAP_COLORS', {
+    monster: {
+        outline: '#ff0000',
+        fill: '#aa0000'
+    },
+    poi: {
+        outline: '#ffff00',
+        fill: '#aaaa00'
+    },
+    homepoint: {
+        outline: '#00ff00',
+        fill: '#00aa00'
+    },
+    miasma: {
+        outline: '#000000',
+        fill: '#000000'
+    },
+    hero: {
+        outline: '#0000ff',
+        fill: '#0000aa'
+    },
+    heroRadius: {
+        outline: '#ff00ff',
+        fill: '#ff00ff'
+    }
+});
+'use strict';
+
+angular.module('retro').constant('MAP_STYLE', [{
+    featureType: 'water',
+    elementType: 'geometry',
+    stylers: [{ visibility: 'on' }, { color: '#aee2e0' }]
+}, {
+    featureType: 'landscape',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#abce83' }]
+}, {
+    featureType: 'poi',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'poi.park',
+    elementType: 'geometry',
+    stylers: [{ visibility: 'simplified' }, { color: '#8dab68' }]
+}, {
+    featureType: 'road',
+    elementType: 'geometry.fill',
+    stylers: [{ visibility: 'simplified' }]
+}, {
+    featureType: 'road',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#5B5B3F' }]
+}, {
+    featureType: 'road',
+    elementType: 'labels.text.stroke',
+    stylers: [{ color: '#ABCE83' }]
+}, {
+    featureType: 'road',
+    elementType: 'labels.icon',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'road.local',
+    elementType: 'geometry',
+    stylers: [{ color: '#A4C67D' }]
+}, {
+    featureType: 'road.arterial',
+    elementType: 'geometry',
+    stylers: [{ color: '#9BBF72' }]
+}, {
+    featureType: 'road.highway',
+    elementType: 'geometry',
+    stylers: [{ color: '#EBF4A4' }]
+}, {
+    featureType: 'transit',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'administrative',
+    elementType: 'geometry.stroke',
+    stylers: [{ visibility: 'on' }, { color: '#87ae79' }]
+}, {
+    featureType: 'administrative',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#7f2200' }, { visibility: 'off' }]
+}, {
+    featureType: 'administrative',
+    elementType: 'labels.text.stroke',
+    stylers: [{ color: '#ffffff' }, { visibility: 'on' }, { weight: 4.1 }]
+}, {
+    featureType: 'administrative',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#495421' }]
+}, {
+    featureType: 'administrative.neighborhood',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'administrative.land_parcel',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'administrative.locality',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
 }]);
 'use strict';
 
@@ -1182,150 +1182,6 @@ angular.module('retro').service('Toaster', ["$cordovaToast", function ($cordovaT
 }]);
 'use strict';
 
-angular.module('retro').service('AuthFlow', ["$q", "AuthData", "Toaster", "$localStorage", "$state", "$stateWrapper", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, LocationWatcher, Config, socket) {
-    var flow = {
-        toPlayer: function toPlayer() {
-            if (!_.contains(['home', 'create'], $state.current.name)) return;
-
-            $stateWrapper.noGoingBack('player');
-        },
-        tryAutoLogin: function tryAutoLogin() {
-            if (!$localStorage.profile || !$localStorage.profile.user_id) {
-                AuthData.update({ attemptAutoLogin: false });
-                return;
-            }
-            flow.login(_.clone($localStorage), true);
-        },
-        tryAuth: function tryAuth() {
-            var fail = function fail(val) {
-                if (!val) return;
-                $stateWrapper.go('create');
-            };
-
-            if ($localStorage.profile.user_id) {
-                flow.login(_.clone($localStorage), true).then(null, fail);
-
-                // only fail to the char create screen if there's a server connection
-            } else if (AuthData.get().canConnect) {
-                    fail();
-                }
-        },
-        login: function login(NewHeroProto) {
-            var swallow = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-            var defer = $q.defer();
-
-            var NewHero = {
-                name: NewHeroProto.name,
-                profession: NewHeroProto.profession,
-                userId: NewHeroProto.profile.user_id,
-                token: NewHeroProto.token
-            };
-
-            var currentLocation = LocationWatcher.current();
-            if (!currentLocation) {
-                Toaster.show('No current location. Is your GPS on?');
-                defer.reject(false);
-                return defer.promise;
-            }
-
-            NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
-
-            socket.emit('login', NewHero, function (err, success) {
-                if (err) {
-                    defer.reject(true);
-                } else {
-                    defer.resolve();
-                    _.extend(Settings, success.settings);
-                    flow.toPlayer();
-                    flow.isLoggedIn = true;
-                    $localStorage.env = Config._cfg;
-                }
-
-                if (!swallow) {
-                    var msgObj = err ? err : success;
-                    Toaster.show(msgObj.msg);
-                }
-            });
-
-            Settings.isReady = defer.promise;
-            return Settings.isReady;
-        }
-    };
-
-    return flow;
-}]);
-'use strict';
-
-angular.module('retro').service('BattleFlow', ["Player", "Battle", "Toaster", "$stateWrapper", "socket", function (Player, Battle, Toaster, $stateWrapper, socket) {
-
-    var start = function start(monster) {
-        socket.emit('combat:enter', { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
-    };
-
-    var confirmAction = function confirmAction(_ref) {
-        var origin = _ref.origin;
-        var id = _ref.id;
-        var skill = _ref.skill;
-
-        socket.emit('combat:confirmaction', { skill: skill, target: id, name: origin }, Toaster.handleDefault());
-    };
-
-    var toExplore = function toExplore() {
-        $stateWrapper.noGoingBack('explore');
-    };
-
-    return {
-        start: start,
-        confirmAction: confirmAction,
-        toExplore: toExplore
-    };
-}]);
-'use strict';
-
-angular.module('retro').service('ClassChangeFlow', ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
-    return {
-        change: function change(newProfession) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, newProfession: newProfession };
-            socket.emit('player:change:class', opts, Toaster.handleDefault(function () {
-                return $stateWrapper.go('player');
-            }));
-        }
-    };
-}]);
-'use strict';
-
-angular.module('retro').service('EquipFlow', ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
-    return {
-        equip: function equip(newItem) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, itemId: newItem.itemId };
-            socket.emit('player:change:equipment', opts, Toaster.handleDefault(function () {
-                return $stateWrapper.go('player');
-            }));
-        }
-    };
-}]);
-'use strict';
-
-angular.module('retro').service('SkillChangeFlow', ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
-    return {
-        change: function change(skill, slot) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, skillName: skill, skillSlot: slot };
-            socket.emit('player:change:skill', opts, Toaster.handleDefault());
-        }
-    };
-}]);
-'use strict';
-
 angular.module('retro').service('AuthData', ["$q", function ($q) {
 
     var defer = $q.defer();
@@ -1497,6 +1353,149 @@ angular.module('retro').service('Skills', ["$q", function ($q) {
         set: getNewSkills,
         get: function get() {
             return skills;
+        }
+    };
+}]);
+'use strict';
+
+angular.module('retro').service('AuthFlow', ["$q", "AuthData", "Toaster", "$localStorage", "$state", "$stateWrapper", "Player", "Settings", "LocationWatcher", "Config", "socket", function ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, LocationWatcher, Config, socket) {
+    var flow = {
+        toPlayer: function toPlayer() {
+            if (!_.contains(['home', 'create'], $state.current.name)) return;
+
+            $stateWrapper.noGoingBack('player');
+        },
+        tryAutoLogin: function tryAutoLogin() {
+            if (!$localStorage.profile || !$localStorage.profile.user_id) {
+                AuthData.update({ attemptAutoLogin: false });
+                return;
+            }
+            flow.login(_.clone($localStorage), true);
+        },
+        tryAuth: function tryAuth() {
+            var fail = function fail(val) {
+                if (!val) return;
+                $stateWrapper.go('create');
+            };
+
+            if ($localStorage.profile.user_id) {
+                flow.login(_.clone($localStorage), true).then(null, fail);
+
+                // only fail to the char create screen if there's a server connection
+            } else if (AuthData.get().canConnect) {
+                    fail();
+                }
+        },
+        login: function login(NewHeroProto) {
+            var swallow = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+            var defer = $q.defer();
+
+            var NewHero = {
+                name: NewHeroProto.name,
+                profession: NewHeroProto.profession,
+                userId: NewHeroProto.profile.user_id,
+                token: NewHeroProto.token
+            };
+
+            var currentLocation = LocationWatcher.current();
+            if (!currentLocation) {
+                defer.reject(false);
+                return defer.promise;
+            }
+
+            NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
+
+            socket.emit('login', NewHero, function (err, success) {
+                if (err) {
+                    defer.reject(true);
+                } else {
+                    defer.resolve();
+                    _.extend(Settings, success.settings);
+                    flow.toPlayer();
+                    flow.isLoggedIn = true;
+                    $localStorage.env = Config._cfg;
+                }
+
+                if (!swallow) {
+                    var msgObj = err ? err : success;
+                    Toaster.show(msgObj.msg);
+                }
+            });
+
+            Settings.isReady = defer.promise;
+            return Settings.isReady;
+        }
+    };
+
+    return flow;
+}]);
+'use strict';
+
+angular.module('retro').service('BattleFlow', ["Player", "Battle", "Toaster", "$stateWrapper", "socket", function (Player, Battle, Toaster, $stateWrapper, socket) {
+
+    var start = function start(monster) {
+        socket.emit('combat:enter', { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
+    };
+
+    var confirmAction = function confirmAction(_ref) {
+        var origin = _ref.origin;
+        var id = _ref.id;
+        var skill = _ref.skill;
+
+        socket.emit('combat:confirmaction', { skill: skill, target: id, name: origin }, Toaster.handleDefault());
+    };
+
+    var toExplore = function toExplore() {
+        $stateWrapper.noGoingBack('explore');
+    };
+
+    return {
+        start: start,
+        confirmAction: confirmAction,
+        toExplore: toExplore
+    };
+}]);
+'use strict';
+
+angular.module('retro').service('ClassChangeFlow', ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
+    return {
+        change: function change(newProfession) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, newProfession: newProfession };
+            socket.emit('player:change:class', opts, Toaster.handleDefault(function () {
+                return $stateWrapper.go('player');
+            }));
+        }
+    };
+}]);
+'use strict';
+
+angular.module('retro').service('EquipFlow', ["Toaster", "$stateWrapper", "Player", "socket", function (Toaster, $stateWrapper, Player, socket) {
+    return {
+        equip: function equip(newItem) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, itemId: newItem.itemId };
+            socket.emit('player:change:equipment', opts, Toaster.handleDefault(function () {
+                return $stateWrapper.go('player');
+            }));
+        }
+    };
+}]);
+'use strict';
+
+angular.module('retro').service('SkillChangeFlow', ["Toaster", "$state", "Player", "socket", function (Toaster, $state, Player, socket) {
+    return {
+        change: function change(skill, slot) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, skillName: skill, skillSlot: slot };
+            socket.emit('player:change:skill', opts, Toaster.handleDefault());
         }
     };
 }]);

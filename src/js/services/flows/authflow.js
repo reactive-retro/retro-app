@@ -38,7 +38,6 @@ angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorag
 
             const currentLocation = LocationWatcher.current();
             if(!currentLocation) {
-                Toaster.show('No current location. Is your GPS on?');
                 defer.reject(false);
                 return defer.promise;
             }
