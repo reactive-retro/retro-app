@@ -672,12 +672,12 @@ angular.module('retro').controller('MenuController', ["$scope", "$state", "$stat
 
 angular.module('retro').controller('PlayerController', ["$scope", "$stateWrapper", "Player", function ($scope, $stateWrapper, Player) {
     $scope.player = Player.get();
+    $scope.isEmpty = _.isEmpty;
+
+    $scope.go = $stateWrapper.goBreakCache;
     Player.observer.then(null, null, function (player) {
         return $scope.player = player;
     });
-    $scope.isEmpty = _.isEmpty;
-
-    $scope.go = $stateWrapper.go;
 }]);
 'use strict';
 
