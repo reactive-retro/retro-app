@@ -395,31 +395,10 @@ angular.module('retro').controller('BattleController', ["$scope", "$ionicModal",
         }).value();
     };
 
-    $scope.getMultiplier = function (skill) {
-        return _.filter($scope.me.skills, function (check) {
-            return check === skill;
-        }).length;
-    };
-
-    $scope.skillCooldown = function (skill) {
-        return $scope.getMultiplier(skill ? skill.spellName : '') * (skill ? skill.spellCooldown : 0);
-    };
-    $scope.canCastSkillCD = function (skill) {
-        var skillName = skill ? skill.spellName : '';
-        return !$scope.me.cooldowns[skillName] || $scope.me.cooldowns[skillName] <= 0;
-    };
-
-    $scope.skillCost = function (skill) {
-        return $scope.getMultiplier(skill ? skill.spellName : '') * (skill ? skill.spellCost : 0);
-    };
-    $scope.canCastSkillMP = function (skill) {
-        return $scope.skillCost(skill) <= $scope.me.stats.mp.__current;
-    };
-
     $scope.openSkillInfo = function (skill) {
         $scope.activeSkill = _.find(Skills.get(), { spellName: skill });
 
-        $scope.multiplier = $scope.getMultiplier($scope.activeSkill.spellName);
+        $scope.multiplier = BattleFlow.getMultiplier($scope.activeSkill.spellName, $scope.me);
         if (skill === 'Attack') {
             $scope.multiplier += 1;
         }
@@ -1450,10 +1429,36 @@ angular.module('retro').service('BattleFlow', ["Player", "Battle", "Toaster", "$
         $stateWrapper.noGoingBack('explore');
     };
 
+    var getMultiplier = function getMultiplier(skill, me) {
+        return _.filter(me.skills, function (check) {
+            return check === skill;
+        }).length;
+    };
+
+    var skillCooldown = function skillCooldown(skill, me) {
+        return getMultiplier(skill ? skill.spellName : '', me) * (skill ? skill.spellCooldown : 0);
+    };
+    var canCastSkillCD = function canCastSkillCD(skill, me) {
+        var skillName = skill ? skill.spellName : '';
+        return !me.cooldowns[skillName] || me.cooldowns[skillName] <= 0;
+    };
+
+    var skillCost = function skillCost(skill, me) {
+        return getMultiplier(skill ? skill.spellName : '', me) * (skill ? skill.spellCost : 0);
+    };
+    var canCastSkillMP = function canCastSkillMP(skill, me) {
+        return skillCost(skill, me) <= me.stats.mp.__current;
+    };
+
     return {
         start: start,
         confirmAction: confirmAction,
-        toExplore: toExplore
+        toExplore: toExplore,
+        getMultiplier: getMultiplier,
+        skillCooldown: skillCooldown,
+        canCastSkillCD: canCastSkillCD,
+        skillCost: skillCost,
+        canCastSkillMP: canCastSkillMP
     };
 }]);
 'use strict';

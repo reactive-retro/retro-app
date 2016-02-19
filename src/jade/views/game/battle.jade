@@ -50,9 +50,9 @@ script(type="text/ng-template", id="battle")
                                 )
                                 .row.padding-0.skill-name
                                     .col {{skill.spellName}}
-                                .row.padding-0.skill-disabled(ng-if="!canCastSkillMP(skill) || !canCastSkillCD(skill)")
+                                .row.padding-0.skill-disabled(ng-if="!battleFlow.canCastSkillMP(skill, me) || !battleFlow.canCastSkillCD(skill, me)")
                                     .col.col-center.assertive
-                                        span(ng-if="!canCastSkillMP(skill)")
+                                        span(ng-if="!battleFlow.canCastSkillMP(skill, me)")
                                             i.icon.ion-waterdrop
-                                        span(ng-if="!canCastSkillCD(skill)")
+                                        span(ng-if="!battleFlow.canCastSkillCD(skill, me)")
                                             i.icon.ion-clock

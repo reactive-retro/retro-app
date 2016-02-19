@@ -12,9 +12,26 @@ angular.module('retro').service('BattleFlow', (Player, Battle, Toaster, $stateWr
         $stateWrapper.noGoingBack('explore');
     };
 
+
+    const getMultiplier = (skill, me) => _.filter(me.skills, check => check === skill).length;
+
+    const skillCooldown = (skill, me) => getMultiplier(skill ? skill.spellName : '', me) * (skill ? skill.spellCooldown : 0);
+    const canCastSkillCD = (skill, me) => {
+        const skillName = skill ? skill.spellName : '';
+        return !me.cooldowns[skillName] || me.cooldowns[skillName] <= 0;
+    };
+
+    const skillCost = (skill, me) => getMultiplier(skill ? skill.spellName : '', me) * (skill ? skill.spellCost : 0);
+    const canCastSkillMP = (skill, me) => skillCost(skill, me) <= me.stats.mp.__current;
+
     return {
         start,
         confirmAction,
-        toExplore
+        toExplore,
+        getMultiplier,
+        skillCooldown,
+        canCastSkillCD,
+        skillCost,
+        canCastSkillMP
     };
 });

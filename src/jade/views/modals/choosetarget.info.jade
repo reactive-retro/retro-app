@@ -11,9 +11,9 @@ script(type="text/ng-template", id="choosetarget.info")
                 .col
                     .row
                         .col.text-center
-                            cooldown(turns="skillCooldown(activeSkill)")
+                            cooldown(turns="battleFlow.skillCooldown(activeSkill, me)")
                         .col.text-center
-                            mp-cost(cost="skillCost(activeSkill)")
+                            mp-cost(cost="battleFlow.skillCost(activeSkill, me)")
                         .col.text-center
                             i.icon.ion-android-contact
                             span &nbsp;
@@ -32,17 +32,17 @@ script(type="text/ng-template", id="choosetarget.info")
                         .col.text-center
                             h3.title Choose Target
 
-                    .row.skill-container(ng-if="!canCastSkillMP(activeSkill)")
+                    .row.skill-container(ng-if="!battleFlow.canCastSkillMP(activeSkill, me)")
                         .col.col-flex.col-center
                             .row.row-center.text-center
                                 div You need <mp-cost cost="skillCost(activeSkill) - me.stats.mp.__current"></mp-cost> to cast this spell.
 
-                    .row.skill-container(ng-if="!canCastSkillCD(activeSkill)")
+                    .row.skill-container(ng-if="!battleFlow.canCastSkillCD(activeSkill, me)")
                         .col.col-flex.col-center
                             .row.row-center.text-center
                                 div You to wait <cooldown turns="me.cooldowns[activeSkill.spellName]"></cooldown> to cast this spell.
 
-                    .row.skill-container(ng-if="canCastSkillMP(activeSkill) && canCastSkillCD(activeSkill)")
+                    .row.skill-container(ng-if="battleFlow.canCastSkillMP(activeSkill, me) && battleFlow.canCastSkillCD(activeSkill, me)")
                         .col.col-flex
 
                             .row(ng-if="activeSkill.spellTargets === 'Single Ally'")
