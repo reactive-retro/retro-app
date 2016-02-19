@@ -125,14 +125,5 @@ angular.module('retro').controller('BattleController',
 
         setupBattleData();
         Battle.observer().then(null, null, setupBattleData);
-
-        /*
-        TODO make buffbar
-            - ion-flash - shocked
-            - ion-eye-disabled - blinded
-            - ion-fireball - burned
-            - ion-ios-snowy - frozen
-            - ion-load-b - stunned
-         */
     }
 );
