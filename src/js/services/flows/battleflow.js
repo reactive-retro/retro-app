@@ -1,7 +1,10 @@
-angular.module('retro').service('BattleFlow', (Player, Battle, Toaster, $stateWrapper, socket) => {
+angular.module('retro').service('BattleFlow', (Player, Battle, Toaster, BlockState, $stateWrapper, socket) => {
 
     const start = (monster) => {
-        socket.emit('combat:enter', { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault());
+        BlockState.block('Battle');
+        socket.emit('combat:enter', { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault(() => {
+            BlockState.unblock('Battle');
+        }));
     };
 
     const confirmAction = ({ origin, id, skill }) => {

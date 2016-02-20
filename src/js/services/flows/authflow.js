@@ -1,4 +1,4 @@
-angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, LocationWatcher, Config, socket) => {
+angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, BlockState, LocationWatcher, Config, socket) => {
     const flow = {
         toPlayer: () => {
             if(!_.contains(['home', 'create'], $state.current.name)) return;
@@ -53,6 +53,7 @@ angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorag
                     flow.toPlayer();
                     flow.isLoggedIn = true;
                     $localStorage.env = Config._cfg;
+                    BlockState.unblockAll();
                 }
 
                 if(!swallow) {

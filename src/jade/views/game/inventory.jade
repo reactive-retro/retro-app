@@ -41,7 +41,9 @@ script(type="text/ng-template", id="inventory-item")
         h2
             span {{item.name}}
             span.float-right
-                button.button.button-small(ng-click="EquipFlow.equip(item)")
+                button.button.button-small(
+                    blocked-by="Player",
+                    ng-click="EquipFlow.equip(item)")
                     i.icon.ion-arrow-swap
     div.item.item-body
         div.row

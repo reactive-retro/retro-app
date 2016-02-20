@@ -43,6 +43,7 @@ script(type="text/ng-template", id="changeskill.info")
                                     .row
                                         .col
                                             button.button.button-full.skill-button.button-block(
+                                                blocked-by="Player",
                                                 ng-class="{'button-stable': !player.skills[idx], 'button-balanced': player.skills[idx]}",
                                                 ng-click="setSkillInSlot(activeSkill.spellName, idx)")
                                                 span.skill-text {{player.skills[idx] || 'none'}}
