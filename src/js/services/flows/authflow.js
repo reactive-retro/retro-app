@@ -28,6 +28,10 @@ angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorag
         },
         login: (NewHeroProto, swallow = false) => {
             const defer = $q.defer();
+            if(BlockState.get()['Login'] || flow.isLoggedIn) {
+                defer.reject(false);
+                return defer.promise;
+            }
 
             const NewHero = {
                 name: NewHeroProto.name,
@@ -44,7 +48,9 @@ angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorag
 
             NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
 
+            BlockState.block('Login');
             socket.emit('login', NewHero, (err, success) => {
+                BlockState.unblock('Login');
                 if(err) {
                     defer.reject(true);
                 } else {

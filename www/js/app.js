@@ -3,6 +3,20 @@
 angular.module('retro', ['ionic', 'ngCordova', 'ngStorage', 'auth0', 'angular-jwt']);
 'use strict';
 
+angular.module('retro').constant('Config', {
+    _cfg: 'DEV',
+    DEV: {
+        url: '127.0.0.1',
+        port: 8080
+    },
+    PROD: {
+        protocol: 'https',
+        url: 'reactive-retro.herokuapp.com',
+        port: 80
+    }
+});
+'use strict';
+
 angular.module('retro').config(["authProvider", function (authProvider) {
     authProvider.init({
         domain: 'reactive-retro.auth0.com',
@@ -207,20 +221,6 @@ angular.module('retro').config(["$ionicConfigProvider", "$urlRouterProvider", "$
         data: { requiresLogin: true }
     });
 }]);
-'use strict';
-
-angular.module('retro').constant('Config', {
-    _cfg: 'DEV',
-    DEV: {
-        url: '127.0.0.1',
-        port: 8080
-    },
-    PROD: {
-        protocol: 'https',
-        url: 'reactive-retro.herokuapp.com',
-        port: 80
-    }
-});
 'use strict';
 
 angular.module('retro').constant('CLASSES', {
@@ -1395,6 +1395,10 @@ angular.module('retro').service('AuthFlow', ["$q", "AuthData", "Toaster", "$loca
             var swallow = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
             var defer = $q.defer();
+            if (BlockState.get()['Login'] || flow.isLoggedIn) {
+                defer.reject(false);
+                return defer.promise;
+            }
 
             var NewHero = {
                 name: NewHeroProto.name,
@@ -1411,7 +1415,9 @@ angular.module('retro').service('AuthFlow', ["$q", "AuthData", "Toaster", "$loca
 
             NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
 
+            BlockState.block('Login');
             socket.emit('login', NewHero, function (err, success) {
+                BlockState.unblock('Login');
                 if (err) {
                     defer.reject(true);
                 } else {
