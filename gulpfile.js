@@ -31,7 +31,8 @@ var lib = [
     './www/lib/socketcluster-client/socketcluster.js',
     './www/lib/ng-cordova-oauth/ng-cordova-oauth.js',
     './www/lib/angular-jwt/dist/angular-jwt.js',
-    './www/lib/auth0-lock/build/auth0-lock.js'
+    './www/lib/auth0-lock/build/auth0-lock.js',
+    './www/lib/ionic-platform-web-client/dist/ionic.io.bundle.min.js'
 ];
 
 gulp.task('default', ['sass', 'lib', 'html', 'build:dev', 'ionic:start', 'watch']);

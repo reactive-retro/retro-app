@@ -2,7 +2,8 @@
   "name": "reactive-retro",
   "private": "true",
   "devDependencies": {
-    "ionic": "driftyco/ionic-bower"
+    "ionic": "driftyco/ionic-bower",
+    "ionic-platform-web-client": "~0.2.1"
   },
   "dependencies": {
     "ngCordova": "~0.1.23-alpha",
