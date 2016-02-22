@@ -35,7 +35,7 @@ var lib = [
 ];
 
 gulp.task('default', ['sass', 'lib', 'html', 'build:dev', 'ionic:start', 'watch']);
-gulp.task('test', ['build']);
+gulp.task('test', ['build:dev']);
 
 gulp.task('sass', function(done) {
     gulp.src('./src/scss/ionic.app.scss')
