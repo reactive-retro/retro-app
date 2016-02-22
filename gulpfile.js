@@ -10,6 +10,7 @@ var rename = require('gulp-rename');
 var jade = require('gulp-jade');
 var eslint = require('gulp-eslint');
 var ngAnnotate = require('gulp-ng-annotate');
+var preprocess = require('gulp-preprocess');
 
 var sh = require('shelljs');
 
@@ -33,7 +34,7 @@ var lib = [
     './www/lib/auth0-lock/build/auth0-lock.js'
 ];
 
-gulp.task('default', ['sass', 'lib', 'html', 'build', 'ionic:start', 'watch']);
+gulp.task('default', ['sass', 'lib', 'html', 'build:dev', 'ionic:start', 'watch']);
 gulp.task('test', ['build']);
 
 gulp.task('sass', function(done) {
@@ -51,7 +52,7 @@ gulp.task('sass', function(done) {
 gulp.task('watch', function() {
     gulp.watch(paths.sass, ['sass']);
     gulp.watch(paths.jade, ['html']);
-    gulp.watch(paths.js, ['build']);
+    gulp.watch(paths.js, ['build:dev']);
 });
 
 gulp.task('lib', function() {
@@ -74,15 +75,34 @@ gulp.task('eslint', function() {
         .pipe(eslint.failAfterError());
 });
 
-gulp.task('build', ['eslint'], function() {
-    gulp.src(paths.jsB)
+gulp.task('build:dev', ['eslint'], function() {
+    return gulp.src(paths.jsB)
         .pipe(babel({
             presets: ['es2015']
         }))
+        .pipe(preprocess({ context: { ENV: 'DEV' }}))
         .pipe(ngAnnotate())
         .pipe(concat('app.js'))
         .pipe(gulp.dest('./www/js'));
 });
+
+gulp.task('build:production:compile', function() {
+    return gulp.src(paths.jsB)
+        .pipe(babel({
+            presets: ['es2015']
+        }))
+        .pipe(preprocess({ context: { ENV: 'PROD' }}))
+        .pipe(ngAnnotate())
+        .pipe(concat('app.js'))
+        .pipe(gulp.dest('./www/js'));
+});
+
+gulp.task('build:production:apk', ['build:production:compile'], function(done) {
+    sh.exec('sh publish.sh');
+    done();
+});
+
+gulp.task('build:production', ['build:production:compile', 'build:production:apk']);
 
 gulp.task('install', ['git-check'], function() {
     return bower.commands.install()

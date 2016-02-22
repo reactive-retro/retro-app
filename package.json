@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "reactive-retro: An Ionic project",
   "dependencies": {
-    "cordova-plugin-whitelist": "^1.2.0"
+    "cordova-plugin-whitelist": "^1.2.0",
+    "gulp-preprocess": "^2.0.0"
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.5.0",
