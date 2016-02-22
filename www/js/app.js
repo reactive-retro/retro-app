@@ -3,6 +3,20 @@
 angular.module('retro', ['ionic', 'ngCordova', 'ngStorage', 'auth0', 'angular-jwt']);
 'use strict';
 
+angular.module('retro').constant('Config', {
+    _cfg: 'DEV' || 'DEV',
+    DEV: {
+        url: '127.0.0.1',
+        port: 8080
+    },
+    PROD: {
+        protocol: 'https',
+        url: 'reactive-retro.herokuapp.com',
+        port: 80
+    }
+});
+'use strict';
+
 angular.module('retro').config(["authProvider", function (authProvider) {
     authProvider.init({
         domain: 'reactive-retro.auth0.com',
@@ -209,18 +223,124 @@ angular.module('retro').config(["$ionicConfigProvider", "$urlRouterProvider", "$
 }]);
 'use strict';
 
-angular.module('retro').constant('Config', {
-    _cfg: 'DEV' || 'DEV',
-    DEV: {
-        url: '127.0.0.1',
-        port: 8080
+angular.module('retro').constant('CLASSES', {
+    Cleric: 'Clerics specialize in healing their companions.',
+    Fighter: 'Fighters specialize in making their enemies hurt via physical means.',
+    Mage: 'Mages specialize in flinging magic at their enemies -- sometimes multiple at once!',
+    Thief: 'Thieves specialize in quick attacks and physical debuffing.'
+});
+'use strict';
+
+angular.module('retro').constant('OAUTH_KEYS', {
+    google: '195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com',
+    reddit: 'CKzP2LKr74VwYw',
+    facebook: '102489756752863'
+});
+'use strict';
+
+angular.module('retro').constant('MAP_COLORS', {
+    monster: {
+        outline: '#ff0000',
+        fill: '#aa0000'
     },
-    PROD: {
-        protocol: 'https',
-        url: 'reactive-retro.herokuapp.com',
-        port: 80
+    poi: {
+        outline: '#ffff00',
+        fill: '#aaaa00'
+    },
+    homepoint: {
+        outline: '#00ff00',
+        fill: '#00aa00'
+    },
+    miasma: {
+        outline: '#000000',
+        fill: '#000000'
+    },
+    hero: {
+        outline: '#0000ff',
+        fill: '#0000aa'
+    },
+    heroRadius: {
+        outline: '#ff00ff',
+        fill: '#ff00ff'
     }
 });
+'use strict';
+
+angular.module('retro').constant('MAP_STYLE', [{
+    featureType: 'water',
+    elementType: 'geometry',
+    stylers: [{ visibility: 'on' }, { color: '#aee2e0' }]
+}, {
+    featureType: 'landscape',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#abce83' }]
+}, {
+    featureType: 'poi',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'poi.park',
+    elementType: 'geometry',
+    stylers: [{ visibility: 'simplified' }, { color: '#8dab68' }]
+}, {
+    featureType: 'road',
+    elementType: 'geometry.fill',
+    stylers: [{ visibility: 'simplified' }]
+}, {
+    featureType: 'road',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#5B5B3F' }]
+}, {
+    featureType: 'road',
+    elementType: 'labels.text.stroke',
+    stylers: [{ color: '#ABCE83' }]
+}, {
+    featureType: 'road',
+    elementType: 'labels.icon',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'road.local',
+    elementType: 'geometry',
+    stylers: [{ color: '#A4C67D' }]
+}, {
+    featureType: 'road.arterial',
+    elementType: 'geometry',
+    stylers: [{ color: '#9BBF72' }]
+}, {
+    featureType: 'road.highway',
+    elementType: 'geometry',
+    stylers: [{ color: '#EBF4A4' }]
+}, {
+    featureType: 'transit',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'administrative',
+    elementType: 'geometry.stroke',
+    stylers: [{ visibility: 'on' }, { color: '#87ae79' }]
+}, {
+    featureType: 'administrative',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#7f2200' }, { visibility: 'off' }]
+}, {
+    featureType: 'administrative',
+    elementType: 'labels.text.stroke',
+    stylers: [{ color: '#ffffff' }, { visibility: 'on' }, { weight: 4.1 }]
+}, {
+    featureType: 'administrative',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#495421' }]
+}, {
+    featureType: 'administrative.neighborhood',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'administrative.land_parcel',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'administrative.locality',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+}]);
 'use strict';
 
 angular.module('retro').controller('BattleController', ["$scope", "$ionicModal", "BattleFlow", "Battle", "Dice", "Player", "Skills", function ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills) {
@@ -454,6 +574,10 @@ angular.module('retro').controller('ExploreController', ["$scope", "$ionicLoadin
 
         MapDrawing.setCurrentPosition(position);
     };
+
+    Monsters.observer.then(null, null, function () {
+        MapDrawing.drawMonsters($scope.map, Monsters.get(), $scope.select);
+    });
 }]);
 'use strict';
 
@@ -600,126 +724,6 @@ angular.module('retro').controller('SkillChangeController', ["$scope", "$ionicMo
     Skills.observer.then(null, null, function (skills) {
         return $scope.allSkills = getAllSkills(skills);
     });
-}]);
-'use strict';
-
-angular.module('retro').constant('CLASSES', {
-    Cleric: 'Clerics specialize in healing their companions.',
-    Fighter: 'Fighters specialize in making their enemies hurt via physical means.',
-    Mage: 'Mages specialize in flinging magic at their enemies -- sometimes multiple at once!',
-    Thief: 'Thieves specialize in quick attacks and physical debuffing.'
-});
-'use strict';
-
-angular.module('retro').constant('OAUTH_KEYS', {
-    google: '195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com',
-    reddit: 'CKzP2LKr74VwYw',
-    facebook: '102489756752863'
-});
-'use strict';
-
-angular.module('retro').constant('MAP_COLORS', {
-    monster: {
-        outline: '#ff0000',
-        fill: '#aa0000'
-    },
-    poi: {
-        outline: '#ffff00',
-        fill: '#aaaa00'
-    },
-    homepoint: {
-        outline: '#00ff00',
-        fill: '#00aa00'
-    },
-    miasma: {
-        outline: '#000000',
-        fill: '#000000'
-    },
-    hero: {
-        outline: '#0000ff',
-        fill: '#0000aa'
-    },
-    heroRadius: {
-        outline: '#ff00ff',
-        fill: '#ff00ff'
-    }
-});
-'use strict';
-
-angular.module('retro').constant('MAP_STYLE', [{
-    featureType: 'water',
-    elementType: 'geometry',
-    stylers: [{ visibility: 'on' }, { color: '#aee2e0' }]
-}, {
-    featureType: 'landscape',
-    elementType: 'geometry.fill',
-    stylers: [{ color: '#abce83' }]
-}, {
-    featureType: 'poi',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'poi.park',
-    elementType: 'geometry',
-    stylers: [{ visibility: 'simplified' }, { color: '#8dab68' }]
-}, {
-    featureType: 'road',
-    elementType: 'geometry.fill',
-    stylers: [{ visibility: 'simplified' }]
-}, {
-    featureType: 'road',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#5B5B3F' }]
-}, {
-    featureType: 'road',
-    elementType: 'labels.text.stroke',
-    stylers: [{ color: '#ABCE83' }]
-}, {
-    featureType: 'road',
-    elementType: 'labels.icon',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'road.local',
-    elementType: 'geometry',
-    stylers: [{ color: '#A4C67D' }]
-}, {
-    featureType: 'road.arterial',
-    elementType: 'geometry',
-    stylers: [{ color: '#9BBF72' }]
-}, {
-    featureType: 'road.highway',
-    elementType: 'geometry',
-    stylers: [{ color: '#EBF4A4' }]
-}, {
-    featureType: 'transit',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'administrative',
-    elementType: 'geometry.stroke',
-    stylers: [{ visibility: 'on' }, { color: '#87ae79' }]
-}, {
-    featureType: 'administrative',
-    elementType: 'geometry.fill',
-    stylers: [{ color: '#7f2200' }, { visibility: 'off' }]
-}, {
-    featureType: 'administrative',
-    elementType: 'labels.text.stroke',
-    stylers: [{ color: '#ffffff' }, { visibility: 'on' }, { weight: 4.1 }]
-}, {
-    featureType: 'administrative',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#495421' }]
-}, {
-    featureType: 'administrative.neighborhood',
-    elementType: 'labels',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'administrative.land_parcel',
-    elementType: 'labels',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'administrative.locality',
-    elementType: 'labels',
-    stylers: [{ visibility: 'off' }]
 }]);
 'use strict';
 
@@ -903,7 +907,7 @@ angular.module('retro').service('Auth', ["$localStorage", "$stateWrapper", "auth
 }]);
 'use strict';
 
-angular.module('retro').service('LocationWatcher', ["$q", function ($q) {
+angular.module('retro').service('LocationWatcher', ["socket", "Player", "$q", function (socket, Player, $q) {
 
     var defer = $q.defer();
     var ready = $q.defer();
@@ -928,6 +932,7 @@ angular.module('retro').service('LocationWatcher', ["$q", function ($q) {
             navigator.geolocation.watchPosition(function (position) {
                 currentCoords = position.coords;
                 defer.notify(currentCoords);
+                socket.emit('player:change:location', { name: Player.get().name, coords: { latitude: currentCoords.latitude, longitude: currentCoords.longitude } });
             }, error, { timeout: 10000 });
         },
 

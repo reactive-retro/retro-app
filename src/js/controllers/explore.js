@@ -64,5 +64,9 @@ angular.module('retro').controller('ExploreController',
 
             MapDrawing.setCurrentPosition(position);
         };
+
+        Monsters.observer.then(null, null, () => {
+            MapDrawing.drawMonsters($scope.map, Monsters.get(), $scope.select);
+        });
     }
 );

@@ -1,4 +1,4 @@
-angular.module('retro').service('LocationWatcher', ($q) => {
+angular.module('retro').service('LocationWatcher', (socket, Player, $q) => {
 
     const defer = $q.defer();
     const ready = $q.defer();
@@ -21,6 +21,7 @@ angular.module('retro').service('LocationWatcher', ($q) => {
             navigator.geolocation.watchPosition((position) => {
                 currentCoords = position.coords;
                 defer.notify(currentCoords);
+                socket.emit('player:change:location', { name: Player.get().name, coords: { latitude: currentCoords.latitude, longitude: currentCoords.longitude } });
             }, error, { timeout: 10000 });
         },
 
