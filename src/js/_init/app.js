@@ -3,7 +3,5 @@ angular.module('retro', [
     'ngCordova',
     'ngStorage',
     'auth0',
-    'angular-jwt',
-    'ionic.service.core',
-    'ionic.service.analytics'
+    'angular-jwt'
 ]);

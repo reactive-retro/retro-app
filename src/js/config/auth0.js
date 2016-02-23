@@ -1,12 +1,11 @@
 angular.module('retro')
-    .config(authProvider => {
-        authProvider.init({
+    .run((auth, $localStorage, $rootScope, $stateWrapper, jwtHelper, AuthData, Config) => {
+        auth.init({
             domain: 'reactive-retro.auth0.com',
             clientID: 'ucMSnNDYLGdDBL2uppganZv2jKzzJiI0',
             loginState: 'home'
         });
-    })
-    .run((auth, $localStorage, $rootScope, $stateWrapper, jwtHelper, AuthData, Config) => {
+
         auth.hookEvents();
 
         if(Config._cfg !== $localStorage.env) {

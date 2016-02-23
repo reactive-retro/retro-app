@@ -1,10 +1,10 @@
 'use strict';
 
-angular.module('retro', ['ionic', 'ngCordova', 'ngStorage', 'auth0', 'angular-jwt', 'ionic.service.core', 'ionic.service.analytics']);
+angular.module('retro', ['ionic', 'ngCordova', 'ngStorage', 'auth0', 'angular-jwt']);
 'use strict';
 
 angular.module('retro').constant('Config', {
-    _cfg: 'DEV' || 'DEV',
+    _cfg: 'PROD' || 'DEV',
     DEV: {
         url: '127.0.0.1',
         port: 8080
@@ -17,13 +17,13 @@ angular.module('retro').constant('Config', {
 });
 'use strict';
 
-angular.module('retro').config(["authProvider", function (authProvider) {
-    authProvider.init({
+angular.module('retro').run(["auth", "$localStorage", "$rootScope", "$stateWrapper", "jwtHelper", "AuthData", "Config", function (auth, $localStorage, $rootScope, $stateWrapper, jwtHelper, AuthData, Config) {
+    auth.init({
         domain: 'reactive-retro.auth0.com',
         clientID: 'ucMSnNDYLGdDBL2uppganZv2jKzzJiI0',
         loginState: 'home'
     });
-}]).run(["auth", "$localStorage", "$rootScope", "$stateWrapper", "jwtHelper", "AuthData", "Config", function (auth, $localStorage, $rootScope, $stateWrapper, jwtHelper, AuthData, Config) {
+
     auth.hookEvents();
 
     if (Config._cfg !== $localStorage.env) {
@@ -70,7 +70,7 @@ angular.module('retro').config(["authProvider", function (authProvider) {
 }]);
 'use strict';
 
-angular.module('retro').run(["$rootScope", "$ionicPlatform", "$ionicAnalytics", function ($rootScope, $ionicPlatform, $ionicAnalytics) {
+angular.module('retro').run(["$rootScope", "$ionicPlatform", function ($rootScope, $ionicPlatform) {
 
     $rootScope.$on('$stateChangeSuccess', function (event, toState) {
         $rootScope.hideMenu = toState.name === 'home' || toState.name === 'create' || toState.name === 'battle';
@@ -81,8 +81,6 @@ angular.module('retro').run(["$rootScope", "$ionicPlatform", "$ionicAnalytics", 
     }, 100);
 
     $ionicPlatform.ready(function () {
-        $ionicAnalytics.register();
-
         if (window.cordova && window.cordova.plugins.Keyboard) {
             window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
         }
