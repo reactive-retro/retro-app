@@ -6,7 +6,7 @@ angular.module('retro')
             loginState: 'home'
         });
     })
-    .run((auth, $localStorage, $rootScope, $stateWrapper, jwtHelper, AuthData, AuthFlow, Config) => {
+    .run((auth, $localStorage, $rootScope, $stateWrapper, jwtHelper, AuthData, Config) => {
         auth.hookEvents();
 
         if(Config._cfg !== $localStorage.env) {
@@ -14,17 +14,12 @@ angular.module('retro')
             return;
         }
 
-        const autologin = () => {
-            if(!auth.isAuthenticated) return;
-            AuthFlow.tryAutoLogin();
-        };
-
         let refreshingToken = null;
         $rootScope.$on('$locationChangeStart', (e, n, c) => {
             // if you route to the same state and aren't logged in, don't do this event
             // it causes the login events on the server to fire twice
             if(n === c) return;
-            if(AuthFlow.isLoggedIn) return;
+            if(AuthData.get().isLoggedIn) return;
 
             const { token, refreshToken, profile } = $localStorage;
             if(!token) { return; }
@@ -33,7 +28,6 @@ angular.module('retro')
                 if (!auth.isAuthenticated) {
                     auth.authenticate(profile, token);
                 }
-                autologin();
                 return;
             }
 
@@ -42,7 +36,6 @@ angular.module('retro')
                     refreshingToken = auth.refreshIdToken(refreshToken).then((idToken) => {
                         $localStorage.token = idToken;
                         auth.authenticate(profile, idToken);
-                        autologin();
                     }).finally(() => {
                         refreshingToken = null;
                     });
@@ -50,6 +43,6 @@ angular.module('retro')
                 return refreshingToken;
             }
 
-            $stateWrapper.go('home');
+            $stateWrapper.noGoingBackAndNoCache('home');
         });
     });

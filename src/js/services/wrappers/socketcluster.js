@@ -15,7 +15,7 @@ angular.module('retro')
 
         socket.on('error', e => {
             if(!codes[e.code]) return;
-            if(e.code === 1006) { AuthData.update({ canConnect: false, attemptAutoLogin: false }); }
+            if(e.code === 1006) { AuthData.update({ canConnect: false, attemptAutoLogin: false, isLoggedIn: false }); }
             Toaster.show(codes[e.code]);
         });
 
@@ -24,7 +24,7 @@ angular.module('retro')
         });
 
         socket.on('disconnect', () => {
-            $stateWrapper.noGoingBack('home');
+            $stateWrapper.noGoingBackAndNoCache('home');
         });
 
         socketManagement.setUpEvents(socket);

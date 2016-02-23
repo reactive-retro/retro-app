@@ -1,4 +1,4 @@
-angular.module('retro').service('Auth', ($localStorage, $stateWrapper, auth, AuthFlow) => {
+angular.module('retro').service('Auth', ($localStorage, $stateWrapper, auth, AuthFlow, AuthData) => {
 
     const localAuth = {
         autoLogin: () => AuthFlow.tryAutoLogin(),
@@ -23,7 +23,9 @@ angular.module('retro').service('Auth', ($localStorage, $stateWrapper, auth, Aut
             $localStorage.profile = null;
             $localStorage.token = null;
 
-            $stateWrapper.noGoingBack('home');
+            AuthData.update({ attemptAutoLogin: false, isLoggedIn: false });
+
+            $stateWrapper.noGoingBackAndNoCache('home');
         }
     };
 

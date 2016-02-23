@@ -12,4 +12,7 @@ script(type="text/ng-template", id="createchar")
                 label.item-input
                     span {{CLASSES[NewHero.profession]}}
 
-                button.button.button-block.button-calm(ng-click="create()") Finish
+                label.item-input(ng-if="!coords")
+                    span You need to have location enabled to create a character!
+
+                button.button.button-block.button-calm(ng-click="create()", ng-disabled="!coords") Finish

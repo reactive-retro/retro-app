@@ -1,23 +1,15 @@
 angular.module('retro').controller('HomeController',
-    ($scope, LocationWatcher, Auth, AuthData) => {
+    ($scope, LocationWatcher, Auth, AuthData, BlockState) => {
         $scope.auth = Auth;
-        $scope.authData = AuthData.get();
 
-
-        $scope.coords = LocationWatcher.current();
-        LocationWatcher.watch.then(null, null, (coords) => {
-            $scope.coords = coords;
-            if($scope.authData.attemptAutoLogin) {
+        const setAuthData = (data) => {
+            $scope.authData = data;
+            if(data.attemptAutoLogin && !BlockState.get().Login) {
                 Auth.autoLogin();
             }
-        });
+        };
 
-
-        AuthData.observer.then(null, null, val => {
-            $scope.authData = val;
-            if(val.attemptAutoLogin) {
-                Auth.autoLogin();
-            }
-        });
+        setAuthData(AuthData.get());
+        AuthData.observer.then(null, null, setAuthData);
     }
 );

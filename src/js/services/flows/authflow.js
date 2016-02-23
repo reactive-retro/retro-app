@@ -1,4 +1,8 @@
-angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, BlockState, LocationWatcher, Config, socket) => {
+angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, BlockState, Config, socket) => {
+    const unsetAutoLogin = () => {
+        AuthData.update({ attemptAutoLogin: false });
+    };
+
     const flow = {
         toPlayer: () => {
             if(!_.contains(['home', 'create'], $state.current.name)) return;
@@ -7,19 +11,20 @@ angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorag
         },
         tryAutoLogin: () => {
             if(!$localStorage.profile || !$localStorage.profile.user_id) {
-                AuthData.update({ attemptAutoLogin: false });
+                unsetAutoLogin();
                 return;
             }
-            flow.login(_.clone($localStorage), true);
+            flow.login(_.cloneDeep($localStorage), true).then(null, unsetAutoLogin);
         },
         tryAuth: () => {
             const fail = (val) => {
+                unsetAutoLogin();
                 if(!val) return;
                 $stateWrapper.go('create');
             };
 
             if($localStorage.profile.user_id) {
-                flow.login(_.clone($localStorage), true).then(null, fail);
+                flow.login(_.cloneDeep($localStorage), true).then(null, fail);
 
             // only fail to the char create screen if there's a server connection
             } else if(AuthData.get().canConnect) {
@@ -28,7 +33,7 @@ angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorag
         },
         login: (NewHeroProto, swallow = false) => {
             const defer = $q.defer();
-            if(BlockState.get()['Login'] || flow.isLoggedIn) {
+            if(BlockState.get().Login || AuthData.get().isLoggedIn) {
                 defer.reject(false);
                 return defer.promise;
             }
@@ -37,16 +42,9 @@ angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorag
                 name: NewHeroProto.name,
                 profession: NewHeroProto.profession,
                 userId: NewHeroProto.profile.user_id,
-                token: NewHeroProto.token
+                token: NewHeroProto.token,
+                homepoint: NewHeroProto.homepoint
             };
-
-            const currentLocation = LocationWatcher.current();
-            if(!currentLocation) {
-                defer.reject(false);
-                return defer.promise;
-            }
-
-            NewHero.homepoint = { lat: currentLocation.latitude, lon: currentLocation.longitude };
 
             BlockState.block('Login');
             socket.emit('login', NewHero, (err, success) => {
@@ -57,7 +55,7 @@ angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorag
                     defer.resolve();
                     _.extend(Settings, success.settings);
                     flow.toPlayer();
-                    flow.isLoggedIn = true;
+                    AuthData.update({ isLoggedIn: true });
                     $localStorage.env = Config._cfg;
                     BlockState.unblockAll();
                 }
