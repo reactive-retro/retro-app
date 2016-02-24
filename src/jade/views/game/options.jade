@@ -2,5 +2,27 @@ script(type="text/ng-template", id="options")
     ion-view(view-title="Options")
         ion-content
             div.list
-                div.item.item-divider Player
-                ion-toggle(ng-model="player.pvp") PvP Mode
+                div.item.item-divider Combat
+                ion-toggle(
+                    ng-model="settings.autoConfirmAttacks",
+                    ng-click="changeSetting('autoConfirmAttacks', true)",
+                    blocked-by="Setting")
+                    div Auto-confirm attacks
+
+                ion-toggle(
+                    ng-show="settings.autoConfirmAttacks",
+                    ng-model="settings.autoConfirmAttacksIfOnly",
+                    ng-click="changeSetting('autoConfirmAttacksIfOnly', true)",
+                    blocked-by="Setting")
+                    div Auto-confirm if only living member
+
+script(type="text/ng-template", id="options-divider")
+    div.item.item-divider {{option.label}}
+
+script(type="text/ng-template", id="options-toggle")
+    ion-toggle(
+        ng-show="isVisible(option)",
+        ng-model="settings[option.variable]",
+        ng-click="toggleSetting(option)",
+        blocked-by="Setting"
+    ) {{option.label}}

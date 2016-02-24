@@ -189,6 +189,7 @@ angular.module('retro').config(["$ionicConfigProvider", "$urlRouterProvider", "$
     }).state('options', {
         url: '/options',
         templateUrl: 'options',
+        controller: 'OptionsController',
         data: { requiresLogin: true },
         resolve: {
             playerLoaded: ["$injector", function playerLoaded($injector) {
@@ -639,6 +640,52 @@ angular.module('retro').controller('MenuController', ["$scope", "$state", "$stat
     LocationWatcher.watch.then(null, null, function (coords) {
         return $scope.coords = coords;
     });
+}]);
+'use strict';
+
+angular.module('retro').controller('OptionsController', ["$scope", "Settings", "SettingFlow", function ($scope, Settings, SettingFlow) {
+
+    $scope.changeSetting = function (key, val) {
+        SettingFlow.change({ setting: key, newVal: val });
+    };
+
+    $scope.isVisible = function (option) {
+        if (!option.visibleIf) return true;
+        return _.all(option.visibleIf, function (varObj) {
+            return $scope.settings[varObj.varName] === varObj.checkVal;
+        });
+    };
+
+    $scope.toggleSetting = function (option) {
+        console.log(option);
+    };
+
+    $scope.settings = Settings.get();
+    Settings.observer.then(null, null, function () {
+        return $scope.settings = Settings.get();
+    });
+
+    $scope.options = [{
+        type: 'divider',
+        label: 'Combat'
+    }, {
+        type: 'toggle',
+        label: 'Auto-confirm attacks',
+        variable: 'autoConfirmAttacks',
+        auxOnSet: [{
+            checkVal: false,
+            variables: ['autoConfirmAttacksIfOnly'],
+            ifSelf: false
+        }]
+    }, {
+        type: 'toggle',
+        label: 'Auto-confirm only if last alive',
+        variable: 'autoConfirmAttacksIfOnly',
+        visibleIf: [{
+            checkVal: true,
+            varName: 'autoConfirmAttacks'
+        }]
+    }];
 }]);
 'use strict';
 
@@ -1347,6 +1394,30 @@ angular.module('retro').service('Player', ["$q", function ($q) {
 }]);
 'use strict';
 
+angular.module('retro').service('Settings', ["$q", function ($q) {
+
+    var defer = $q.defer();
+
+    var settings = {};
+
+    var updateSettings = function updateSettings(newSettings) {
+        settings = newSettings;
+        defer.notify(settings);
+    };
+
+    return {
+        observer: defer.promise,
+        apply: function apply() {
+            defer.notify(settings);
+        },
+        set: updateSettings,
+        get: function get() {
+            return settings;
+        }
+    };
+}]);
+'use strict';
+
 angular.module('retro').service('Skills', ["$q", function ($q) {
 
     var defer = $q.defer();
@@ -1538,6 +1609,24 @@ angular.module('retro').service('EquipFlow', ["Toaster", "$stateWrapper", "Playe
 }]);
 'use strict';
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+angular.module('retro').service('SettingFlow', ["BlockState", "Player", "Toaster", "socket", function (BlockState, Player, Toaster, socket) {
+    return {
+        change: function change(_ref) {
+            var setting = _ref.setting;
+            var newVal = _ref.newVal;
+
+            var newSettings = { name: Player.get().name, settingHash: _defineProperty({}, setting, newVal) };
+            BlockState.block('Setting');
+            socket.emit('player:change:setting', newSettings, Toaster.handleDefault(function () {
+                BlockState.unblock('Setting');
+            }));
+        }
+    };
+}]);
+'use strict';
+
 angular.module('retro').service('SkillChangeFlow', ["Toaster", "$state", "Player", "BlockState", "socket", function (Toaster, $state, Player, BlockState, socket) {
     return {
         change: function change(skill, slot) {
@@ -1599,13 +1688,14 @@ angular.module('retro').service('socketCluster', ["$window", function ($window) 
     socketManagement.setUpEvents(socket);
 
     return socket;
-}]).service('socketManagement', ["Player", "Skills", "Places", "Monsters", "Battle", function (Player, Skills, Places, Monsters, Battle) {
+}]).service('socketManagement', ["Player", "Skills", "Places", "Monsters", "Battle", "Settings", function (Player, Skills, Places, Monsters, Battle, Settings) {
     return {
         setUpEvents: function setUpEvents(socket) {
             socket.on('update:player', Player.set);
             socket.on('update:skills', Skills.set);
             socket.on('update:places', Places.set);
             socket.on('update:monsters', Monsters.set);
+            socket.on('update:settings', Settings.set);
             socket.on('combat:entered', Battle.set);
 
             Battle.setSocket(socket);

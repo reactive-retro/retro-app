@@ -91,6 +91,7 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
         .state('options', {
             url: '/options',
             templateUrl: 'options',
+            controller: 'OptionsController',
             data: { requiresLogin: true },
             resolve: {
                 playerLoaded: ($injector) => $injector.get('Settings').isReady

@@ -31,13 +31,14 @@ angular.module('retro')
 
         return socket;
     })
-    .service('socketManagement', (Player, Skills, Places, Monsters, Battle) => {
+    .service('socketManagement', (Player, Skills, Places, Monsters, Battle, Settings) => {
         return {
             setUpEvents: (socket) => {
                 socket.on('update:player', Player.set);
                 socket.on('update:skills', Skills.set);
                 socket.on('update:places', Places.set);
                 socket.on('update:monsters', Monsters.set);
+                socket.on('update:settings', Settings.set);
                 socket.on('combat:entered', Battle.set);
 
                 Battle.setSocket(socket);
