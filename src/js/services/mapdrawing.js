@@ -91,7 +91,10 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
             monsterMarker.addListener('click', () => {
 
                 const infoWindow = new Google.maps.InfoWindow({
-                    content: monster.name
+                    content: `${monster.name}<br>
+                    Class: ${monster.profession}<br>
+                    Rating: ${monster.rating > 0 ? '+' : ''}${monster.rating}
+                    `
                 });
 
                 infoWindow.open(map, monsterMarker);

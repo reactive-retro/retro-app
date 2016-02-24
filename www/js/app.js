@@ -3,20 +3,6 @@
 angular.module('retro', ['ionic', 'ngCordova', 'ngStorage', 'auth0', 'angular-jwt']);
 'use strict';
 
-angular.module('retro').constant('Config', {
-    _cfg: 'PROD' || 'DEV',
-    DEV: {
-        url: '127.0.0.1',
-        port: 8080
-    },
-    PROD: {
-        protocol: 'https',
-        url: 'reactive-retro.herokuapp.com',
-        port: 80
-    }
-});
-'use strict';
-
 angular.module('retro').run(["auth", "$localStorage", "$rootScope", "$stateWrapper", "jwtHelper", "AuthData", "Config", function (auth, $localStorage, $rootScope, $stateWrapper, jwtHelper, AuthData, Config) {
     auth.init({
         domain: 'reactive-retro.auth0.com',
@@ -216,124 +202,18 @@ angular.module('retro').config(["$ionicConfigProvider", "$urlRouterProvider", "$
 }]);
 'use strict';
 
-angular.module('retro').constant('CLASSES', {
-    Cleric: 'Clerics specialize in healing their companions.',
-    Fighter: 'Fighters specialize in making their enemies hurt via physical means.',
-    Mage: 'Mages specialize in flinging magic at their enemies -- sometimes multiple at once!',
-    Thief: 'Thieves specialize in quick attacks and physical debuffing.'
-});
-'use strict';
-
-angular.module('retro').constant('OAUTH_KEYS', {
-    google: '195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com',
-    reddit: 'CKzP2LKr74VwYw',
-    facebook: '102489756752863'
-});
-'use strict';
-
-angular.module('retro').constant('MAP_COLORS', {
-    monster: {
-        outline: '#ff0000',
-        fill: '#aa0000'
+angular.module('retro').constant('Config', {
+    _cfg: 'DEV' || 'DEV',
+    DEV: {
+        url: '127.0.0.1',
+        port: 8080
     },
-    poi: {
-        outline: '#ffff00',
-        fill: '#aaaa00'
-    },
-    homepoint: {
-        outline: '#00ff00',
-        fill: '#00aa00'
-    },
-    miasma: {
-        outline: '#000000',
-        fill: '#000000'
-    },
-    hero: {
-        outline: '#0000ff',
-        fill: '#0000aa'
-    },
-    heroRadius: {
-        outline: '#ff00ff',
-        fill: '#ff00ff'
+    PROD: {
+        protocol: 'https',
+        url: 'reactive-retro.herokuapp.com',
+        port: 80
     }
 });
-'use strict';
-
-angular.module('retro').constant('MAP_STYLE', [{
-    featureType: 'water',
-    elementType: 'geometry',
-    stylers: [{ visibility: 'on' }, { color: '#aee2e0' }]
-}, {
-    featureType: 'landscape',
-    elementType: 'geometry.fill',
-    stylers: [{ color: '#abce83' }]
-}, {
-    featureType: 'poi',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'poi.park',
-    elementType: 'geometry',
-    stylers: [{ visibility: 'simplified' }, { color: '#8dab68' }]
-}, {
-    featureType: 'road',
-    elementType: 'geometry.fill',
-    stylers: [{ visibility: 'simplified' }]
-}, {
-    featureType: 'road',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#5B5B3F' }]
-}, {
-    featureType: 'road',
-    elementType: 'labels.text.stroke',
-    stylers: [{ color: '#ABCE83' }]
-}, {
-    featureType: 'road',
-    elementType: 'labels.icon',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'road.local',
-    elementType: 'geometry',
-    stylers: [{ color: '#A4C67D' }]
-}, {
-    featureType: 'road.arterial',
-    elementType: 'geometry',
-    stylers: [{ color: '#9BBF72' }]
-}, {
-    featureType: 'road.highway',
-    elementType: 'geometry',
-    stylers: [{ color: '#EBF4A4' }]
-}, {
-    featureType: 'transit',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'administrative',
-    elementType: 'geometry.stroke',
-    stylers: [{ visibility: 'on' }, { color: '#87ae79' }]
-}, {
-    featureType: 'administrative',
-    elementType: 'geometry.fill',
-    stylers: [{ color: '#7f2200' }, { visibility: 'off' }]
-}, {
-    featureType: 'administrative',
-    elementType: 'labels.text.stroke',
-    stylers: [{ color: '#ffffff' }, { visibility: 'on' }, { weight: 4.1 }]
-}, {
-    featureType: 'administrative',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#495421' }]
-}, {
-    featureType: 'administrative.neighborhood',
-    elementType: 'labels',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'administrative.land_parcel',
-    elementType: 'labels',
-    stylers: [{ visibility: 'off' }]
-}, {
-    featureType: 'administrative.locality',
-    elementType: 'labels',
-    stylers: [{ visibility: 'off' }]
-}]);
 'use strict';
 
 angular.module('retro').controller('BattleController', ["$scope", "$ionicModal", "BattleFlow", "Battle", "Dice", "Player", "Skills", function ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills) {
@@ -720,6 +600,126 @@ angular.module('retro').controller('SkillChangeController', ["$scope", "$ionicMo
 }]);
 'use strict';
 
+angular.module('retro').constant('CLASSES', {
+    Cleric: 'Clerics specialize in healing their companions.',
+    Fighter: 'Fighters specialize in making their enemies hurt via physical means.',
+    Mage: 'Mages specialize in flinging magic at their enemies -- sometimes multiple at once!',
+    Thief: 'Thieves specialize in quick attacks and physical debuffing.'
+});
+'use strict';
+
+angular.module('retro').constant('OAUTH_KEYS', {
+    google: '195531055167-99jquaolc9p50656qqve3q913204pmnp.apps.googleusercontent.com',
+    reddit: 'CKzP2LKr74VwYw',
+    facebook: '102489756752863'
+});
+'use strict';
+
+angular.module('retro').constant('MAP_COLORS', {
+    monster: {
+        outline: '#ff0000',
+        fill: '#aa0000'
+    },
+    poi: {
+        outline: '#ffff00',
+        fill: '#aaaa00'
+    },
+    homepoint: {
+        outline: '#00ff00',
+        fill: '#00aa00'
+    },
+    miasma: {
+        outline: '#000000',
+        fill: '#000000'
+    },
+    hero: {
+        outline: '#0000ff',
+        fill: '#0000aa'
+    },
+    heroRadius: {
+        outline: '#ff00ff',
+        fill: '#ff00ff'
+    }
+});
+'use strict';
+
+angular.module('retro').constant('MAP_STYLE', [{
+    featureType: 'water',
+    elementType: 'geometry',
+    stylers: [{ visibility: 'on' }, { color: '#aee2e0' }]
+}, {
+    featureType: 'landscape',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#abce83' }]
+}, {
+    featureType: 'poi',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'poi.park',
+    elementType: 'geometry',
+    stylers: [{ visibility: 'simplified' }, { color: '#8dab68' }]
+}, {
+    featureType: 'road',
+    elementType: 'geometry.fill',
+    stylers: [{ visibility: 'simplified' }]
+}, {
+    featureType: 'road',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#5B5B3F' }]
+}, {
+    featureType: 'road',
+    elementType: 'labels.text.stroke',
+    stylers: [{ color: '#ABCE83' }]
+}, {
+    featureType: 'road',
+    elementType: 'labels.icon',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'road.local',
+    elementType: 'geometry',
+    stylers: [{ color: '#A4C67D' }]
+}, {
+    featureType: 'road.arterial',
+    elementType: 'geometry',
+    stylers: [{ color: '#9BBF72' }]
+}, {
+    featureType: 'road.highway',
+    elementType: 'geometry',
+    stylers: [{ color: '#EBF4A4' }]
+}, {
+    featureType: 'transit',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'administrative',
+    elementType: 'geometry.stroke',
+    stylers: [{ visibility: 'on' }, { color: '#87ae79' }]
+}, {
+    featureType: 'administrative',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#7f2200' }, { visibility: 'off' }]
+}, {
+    featureType: 'administrative',
+    elementType: 'labels.text.stroke',
+    stylers: [{ color: '#ffffff' }, { visibility: 'on' }, { weight: 4.1 }]
+}, {
+    featureType: 'administrative',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#495421' }]
+}, {
+    featureType: 'administrative.neighborhood',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'administrative.land_parcel',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'administrative.locality',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+}]);
+'use strict';
+
 angular.module('retro').directive('blockedBy', ["BlockState", function (BlockState) {
     return {
         restrict: 'A',
@@ -1026,7 +1026,7 @@ angular.module('retro').service('MapDrawing', ["Google", "Settings", "MAP_COLORS
             monsterMarker.addListener('click', function () {
 
                 var infoWindow = new Google.maps.InfoWindow({
-                    content: monster.name
+                    content: monster.name + '<br>\n                    Class: ' + monster.profession + '<br>\n                    Rating: ' + (monster.rating > 0 ? '+' : '') + monster.rating + '\n                    '
                 });
 
                 infoWindow.open(map, monsterMarker);
@@ -1162,193 +1162,6 @@ angular.module('retro').service('Toaster', ["$cordovaToast", function ($cordovaT
     return {
         show: show,
         handleDefault: handleDefault
-    };
-}]);
-'use strict';
-
-angular.module('retro').service('AuthFlow', ["$q", "AuthData", "Toaster", "$localStorage", "$state", "$stateWrapper", "Player", "Settings", "BlockState", "Config", "socket", function ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, BlockState, Config, socket) {
-    var unsetAutoLogin = function unsetAutoLogin() {
-        AuthData.update({ attemptAutoLogin: false });
-    };
-
-    var flow = {
-        toPlayer: function toPlayer() {
-            if (!_.contains(['home', 'create'], $state.current.name)) return;
-
-            $stateWrapper.noGoingBack('player');
-        },
-        tryAutoLogin: function tryAutoLogin() {
-            if (!$localStorage.profile || !$localStorage.profile.user_id) {
-                unsetAutoLogin();
-                return;
-            }
-            flow.login(_.cloneDeep($localStorage), true).then(null, unsetAutoLogin);
-        },
-        tryAuth: function tryAuth() {
-            var fail = function fail(val) {
-                unsetAutoLogin();
-                if (!val) return;
-                $stateWrapper.go('create');
-            };
-
-            if ($localStorage.profile.user_id) {
-                flow.login(_.cloneDeep($localStorage), true).then(null, fail);
-
-                // only fail to the char create screen if there's a server connection
-            } else if (AuthData.get().canConnect) {
-                    fail();
-                }
-        },
-        login: function login(NewHeroProto) {
-            var swallow = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-            var defer = $q.defer();
-            if (BlockState.get().Login || AuthData.get().isLoggedIn) {
-                defer.reject(false);
-                return defer.promise;
-            }
-
-            var NewHero = {
-                name: NewHeroProto.name,
-                profession: NewHeroProto.profession,
-                userId: NewHeroProto.profile.user_id,
-                token: NewHeroProto.token,
-                homepoint: NewHeroProto.homepoint
-            };
-
-            BlockState.block('Login');
-            socket.emit('login', NewHero, function (err, success) {
-                BlockState.unblock('Login');
-                if (err) {
-                    defer.reject(true);
-                } else {
-                    defer.resolve();
-                    _.extend(Settings, success.settings);
-                    flow.toPlayer();
-                    AuthData.update({ isLoggedIn: true });
-                    $localStorage.env = Config._cfg;
-                    BlockState.unblockAll();
-                }
-
-                if (!swallow) {
-                    var msgObj = err ? err : success;
-                    Toaster.show(msgObj.msg);
-                }
-            });
-
-            Settings.isReady = defer.promise;
-            return Settings.isReady;
-        }
-    };
-
-    return flow;
-}]);
-'use strict';
-
-angular.module('retro').service('BattleFlow', ["Player", "Battle", "Toaster", "BlockState", "$stateWrapper", "socket", function (Player, Battle, Toaster, BlockState, $stateWrapper, socket) {
-
-    var start = function start(monster) {
-        BlockState.block('Battle');
-        socket.emit('combat:enter', { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault(function () {
-            BlockState.unblock('Battle');
-        }));
-    };
-
-    var confirmAction = function confirmAction(_ref) {
-        var origin = _ref.origin;
-        var id = _ref.id;
-        var skill = _ref.skill;
-
-        socket.emit('combat:confirmaction', { skill: skill, target: id, name: origin }, Toaster.handleDefault());
-    };
-
-    var toExplore = function toExplore() {
-        $stateWrapper.noGoingBack('explore');
-    };
-
-    var getMultiplier = function getMultiplier(skill, me) {
-        return _.filter(me.skills, function (check) {
-            return check === skill;
-        }).length;
-    };
-
-    var skillCooldown = function skillCooldown(skill, me) {
-        return getMultiplier(skill ? skill.spellName : '', me) * (skill ? skill.spellCooldown : 0);
-    };
-    var canCastSkillCD = function canCastSkillCD(skill, me) {
-        var skillName = skill ? skill.spellName : '';
-        return !me.cooldowns[skillName] || me.cooldowns[skillName] <= 0;
-    };
-
-    var skillCost = function skillCost(skill, me) {
-        return getMultiplier(skill ? skill.spellName : '', me) * (skill ? skill.spellCost : 0);
-    };
-    var canCastSkillMP = function canCastSkillMP(skill, me) {
-        return skillCost(skill, me) <= me.stats.mp.__current;
-    };
-
-    return {
-        start: start,
-        confirmAction: confirmAction,
-        toExplore: toExplore,
-        getMultiplier: getMultiplier,
-        skillCooldown: skillCooldown,
-        canCastSkillCD: canCastSkillCD,
-        skillCost: skillCost,
-        canCastSkillMP: canCastSkillMP
-    };
-}]);
-'use strict';
-
-angular.module('retro').service('ClassChangeFlow', ["Toaster", "$stateWrapper", "Player", "BlockState", "socket", function (Toaster, $stateWrapper, Player, BlockState, socket) {
-    return {
-        change: function change(newProfession) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, newProfession: newProfession };
-
-            BlockState.block('Player');
-            socket.emit('player:change:class', opts, Toaster.handleDefault(function () {
-                $stateWrapper.go('player');
-                BlockState.unblock('Player');
-            }));
-        }
-    };
-}]);
-'use strict';
-
-angular.module('retro').service('EquipFlow', ["Toaster", "$stateWrapper", "Player", "BlockState", "socket", function (Toaster, $stateWrapper, Player, BlockState, socket) {
-    return {
-        equip: function equip(newItem) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, itemId: newItem.itemId };
-
-            BlockState.block('Player');
-            socket.emit('player:change:equipment', opts, Toaster.handleDefault(function () {
-                $stateWrapper.go('player');
-                BlockState.unblock('Player');
-            }));
-        }
-    };
-}]);
-'use strict';
-
-angular.module('retro').service('SkillChangeFlow', ["Toaster", "$state", "Player", "BlockState", "socket", function (Toaster, $state, Player, BlockState, socket) {
-    return {
-        change: function change(skill, slot) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, skillName: skill, skillSlot: slot };
-
-            BlockState.block('Player');
-            socket.emit('player:change:skill', opts, Toaster.handleDefault(function () {
-                BlockState.unblock('Player');
-            }));
-        }
     };
 }]);
 'use strict';
@@ -1545,6 +1358,193 @@ angular.module('retro').service('Skills', ["$q", function ($q) {
         set: getNewSkills,
         get: function get() {
             return skills;
+        }
+    };
+}]);
+'use strict';
+
+angular.module('retro').service('AuthFlow', ["$q", "AuthData", "Toaster", "$localStorage", "$state", "$stateWrapper", "Player", "Settings", "BlockState", "Config", "socket", function ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, BlockState, Config, socket) {
+    var unsetAutoLogin = function unsetAutoLogin() {
+        AuthData.update({ attemptAutoLogin: false });
+    };
+
+    var flow = {
+        toPlayer: function toPlayer() {
+            if (!_.contains(['home', 'create'], $state.current.name)) return;
+
+            $stateWrapper.noGoingBack('player');
+        },
+        tryAutoLogin: function tryAutoLogin() {
+            if (!$localStorage.profile || !$localStorage.profile.user_id) {
+                unsetAutoLogin();
+                return;
+            }
+            flow.login(_.cloneDeep($localStorage), true).then(null, unsetAutoLogin);
+        },
+        tryAuth: function tryAuth() {
+            var fail = function fail(val) {
+                unsetAutoLogin();
+                if (!val) return;
+                $stateWrapper.go('create');
+            };
+
+            if ($localStorage.profile.user_id) {
+                flow.login(_.cloneDeep($localStorage), true).then(null, fail);
+
+                // only fail to the char create screen if there's a server connection
+            } else if (AuthData.get().canConnect) {
+                    fail();
+                }
+        },
+        login: function login(NewHeroProto) {
+            var swallow = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+            var defer = $q.defer();
+            if (BlockState.get().Login || AuthData.get().isLoggedIn) {
+                defer.reject(false);
+                return defer.promise;
+            }
+
+            var NewHero = {
+                name: NewHeroProto.name,
+                profession: NewHeroProto.profession,
+                userId: NewHeroProto.profile.user_id,
+                token: NewHeroProto.token,
+                homepoint: NewHeroProto.homepoint
+            };
+
+            BlockState.block('Login');
+            socket.emit('login', NewHero, function (err, success) {
+                BlockState.unblock('Login');
+                if (err) {
+                    defer.reject(true);
+                } else {
+                    defer.resolve();
+                    _.extend(Settings, success.settings);
+                    flow.toPlayer();
+                    AuthData.update({ isLoggedIn: true });
+                    $localStorage.env = Config._cfg;
+                    BlockState.unblockAll();
+                }
+
+                if (!swallow) {
+                    var msgObj = err ? err : success;
+                    Toaster.show(msgObj.msg);
+                }
+            });
+
+            Settings.isReady = defer.promise;
+            return Settings.isReady;
+        }
+    };
+
+    return flow;
+}]);
+'use strict';
+
+angular.module('retro').service('BattleFlow', ["Player", "Battle", "Toaster", "BlockState", "$stateWrapper", "socket", function (Player, Battle, Toaster, BlockState, $stateWrapper, socket) {
+
+    var start = function start(monster) {
+        BlockState.block('Battle');
+        socket.emit('combat:enter', { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault(function () {
+            BlockState.unblock('Battle');
+        }));
+    };
+
+    var confirmAction = function confirmAction(_ref) {
+        var origin = _ref.origin;
+        var id = _ref.id;
+        var skill = _ref.skill;
+
+        socket.emit('combat:confirmaction', { skill: skill, target: id, name: origin }, Toaster.handleDefault());
+    };
+
+    var toExplore = function toExplore() {
+        $stateWrapper.noGoingBack('explore');
+    };
+
+    var getMultiplier = function getMultiplier(skill, me) {
+        return _.filter(me.skills, function (check) {
+            return check === skill;
+        }).length;
+    };
+
+    var skillCooldown = function skillCooldown(skill, me) {
+        return getMultiplier(skill ? skill.spellName : '', me) * (skill ? skill.spellCooldown : 0);
+    };
+    var canCastSkillCD = function canCastSkillCD(skill, me) {
+        var skillName = skill ? skill.spellName : '';
+        return !me.cooldowns[skillName] || me.cooldowns[skillName] <= 0;
+    };
+
+    var skillCost = function skillCost(skill, me) {
+        return getMultiplier(skill ? skill.spellName : '', me) * (skill ? skill.spellCost : 0);
+    };
+    var canCastSkillMP = function canCastSkillMP(skill, me) {
+        return skillCost(skill, me) <= me.stats.mp.__current;
+    };
+
+    return {
+        start: start,
+        confirmAction: confirmAction,
+        toExplore: toExplore,
+        getMultiplier: getMultiplier,
+        skillCooldown: skillCooldown,
+        canCastSkillCD: canCastSkillCD,
+        skillCost: skillCost,
+        canCastSkillMP: canCastSkillMP
+    };
+}]);
+'use strict';
+
+angular.module('retro').service('ClassChangeFlow', ["Toaster", "$stateWrapper", "Player", "BlockState", "socket", function (Toaster, $stateWrapper, Player, BlockState, socket) {
+    return {
+        change: function change(newProfession) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, newProfession: newProfession };
+
+            BlockState.block('Player');
+            socket.emit('player:change:class', opts, Toaster.handleDefault(function () {
+                $stateWrapper.go('player');
+                BlockState.unblock('Player');
+            }));
+        }
+    };
+}]);
+'use strict';
+
+angular.module('retro').service('EquipFlow', ["Toaster", "$stateWrapper", "Player", "BlockState", "socket", function (Toaster, $stateWrapper, Player, BlockState, socket) {
+    return {
+        equip: function equip(newItem) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, itemId: newItem.itemId };
+
+            BlockState.block('Player');
+            socket.emit('player:change:equipment', opts, Toaster.handleDefault(function () {
+                $stateWrapper.go('player');
+                BlockState.unblock('Player');
+            }));
+        }
+    };
+}]);
+'use strict';
+
+angular.module('retro').service('SkillChangeFlow', ["Toaster", "$state", "Player", "BlockState", "socket", function (Toaster, $state, Player, BlockState, socket) {
+    return {
+        change: function change(skill, slot) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, skillName: skill, skillSlot: slot };
+
+            BlockState.block('Player');
+            socket.emit('player:change:skill', opts, Toaster.handleDefault(function () {
+                BlockState.unblock('Player');
+            }));
         }
     };
 }]);
