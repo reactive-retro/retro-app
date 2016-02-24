@@ -11,11 +11,21 @@ angular.module('retro').controller('OptionsController',
         };
 
         $scope.toggleSetting = (option) => {
-            console.log(option);
+            const newVal = $scope.settings[option.variable];
+            const setting = { [option.variable]: newVal };
+
+            if(option.auxOnSet) {
+                _.each(option.auxOnSet, auxOption => {
+                    if(newVal !== auxOption.ifSelf) return;
+                    setting[auxOption.varName] = auxOption.setVal;
+                });
+            }
+
+            _.extend($scope.settings, setting);
+            SettingFlow.changeMany(setting);
         };
 
         $scope.settings = Settings.get();
-        Settings.observer.then(null, null, () => $scope.settings = Settings.get());
 
         $scope.options = [
             {
@@ -27,8 +37,8 @@ angular.module('retro').controller('OptionsController',
                 label: 'Auto-confirm attacks',
                 variable: 'autoConfirmAttacks',
                 auxOnSet: [{
-                    checkVal: false,
-                    variables: ['autoConfirmAttacksIfOnly'],
+                    setVal: false,
+                    varName: 'autoConfirmAttacksIfOnly',
                     ifSelf: false
                 }]
             },

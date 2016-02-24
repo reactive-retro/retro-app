@@ -643,6 +643,8 @@ angular.module('retro').controller('MenuController', ["$scope", "$state", "$stat
 }]);
 'use strict';
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 angular.module('retro').controller('OptionsController', ["$scope", "Settings", "SettingFlow", function ($scope, Settings, SettingFlow) {
 
     $scope.changeSetting = function (key, val) {
@@ -657,13 +659,21 @@ angular.module('retro').controller('OptionsController', ["$scope", "Settings", "
     };
 
     $scope.toggleSetting = function (option) {
-        console.log(option);
+        var newVal = $scope.settings[option.variable];
+        var setting = _defineProperty({}, option.variable, newVal);
+
+        if (option.auxOnSet) {
+            _.each(option.auxOnSet, function (auxOption) {
+                if (newVal !== auxOption.ifSelf) return;
+                setting[auxOption.varName] = auxOption.setVal;
+            });
+        }
+
+        _.extend($scope.settings, setting);
+        SettingFlow.changeMany(setting);
     };
 
     $scope.settings = Settings.get();
-    Settings.observer.then(null, null, function () {
-        return $scope.settings = Settings.get();
-    });
 
     $scope.options = [{
         type: 'divider',
@@ -673,8 +683,8 @@ angular.module('retro').controller('OptionsController', ["$scope", "Settings", "
         label: 'Auto-confirm attacks',
         variable: 'autoConfirmAttacks',
         auxOnSet: [{
-            checkVal: false,
-            variables: ['autoConfirmAttacksIfOnly'],
+            setVal: false,
+            varName: 'autoConfirmAttacksIfOnly',
             ifSelf: false
         }]
     }, {
@@ -1618,6 +1628,13 @@ angular.module('retro').service('SettingFlow', ["BlockState", "Player", "Toaster
             var newVal = _ref.newVal;
 
             var newSettings = { name: Player.get().name, settingHash: _defineProperty({}, setting, newVal) };
+            BlockState.block('Setting');
+            socket.emit('player:change:setting', newSettings, Toaster.handleDefault(function () {
+                BlockState.unblock('Setting');
+            }));
+        },
+        changeMany: function changeMany(settings) {
+            var newSettings = { name: Player.get().name, settingHash: settings };
             BlockState.block('Setting');
             socket.emit('player:change:setting', newSettings, Toaster.handleDefault(function () {
                 BlockState.unblock('Setting');

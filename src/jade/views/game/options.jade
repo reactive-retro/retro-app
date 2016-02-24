@@ -2,19 +2,7 @@ script(type="text/ng-template", id="options")
     ion-view(view-title="Options")
         ion-content
             div.list
-                div.item.item-divider Combat
-                ion-toggle(
-                    ng-model="settings.autoConfirmAttacks",
-                    ng-click="changeSetting('autoConfirmAttacks', true)",
-                    blocked-by="Setting")
-                    div Auto-confirm attacks
-
-                ion-toggle(
-                    ng-show="settings.autoConfirmAttacks",
-                    ng-model="settings.autoConfirmAttacksIfOnly",
-                    ng-click="changeSetting('autoConfirmAttacksIfOnly', true)",
-                    blocked-by="Setting")
-                    div Auto-confirm if only living member
+                div(ng-repeat="option in options", ng-include="'options-'+option.type")
 
 script(type="text/ng-template", id="options-divider")
     div.item.item-divider {{option.label}}
