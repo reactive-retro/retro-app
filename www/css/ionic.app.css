@@ -9765,15 +9765,15 @@ map {
 .scroll {
   height: 100%; }
 
-.gmaps-button {
+.above-gmaps {
   position: absolute;
   z-index: 20; }
-  .gmaps-button.findme-button {
+  .above-gmaps.findme-button {
     bottom: 30px;
     left: 15px; }
-    .gmaps-button.findme-button .icon {
+    .above-gmaps.findme-button .icon {
       font-size: smaller; }
-  .gmaps-button.fight-button {
+  .above-gmaps.fight-button {
     bottom: 30px;
     right: 15px; }
 

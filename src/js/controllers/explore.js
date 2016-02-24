@@ -3,6 +3,7 @@ angular.module('retro').controller('ExploreController',
 
         $scope.currentlySelected = null;
         $scope.centered = true;
+        $scope.player = Player.get();
 
         const unCenter = () => $scope.centered = false;
 
@@ -67,6 +68,10 @@ angular.module('retro').controller('ExploreController',
 
         Monsters.observer.then(null, null, () => {
             MapDrawing.drawMonsters($scope.map, Monsters.get(), $scope.select);
+        });
+
+        Player.observer.then(null, null, () => {
+            $scope.player = Player.get();
         });
     }
 );
