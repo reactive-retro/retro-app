@@ -1,4 +1,11 @@
 {
   "name": "reactive-retro",
-  "app_id": "332f1520"
+  "app_id": "332f1520",
+  "browsers": [
+    {
+      "platform": "android",
+      "browser": "crosswalk",
+      "version": "12.41.296.5"
+    }
+  ]
 }
