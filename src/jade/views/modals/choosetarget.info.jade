@@ -6,7 +6,7 @@ script(type="text/ng-template", id="choosetarget.info")
                 button.button(ng-click="closeModal('targetModal')")
                     i.icon.ion-close
             h1.title {{activeSkill.spellName}}
-        ion-content.skill-modal-container(scroll="false")
+        ion-content.skill-modal-container
             .row.data-area(ng-if="activeSkill")
                 .col
                     .row

@@ -720,6 +720,151 @@ angular.module('retro').controller('SkillChangeController', ["$scope", "$ionicMo
 }]);
 'use strict';
 
+angular.module('retro').directive('blockedBy', ["BlockState", function (BlockState) {
+    return {
+        restrict: 'A',
+        link: function link($scope, element, attrs) {
+            $scope.$parent.$watch(function () {
+                return BlockState.get()[attrs.blockedBy];
+            }, function (newVal) {
+                element.prop('disabled', newVal);
+            });
+        }
+    };
+}]);
+'use strict';
+
+angular.module('retro').directive('colorText', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            value: '=',
+            preText: '@'
+        },
+        template: '\n                <span ng-class="{assertive: value < 0, balanced: value > 0}">{{preText}} {{value}}</span>\n            '
+    };
+});
+'use strict';
+
+angular.module('retro').directive('cooldown', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            turns: '='
+        },
+        template: '\n                <span>\n                    <i class="icon ion-clock"></i> <ng-pluralize count="turns", when="{\'0\': \'Instant\', \'one\': \'1 round\', \'other\': \'{} rounds\'}"></ng-pluralize>\n                </span>\n            '
+    };
+});
+'use strict';
+
+angular.module('retro').directive('healthDisplay', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            target: '='
+        },
+        template: '\n                <div>\n                    <i class="icon ion-heart assertive"></i> {{target.stats.hp.__current}} / {{target.stats.hp.maximum}}\n                </div>\n            '
+    };
+});
+'use strict';
+
+angular.module('retro').directive('manaDisplay', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            target: '='
+        },
+        template: '\n                <div>\n                    <i class="icon ion-waterdrop positive"></i> {{target.stats.mp.__current}} / {{target.stats.mp.maximum}}\n                </div>\n            '
+    };
+});
+'use strict';
+
+angular.module('retro').directive('map', ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
+    return {
+        restrict: 'E',
+        scope: {
+            onCreate: '&',
+            onClick: '&'
+        },
+        link: function link($scope, $element) {
+
+            if (!Google || !Google.maps) {
+                Toaster.show('Could not reach google.');
+                return;
+            }
+
+            // this is the available list of places in the game
+            var init = function init() {
+                var mapOptions = {
+                    center: new Google.maps.LatLng(32.3078, -64.7505),
+                    zoom: 17,
+                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
+                    draggable: true,
+                    minZoom: 15,
+                    maxZoom: 17,
+                    styles: MAP_STYLE,
+                    mapTypeControlOptions: { mapTypeIds: [] },
+                    overviewMapControl: false,
+                    streetViewControl: false,
+                    zoomControl: false
+                };
+
+                var map = new Google.maps.Map($element[0], mapOptions);
+
+                $scope.onCreate({ map: map });
+
+                Google.maps.event.addDomListener($element[0], 'mousedown', function (e) {
+                    $scope.onClick();
+                    e.preventDefault();
+                    return false;
+                });
+            };
+
+            if (document.readyState === 'complete') {
+                init();
+            } else {
+                Google.maps.event.addDomListener(window, 'load', init);
+            }
+        }
+    };
+}]);
+'use strict';
+
+angular.module('retro').directive('mpCost', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            cost: '='
+        },
+        template: '\n                <span>\n                    <i class="icon ion-waterdrop positive"></i> {{cost}} mp\n                </span>\n            '
+    };
+});
+'use strict';
+
+angular.module('retro').directive('skillEffectDisplay', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            effects: '=',
+            multiplier: '='
+        },
+        template: '\n                <div class="row" ng-repeat="effect in effects">\n                    <div class="col col-20 col-offset-20 text-right">\n                        <strong>{{effect.name}}</strong>\n                    </div>\n\n                    <div class="col text-left">\n                        <span>{{effect.value.min_possible * multiplier}}</span>\n                        <span ng-if="effect.value.min_possible !== effect.value.max_possible">- {{effect.value.max_possible*multiplier}}</span>\n                        <ng-pluralize ng-if="effect.extra.string" count="effect.value.max_possible*multiplier" when="{\'one\': \' \'+effect.extra.string, \'other\': \' \'+effect.extra.string+\'s\'}"></ng-pluralize>\n                        <span ng-if="effect.extra.chance"> ({{effect.extra.chance + effect.accuracy}}% chance)</span>\n                    </div>\n                </div>\n            '
+    };
+});
+'use strict';
+
+angular.module('retro').directive('statBar', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            target: '=',
+            stat: '@'
+        },
+        template: '\n                <div class="stat-bar-container">\n                    <div class="stat-bar {{stat}}" style="width: {{target.stats[stat].__current/target.stats[stat].maximum*100}}%"></div>\n                </div>\n            '
+    };
+});
+'use strict';
+
 angular.module('retro').service('Auth', ["$localStorage", "$stateWrapper", "auth", "AuthFlow", "AuthData", function ($localStorage, $stateWrapper, auth, AuthFlow, AuthData) {
 
     var localAuth = {
@@ -1021,149 +1166,191 @@ angular.module('retro').service('Toaster', ["$cordovaToast", function ($cordovaT
 }]);
 'use strict';
 
-angular.module('retro').directive('blockedBy', ["BlockState", function (BlockState) {
-    return {
-        restrict: 'A',
-        link: function link($scope, element, attrs) {
-            $scope.$parent.$watch(function () {
-                return BlockState.get()[attrs.blockedBy];
-            }, function (newVal) {
-                element.prop('disabled', newVal);
-            });
-        }
+angular.module('retro').service('AuthFlow', ["$q", "AuthData", "Toaster", "$localStorage", "$state", "$stateWrapper", "Player", "Settings", "BlockState", "Config", "socket", function ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, BlockState, Config, socket) {
+    var unsetAutoLogin = function unsetAutoLogin() {
+        AuthData.update({ attemptAutoLogin: false });
     };
-}]);
-'use strict';
 
-angular.module('retro').directive('colorText', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            value: '=',
-            preText: '@'
+    var flow = {
+        toPlayer: function toPlayer() {
+            if (!_.contains(['home', 'create'], $state.current.name)) return;
+
+            $stateWrapper.noGoingBack('player');
         },
-        template: '\n                <span ng-class="{assertive: value < 0, balanced: value > 0}">{{preText}} {{value}}</span>\n            '
-    };
-});
-'use strict';
-
-angular.module('retro').directive('cooldown', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            turns: '='
-        },
-        template: '\n                <span>\n                    <i class="icon ion-clock"></i> <ng-pluralize count="turns", when="{\'0\': \'Instant\', \'one\': \'1 round\', \'other\': \'{} rounds\'}"></ng-pluralize>\n                </span>\n            '
-    };
-});
-'use strict';
-
-angular.module('retro').directive('healthDisplay', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            target: '='
-        },
-        template: '\n                <div>\n                    <i class="icon ion-heart assertive"></i> {{target.stats.hp.__current}} / {{target.stats.hp.maximum}}\n                </div>\n            '
-    };
-});
-'use strict';
-
-angular.module('retro').directive('manaDisplay', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            target: '='
-        },
-        template: '\n                <div>\n                    <i class="icon ion-waterdrop positive"></i> {{target.stats.mp.__current}} / {{target.stats.mp.maximum}}\n                </div>\n            '
-    };
-});
-'use strict';
-
-angular.module('retro').directive('map', ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
-    return {
-        restrict: 'E',
-        scope: {
-            onCreate: '&',
-            onClick: '&'
-        },
-        link: function link($scope, $element) {
-
-            if (!Google || !Google.maps) {
-                Toaster.show('Could not reach google.');
+        tryAutoLogin: function tryAutoLogin() {
+            if (!$localStorage.profile || !$localStorage.profile.user_id) {
+                unsetAutoLogin();
                 return;
             }
-
-            // this is the available list of places in the game
-            var init = function init() {
-                var mapOptions = {
-                    center: new Google.maps.LatLng(32.3078, -64.7505),
-                    zoom: 17,
-                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
-                    draggable: true,
-                    minZoom: 15,
-                    maxZoom: 17,
-                    styles: MAP_STYLE,
-                    mapTypeControlOptions: { mapTypeIds: [] },
-                    overviewMapControl: false,
-                    streetViewControl: false,
-                    zoomControl: false
-                };
-
-                var map = new Google.maps.Map($element[0], mapOptions);
-
-                $scope.onCreate({ map: map });
-
-                Google.maps.event.addDomListener($element[0], 'mousedown', function (e) {
-                    $scope.onClick();
-                    e.preventDefault();
-                    return false;
-                });
+            flow.login(_.cloneDeep($localStorage), true).then(null, unsetAutoLogin);
+        },
+        tryAuth: function tryAuth() {
+            var fail = function fail(val) {
+                unsetAutoLogin();
+                if (!val) return;
+                $stateWrapper.go('create');
             };
 
-            if (document.readyState === 'complete') {
-                init();
-            } else {
-                Google.maps.event.addDomListener(window, 'load', init);
+            if ($localStorage.profile.user_id) {
+                flow.login(_.cloneDeep($localStorage), true).then(null, fail);
+
+                // only fail to the char create screen if there's a server connection
+            } else if (AuthData.get().canConnect) {
+                    fail();
+                }
+        },
+        login: function login(NewHeroProto) {
+            var swallow = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+            var defer = $q.defer();
+            if (BlockState.get().Login || AuthData.get().isLoggedIn) {
+                defer.reject(false);
+                return defer.promise;
             }
+
+            var NewHero = {
+                name: NewHeroProto.name,
+                profession: NewHeroProto.profession,
+                userId: NewHeroProto.profile.user_id,
+                token: NewHeroProto.token,
+                homepoint: NewHeroProto.homepoint
+            };
+
+            BlockState.block('Login');
+            socket.emit('login', NewHero, function (err, success) {
+                BlockState.unblock('Login');
+                if (err) {
+                    defer.reject(true);
+                } else {
+                    defer.resolve();
+                    _.extend(Settings, success.settings);
+                    flow.toPlayer();
+                    AuthData.update({ isLoggedIn: true });
+                    $localStorage.env = Config._cfg;
+                    BlockState.unblockAll();
+                }
+
+                if (!swallow) {
+                    var msgObj = err ? err : success;
+                    Toaster.show(msgObj.msg);
+                }
+            });
+
+            Settings.isReady = defer.promise;
+            return Settings.isReady;
+        }
+    };
+
+    return flow;
+}]);
+'use strict';
+
+angular.module('retro').service('BattleFlow', ["Player", "Battle", "Toaster", "BlockState", "$stateWrapper", "socket", function (Player, Battle, Toaster, BlockState, $stateWrapper, socket) {
+
+    var start = function start(monster) {
+        BlockState.block('Battle');
+        socket.emit('combat:enter', { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault(function () {
+            BlockState.unblock('Battle');
+        }));
+    };
+
+    var confirmAction = function confirmAction(_ref) {
+        var origin = _ref.origin;
+        var id = _ref.id;
+        var skill = _ref.skill;
+
+        socket.emit('combat:confirmaction', { skill: skill, target: id, name: origin }, Toaster.handleDefault());
+    };
+
+    var toExplore = function toExplore() {
+        $stateWrapper.noGoingBack('explore');
+    };
+
+    var getMultiplier = function getMultiplier(skill, me) {
+        return _.filter(me.skills, function (check) {
+            return check === skill;
+        }).length;
+    };
+
+    var skillCooldown = function skillCooldown(skill, me) {
+        return getMultiplier(skill ? skill.spellName : '', me) * (skill ? skill.spellCooldown : 0);
+    };
+    var canCastSkillCD = function canCastSkillCD(skill, me) {
+        var skillName = skill ? skill.spellName : '';
+        return !me.cooldowns[skillName] || me.cooldowns[skillName] <= 0;
+    };
+
+    var skillCost = function skillCost(skill, me) {
+        return getMultiplier(skill ? skill.spellName : '', me) * (skill ? skill.spellCost : 0);
+    };
+    var canCastSkillMP = function canCastSkillMP(skill, me) {
+        return skillCost(skill, me) <= me.stats.mp.__current;
+    };
+
+    return {
+        start: start,
+        confirmAction: confirmAction,
+        toExplore: toExplore,
+        getMultiplier: getMultiplier,
+        skillCooldown: skillCooldown,
+        canCastSkillCD: canCastSkillCD,
+        skillCost: skillCost,
+        canCastSkillMP: canCastSkillMP
+    };
+}]);
+'use strict';
+
+angular.module('retro').service('ClassChangeFlow', ["Toaster", "$stateWrapper", "Player", "BlockState", "socket", function (Toaster, $stateWrapper, Player, BlockState, socket) {
+    return {
+        change: function change(newProfession) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, newProfession: newProfession };
+
+            BlockState.block('Player');
+            socket.emit('player:change:class', opts, Toaster.handleDefault(function () {
+                $stateWrapper.go('player');
+                BlockState.unblock('Player');
+            }));
         }
     };
 }]);
 'use strict';
 
-angular.module('retro').directive('mpCost', function () {
+angular.module('retro').service('EquipFlow', ["Toaster", "$stateWrapper", "Player", "BlockState", "socket", function (Toaster, $stateWrapper, Player, BlockState, socket) {
     return {
-        restrict: 'E',
-        scope: {
-            cost: '='
-        },
-        template: '\n                <span>\n                    <i class="icon ion-waterdrop positive"></i> {{cost}} mp\n                </span>\n            '
+        equip: function equip(newItem) {
+
+            var player = Player.get();
+
+            var opts = { name: player.name, itemId: newItem.itemId };
+
+            BlockState.block('Player');
+            socket.emit('player:change:equipment', opts, Toaster.handleDefault(function () {
+                $stateWrapper.go('player');
+                BlockState.unblock('Player');
+            }));
+        }
     };
-});
+}]);
 'use strict';
 
-angular.module('retro').directive('skillEffectDisplay', function () {
+angular.module('retro').service('SkillChangeFlow', ["Toaster", "$state", "Player", "BlockState", "socket", function (Toaster, $state, Player, BlockState, socket) {
     return {
-        restrict: 'E',
-        scope: {
-            effects: '=',
-            multiplier: '='
-        },
-        template: '\n                <div class="row" ng-repeat="effect in effects">\n                    <div class="col col-20 col-offset-20 text-right">\n                        <strong>{{effect.name}}</strong>\n                    </div>\n\n                    <div class="col text-left">\n                        <span>{{effect.value.min_possible * multiplier}}</span>\n                        <span ng-if="effect.value.min_possible !== effect.value.max_possible">- {{effect.value.max_possible*multiplier}}</span>\n                        <ng-pluralize ng-if="effect.extra.string" count="effect.value.max_possible*multiplier" when="{\'one\': \' \'+effect.extra.string, \'other\': \' \'+effect.extra.string+\'s\'}"></ng-pluralize>\n                        <span ng-if="effect.extra.chance"> ({{effect.extra.chance + effect.accuracy}}% chance)</span>\n                    </div>\n                </div>\n            '
-    };
-});
-'use strict';
+        change: function change(skill, slot) {
 
-angular.module('retro').directive('statBar', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            target: '=',
-            stat: '@'
-        },
-        template: '\n                <div class="stat-bar-container">\n                    <div class="stat-bar {{stat}}" style="width: {{target.stats[stat].__current/target.stats[stat].maximum*100}}%"></div>\n                </div>\n            '
+            var player = Player.get();
+
+            var opts = { name: player.name, skillName: skill, skillSlot: slot };
+
+            BlockState.block('Player');
+            socket.emit('player:change:skill', opts, Toaster.handleDefault(function () {
+                BlockState.unblock('Player');
+            }));
+        }
     };
-});
+}]);
 'use strict';
 
 angular.module('retro').service('AuthData', ["$q", function ($q) {
@@ -1358,193 +1545,6 @@ angular.module('retro').service('Skills', ["$q", function ($q) {
         set: getNewSkills,
         get: function get() {
             return skills;
-        }
-    };
-}]);
-'use strict';
-
-angular.module('retro').service('AuthFlow', ["$q", "AuthData", "Toaster", "$localStorage", "$state", "$stateWrapper", "Player", "Settings", "BlockState", "Config", "socket", function ($q, AuthData, Toaster, $localStorage, $state, $stateWrapper, Player, Settings, BlockState, Config, socket) {
-    var unsetAutoLogin = function unsetAutoLogin() {
-        AuthData.update({ attemptAutoLogin: false });
-    };
-
-    var flow = {
-        toPlayer: function toPlayer() {
-            if (!_.contains(['home', 'create'], $state.current.name)) return;
-
-            $stateWrapper.noGoingBack('player');
-        },
-        tryAutoLogin: function tryAutoLogin() {
-            if (!$localStorage.profile || !$localStorage.profile.user_id) {
-                unsetAutoLogin();
-                return;
-            }
-            flow.login(_.cloneDeep($localStorage), true).then(null, unsetAutoLogin);
-        },
-        tryAuth: function tryAuth() {
-            var fail = function fail(val) {
-                unsetAutoLogin();
-                if (!val) return;
-                $stateWrapper.go('create');
-            };
-
-            if ($localStorage.profile.user_id) {
-                flow.login(_.cloneDeep($localStorage), true).then(null, fail);
-
-                // only fail to the char create screen if there's a server connection
-            } else if (AuthData.get().canConnect) {
-                    fail();
-                }
-        },
-        login: function login(NewHeroProto) {
-            var swallow = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-            var defer = $q.defer();
-            if (BlockState.get().Login || AuthData.get().isLoggedIn) {
-                defer.reject(false);
-                return defer.promise;
-            }
-
-            var NewHero = {
-                name: NewHeroProto.name,
-                profession: NewHeroProto.profession,
-                userId: NewHeroProto.profile.user_id,
-                token: NewHeroProto.token,
-                homepoint: NewHeroProto.homepoint
-            };
-
-            BlockState.block('Login');
-            socket.emit('login', NewHero, function (err, success) {
-                BlockState.unblock('Login');
-                if (err) {
-                    defer.reject(true);
-                } else {
-                    defer.resolve();
-                    _.extend(Settings, success.settings);
-                    flow.toPlayer();
-                    AuthData.update({ isLoggedIn: true });
-                    $localStorage.env = Config._cfg;
-                    BlockState.unblockAll();
-                }
-
-                if (!swallow) {
-                    var msgObj = err ? err : success;
-                    Toaster.show(msgObj.msg);
-                }
-            });
-
-            Settings.isReady = defer.promise;
-            return Settings.isReady;
-        }
-    };
-
-    return flow;
-}]);
-'use strict';
-
-angular.module('retro').service('BattleFlow', ["Player", "Battle", "Toaster", "BlockState", "$stateWrapper", "socket", function (Player, Battle, Toaster, BlockState, $stateWrapper, socket) {
-
-    var start = function start(monster) {
-        BlockState.block('Battle');
-        socket.emit('combat:enter', { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault(function () {
-            BlockState.unblock('Battle');
-        }));
-    };
-
-    var confirmAction = function confirmAction(_ref) {
-        var origin = _ref.origin;
-        var id = _ref.id;
-        var skill = _ref.skill;
-
-        socket.emit('combat:confirmaction', { skill: skill, target: id, name: origin }, Toaster.handleDefault());
-    };
-
-    var toExplore = function toExplore() {
-        $stateWrapper.noGoingBack('explore');
-    };
-
-    var getMultiplier = function getMultiplier(skill, me) {
-        return _.filter(me.skills, function (check) {
-            return check === skill;
-        }).length;
-    };
-
-    var skillCooldown = function skillCooldown(skill, me) {
-        return getMultiplier(skill ? skill.spellName : '', me) * (skill ? skill.spellCooldown : 0);
-    };
-    var canCastSkillCD = function canCastSkillCD(skill, me) {
-        var skillName = skill ? skill.spellName : '';
-        return !me.cooldowns[skillName] || me.cooldowns[skillName] <= 0;
-    };
-
-    var skillCost = function skillCost(skill, me) {
-        return getMultiplier(skill ? skill.spellName : '', me) * (skill ? skill.spellCost : 0);
-    };
-    var canCastSkillMP = function canCastSkillMP(skill, me) {
-        return skillCost(skill, me) <= me.stats.mp.__current;
-    };
-
-    return {
-        start: start,
-        confirmAction: confirmAction,
-        toExplore: toExplore,
-        getMultiplier: getMultiplier,
-        skillCooldown: skillCooldown,
-        canCastSkillCD: canCastSkillCD,
-        skillCost: skillCost,
-        canCastSkillMP: canCastSkillMP
-    };
-}]);
-'use strict';
-
-angular.module('retro').service('ClassChangeFlow', ["Toaster", "$stateWrapper", "Player", "BlockState", "socket", function (Toaster, $stateWrapper, Player, BlockState, socket) {
-    return {
-        change: function change(newProfession) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, newProfession: newProfession };
-
-            BlockState.block('Player');
-            socket.emit('player:change:class', opts, Toaster.handleDefault(function () {
-                $stateWrapper.go('player');
-                BlockState.unblock('Player');
-            }));
-        }
-    };
-}]);
-'use strict';
-
-angular.module('retro').service('EquipFlow', ["Toaster", "$stateWrapper", "Player", "BlockState", "socket", function (Toaster, $stateWrapper, Player, BlockState, socket) {
-    return {
-        equip: function equip(newItem) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, itemId: newItem.itemId };
-
-            BlockState.block('Player');
-            socket.emit('player:change:equipment', opts, Toaster.handleDefault(function () {
-                $stateWrapper.go('player');
-                BlockState.unblock('Player');
-            }));
-        }
-    };
-}]);
-'use strict';
-
-angular.module('retro').service('SkillChangeFlow', ["Toaster", "$state", "Player", "BlockState", "socket", function (Toaster, $state, Player, BlockState, socket) {
-    return {
-        change: function change(skill, slot) {
-
-            var player = Player.get();
-
-            var opts = { name: player.name, skillName: skill, skillSlot: slot };
-
-            BlockState.block('Player');
-            socket.emit('player:change:skill', opts, Toaster.handleDefault(function () {
-                BlockState.unblock('Player');
-            }));
         }
     };
 }]);
