@@ -1,9 +1,9 @@
 
 script(type="text/ng-template", id="choosetarget.info")
-    ion-modal-view
+    ion-modal-view(ng-controller="SelectTargetController")
         ion-header-bar.bar-balanced
             .buttons
-                button.button(ng-click="closeModal('targetModal')")
+                button.button(ng-click="closeModal()")
                     i.icon.ion-close
             h1.title {{activeSkill.spellName}}
         ion-content.skill-modal-container

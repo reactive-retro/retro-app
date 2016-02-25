@@ -5,7 +5,7 @@ angular.module('retro').controller('BattleController',
         $scope.targets = {};
         $scope.multiplier = 1;
 
-        const modals = {
+        $scope.modals = {
             targetModal: null,
             resultsModal: null
         };
@@ -18,7 +18,7 @@ angular.module('retro').controller('BattleController',
             $scope.targets = {};
             $scope.results = actions;
             $scope.isDone = isDone;
-            modals.resultsModal.show();
+            $scope.modals.resultsModal.show();
             if(isDone) {
                 Battle.set(null);
             }
@@ -53,33 +53,17 @@ angular.module('retro').controller('BattleController',
         $scope.openSkillInfo = (skill) => {
             $scope.activeSkill = _.find(Skills.get(), { spellName: skill });
 
-            $scope.multiplier = BattleFlow.getMultiplier($scope.activeSkill.spellName, $scope.me);
-            if(skill === 'Attack') {
-                $scope.multiplier += 1;
-            }
-
-            const skillRef = $scope.activeSkill;
-            $scope.activeSkillAttrs = _(skillRef.spellEffects)
-                .keys()
-                .map(key => {
-                    const stats = Dice.statistics(skillRef.spellEffects[key].roll, $scope.me.stats);
-                    return { name: key, value: stats, extra: skillRef.spellEffects[key], accuracy: $scope.me.stats.acc };
-                })
-                // Damage always comes first
-                .sortBy((obj) => obj.name === 'Damage' ? '*' : obj.name)
-                .value();
-
-            modals.targetModal.show();
-        };
-
-        $scope.target = {
-            monster: (monster) => $scope.prepareTarget({ name: monster.name, id: monster.id, skill: $scope.activeSkill.spellName }),
-            player: (player) => $scope.prepareTarget({ name: player.name, id: player.name, skill: $scope.activeSkill.spellName }),
-            other: (other) => $scope.prepareTarget({ name: other, id: other, skill: $scope.activeSkill.spellName })
+            $ionicModal.fromTemplateUrl('choosetarget.info', {
+                scope: $scope,
+                animation: 'slide-in-up'
+            }).then((modal) => {
+                $scope.modals.targetModal = modal;
+                $scope.modals.targetModal.show();
+            });
         };
 
         $scope.closeModal = (modal) => {
-            modals[modal].hide();
+            $scope.modals[modal].hide();
             if($scope.isDone) {
                 BattleFlow.toExplore();
             }
@@ -108,24 +92,17 @@ angular.module('retro').controller('BattleController',
             BattleFlow.confirmAction($scope.targets[$scope.currentPlayerName]);
         };
 
-        $ionicModal.fromTemplateUrl('choosetarget.info', {
-            scope: $scope,
-            animation: 'slide-in-up'
-        }).then((modal) => {
-            modals.targetModal = modal;
-        });
-
         $ionicModal.fromTemplateUrl('results.info', {
             scope: $scope,
             animation: 'slide-in-up'
         }).then((modal) => {
-            modals.resultsModal = modal;
+            $scope.modals.resultsModal = modal;
         });
 
         // clean up modal b/c memory
         $scope.$on('$destroy', () => {
-            modals.targetModal.remove();
-            modals.resultsModal.remove();
+            $scope.modals.targetModal.remove();
+            $scope.modals.resultsModal.remove();
         });
 
         setupBattleData();
