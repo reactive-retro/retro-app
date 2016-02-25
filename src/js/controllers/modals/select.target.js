@@ -14,7 +14,7 @@ angular.module('retro').controller('SelectTargetController',
         $scope.activeSkillAttrs = _(skillRef.spellEffects)
             .keys()
             .map(key => {
-                const stats = Dice.statistics(skillRef.spellEffects[key].roll, $scope.me.stats);
+                const stats = Dice.statistics(skillRef.spellEffects[key].roll, $scope.me.stats, 1);
                 return { name: key, value: stats, extra: skillRef.spellEffects[key], accuracy: $scope.me.stats.acc };
             })
             // Damage always comes first

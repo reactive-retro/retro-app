@@ -6,7 +6,7 @@ angular.module('retro').controller('SkillChangeModalController',
         $scope.activeSkillAttrs = _(skill.spellEffects)
             .keys()
             .map(key => {
-                const stats = Dice.statistics(skill.spellEffects[key].roll, $scope.player.stats);
+                const stats = Dice.statistics(skill.spellEffects[key].roll, $scope.player.stats, 1);
                 return { name: key, value: stats, extra: skill.spellEffects[key] };
             })
             // Damage always comes first
