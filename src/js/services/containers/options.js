@@ -1,4 +1,4 @@
-angular.module('retro').service('Settings', ($q) => {
+angular.module('retro').service('Options', ($q) => {
 
     const defer = $q.defer();
 

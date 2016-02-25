@@ -337,7 +337,7 @@ angular.module('retro').constant('MAP_STYLE', [{
 }]);
 'use strict';
 
-angular.module('retro').controller('BattleController', ["$scope", "$ionicModal", "BattleFlow", "Battle", "Dice", "Player", "Skills", function ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills) {
+angular.module('retro').controller('BattleController', ["$scope", "$ionicModal", "BattleFlow", "Battle", "Dice", "Player", "Skills", "Options", function ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills, Options) {
     $scope.battleFlow = BattleFlow;
     $scope.currentPlayerName = Player.get().name;
     $scope.targets = {};
@@ -435,6 +435,9 @@ angular.module('retro').controller('BattleController', ["$scope", "$ionicModal",
         $scope.battle.actionChannel.publish(target);
         $scope.canConfirm = true;
         $scope.closeModal('targetModal');
+
+        var options = Options.get();
+        console.log(options);
     };
 
     $scope.setTarget = function (target) {
@@ -645,21 +648,17 @@ angular.module('retro').controller('MenuController', ["$scope", "$state", "$stat
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-angular.module('retro').controller('OptionsController', ["$scope", "Settings", "SettingFlow", function ($scope, Settings, SettingFlow) {
-
-    $scope.changeSetting = function (key, val) {
-        SettingFlow.change({ setting: key, newVal: val });
-    };
+angular.module('retro').controller('OptionsController', ["$scope", "Options", "OptionsFlow", function ($scope, Options, OptionsFlow) {
 
     $scope.isVisible = function (option) {
         if (!option.visibleIf) return true;
         return _.all(option.visibleIf, function (varObj) {
-            return $scope.settings[varObj.varName] === varObj.checkVal;
+            return $scope.playerOptions[varObj.varName] === varObj.checkVal;
         });
     };
 
-    $scope.toggleSetting = function (option) {
-        var newVal = $scope.settings[option.variable];
+    $scope.toggleOption = function (option) {
+        var newVal = $scope.playerOptions[option.variable];
         var setting = _defineProperty({}, option.variable, newVal);
 
         if (option.auxOnSet) {
@@ -669,13 +668,13 @@ angular.module('retro').controller('OptionsController', ["$scope", "Settings", "
             });
         }
 
-        _.extend($scope.settings, setting);
-        SettingFlow.changeMany(setting);
+        _.extend($scope.playerOptions, setting);
+        OptionsFlow.changeMany(setting);
     };
 
-    $scope.settings = Settings.get();
+    $scope.playerOptions = Options.get();
 
-    $scope.options = [{
+    $scope.allOptions = [{
         type: 'divider',
         label: 'Combat'
     }, {
@@ -1357,6 +1356,30 @@ angular.module('retro').service('Monsters', ["$q", function ($q) {
 }]);
 'use strict';
 
+angular.module('retro').service('Options', ["$q", function ($q) {
+
+    var defer = $q.defer();
+
+    var settings = {};
+
+    var updateSettings = function updateSettings(newSettings) {
+        settings = newSettings;
+        defer.notify(settings);
+    };
+
+    return {
+        observer: defer.promise,
+        apply: function apply() {
+            defer.notify(settings);
+        },
+        set: updateSettings,
+        get: function get() {
+            return settings;
+        }
+    };
+}]);
+'use strict';
+
 angular.module('retro').service('Places', ["$q", function ($q) {
 
     var defer = $q.defer();
@@ -1399,30 +1422,6 @@ angular.module('retro').service('Player', ["$q", function ($q) {
         set: updatePlayer,
         get: function get() {
             return player;
-        }
-    };
-}]);
-'use strict';
-
-angular.module('retro').service('Settings', ["$q", function ($q) {
-
-    var defer = $q.defer();
-
-    var settings = {};
-
-    var updateSettings = function updateSettings(newSettings) {
-        settings = newSettings;
-        defer.notify(settings);
-    };
-
-    return {
-        observer: defer.promise,
-        apply: function apply() {
-            defer.notify(settings);
-        },
-        set: updateSettings,
-        get: function get() {
-            return settings;
         }
     };
 }]);
@@ -1619,25 +1618,13 @@ angular.module('retro').service('EquipFlow', ["Toaster", "$stateWrapper", "Playe
 }]);
 'use strict';
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-angular.module('retro').service('SettingFlow', ["BlockState", "Player", "Toaster", "socket", function (BlockState, Player, Toaster, socket) {
+angular.module('retro').service('OptionsFlow', ["BlockState", "Player", "Toaster", "socket", function (BlockState, Player, Toaster, socket) {
     return {
-        change: function change(_ref) {
-            var setting = _ref.setting;
-            var newVal = _ref.newVal;
-
-            var newSettings = { name: Player.get().name, settingHash: _defineProperty({}, setting, newVal) };
-            BlockState.block('Setting');
-            socket.emit('player:change:setting', newSettings, Toaster.handleDefault(function () {
-                BlockState.unblock('Setting');
-            }));
-        },
-        changeMany: function changeMany(settings) {
-            var newSettings = { name: Player.get().name, settingHash: settings };
-            BlockState.block('Setting');
-            socket.emit('player:change:setting', newSettings, Toaster.handleDefault(function () {
-                BlockState.unblock('Setting');
+        changeMany: function changeMany(options) {
+            var newOptions = { name: Player.get().name, optionsHash: options };
+            BlockState.block('Options');
+            socket.emit('player:change:options', newOptions, Toaster.handleDefault(function () {
+                BlockState.unblock('Options');
             }));
         }
     };
@@ -1705,14 +1692,14 @@ angular.module('retro').service('socketCluster', ["$window", function ($window) 
     socketManagement.setUpEvents(socket);
 
     return socket;
-}]).service('socketManagement', ["Player", "Skills", "Places", "Monsters", "Battle", "Settings", function (Player, Skills, Places, Monsters, Battle, Settings) {
+}]).service('socketManagement', ["Player", "Skills", "Places", "Monsters", "Battle", "Options", function (Player, Skills, Places, Monsters, Battle, Options) {
     return {
         setUpEvents: function setUpEvents(socket) {
             socket.on('update:player', Player.set);
             socket.on('update:skills', Skills.set);
             socket.on('update:places', Places.set);
+            socket.on('update:options', Options.set);
             socket.on('update:monsters', Monsters.set);
-            socket.on('update:settings', Settings.set);
             socket.on('combat:entered', Battle.set);
 
             Battle.setSocket(socket);

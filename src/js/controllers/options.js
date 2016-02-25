@@ -1,17 +1,13 @@
 angular.module('retro').controller('OptionsController',
-    ($scope, Settings, SettingFlow) => {
-
-        $scope.changeSetting = (key, val) => {
-            SettingFlow.change({ setting: key, newVal: val });
-        };
+    ($scope, Options, OptionsFlow) => {
 
         $scope.isVisible = (option) => {
             if(!option.visibleIf) return true;
-            return _.all(option.visibleIf, varObj => $scope.settings[varObj.varName] === varObj.checkVal);
+            return _.all(option.visibleIf, varObj => $scope.playerOptions[varObj.varName] === varObj.checkVal);
         };
 
-        $scope.toggleSetting = (option) => {
-            const newVal = $scope.settings[option.variable];
+        $scope.toggleOption = (option) => {
+            const newVal = $scope.playerOptions[option.variable];
             const setting = { [option.variable]: newVal };
 
             if(option.auxOnSet) {
@@ -21,13 +17,13 @@ angular.module('retro').controller('OptionsController',
                 });
             }
 
-            _.extend($scope.settings, setting);
-            SettingFlow.changeMany(setting);
+            _.extend($scope.playerOptions, setting);
+            OptionsFlow.changeMany(setting);
         };
 
-        $scope.settings = Settings.get();
+        $scope.playerOptions = Options.get();
 
-        $scope.options = [
+        $scope.allOptions = [
             {
                 type: 'divider',
                 label: 'Combat'

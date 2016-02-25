@@ -1,5 +1,5 @@
 angular.module('retro').controller('BattleController',
-    ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills) => {
+    ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills, Options) => {
         $scope.battleFlow = BattleFlow;
         $scope.currentPlayerName = Player.get().name;
         $scope.targets = {};
@@ -91,6 +91,9 @@ angular.module('retro').controller('BattleController',
             $scope.battle.actionChannel.publish(target);
             $scope.canConfirm = true;
             $scope.closeModal('targetModal');
+
+            const options = Options.get();
+            console.log(options);
         };
 
         $scope.setTarget = (target) => {
