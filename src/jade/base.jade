@@ -4,7 +4,12 @@ html
         meta(charset="utf-8")
         meta(name="viewport", content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width")
         meta(http-equiv="Content-Security-Policy",
-            content="default-src *; img-src * data:; font-src * data:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'")
+            content="default-src *; " +
+            "img-src 'self' * *.gravatar.com *.wp.com *.auth0.com data:; " +
+            "font-src 'self' https://*.auth0.com data:; " +
+            "style-src * 'unsafe-inline'; " +
+            "script-src * 'unsafe-inline' 'unsafe-eval' https://*.auth0.com; " +
+            "connect-src 'self' http://localhost:* ws://127.0.0.1:8080 ws://reactive-retro.herokuapp.com https://reactive-retro.auth0.com")
 
         title Reactive Retro
         link(href="css/ionic.app.css",rel="stylesheet")
