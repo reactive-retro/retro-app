@@ -93,7 +93,9 @@ angular.module('retro').controller('BattleController',
             $scope.closeModal('targetModal');
 
             const options = Options.get();
-            console.log(options);
+            if(options.autoConfirmAttacks) {
+                $scope.confirmAction();
+            }
         };
 
         $scope.setTarget = (target) => {
