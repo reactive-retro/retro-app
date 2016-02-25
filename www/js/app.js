@@ -217,151 +217,6 @@ angular.module('retro').config(["$ionicConfigProvider", "$urlRouterProvider", "$
 }]);
 'use strict';
 
-angular.module('retro').directive('blockedBy', ["BlockState", function (BlockState) {
-    return {
-        restrict: 'A',
-        link: function link($scope, element, attrs) {
-            $scope.$parent.$watch(function () {
-                return BlockState.get()[attrs.blockedBy];
-            }, function (newVal) {
-                element.prop('disabled', newVal);
-            });
-        }
-    };
-}]);
-'use strict';
-
-angular.module('retro').directive('colorText', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            value: '=',
-            preText: '@'
-        },
-        template: '\n                <span ng-class="{assertive: value < 0, balanced: value > 0}">{{preText}} {{value}}</span>\n            '
-    };
-});
-'use strict';
-
-angular.module('retro').directive('cooldown', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            turns: '='
-        },
-        template: '\n                <span>\n                    <i class="icon ion-clock"></i> <ng-pluralize count="turns", when="{\'0\': \'Instant\', \'one\': \'1 round\', \'other\': \'{} rounds\'}"></ng-pluralize>\n                </span>\n            '
-    };
-});
-'use strict';
-
-angular.module('retro').directive('healthDisplay', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            target: '='
-        },
-        template: '\n                <div>\n                    <i class="icon ion-heart assertive"></i> {{target.stats.hp.__current}} / {{target.stats.hp.maximum}}\n                </div>\n            '
-    };
-});
-'use strict';
-
-angular.module('retro').directive('manaDisplay', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            target: '='
-        },
-        template: '\n                <div>\n                    <i class="icon ion-waterdrop positive"></i> {{target.stats.mp.__current}} / {{target.stats.mp.maximum}}\n                </div>\n            '
-    };
-});
-'use strict';
-
-angular.module('retro').directive('map', ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
-    return {
-        restrict: 'E',
-        scope: {
-            onCreate: '&',
-            onClick: '&'
-        },
-        link: function link($scope, $element) {
-
-            if (!Google || !Google.maps) {
-                Toaster.show('Could not reach google.');
-                return;
-            }
-
-            // this is the available list of places in the game
-            var init = function init() {
-                var mapOptions = {
-                    center: new Google.maps.LatLng(32.3078, -64.7505),
-                    zoom: 17,
-                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
-                    draggable: true,
-                    minZoom: 15,
-                    maxZoom: 17,
-                    styles: MAP_STYLE,
-                    mapTypeControlOptions: { mapTypeIds: [] },
-                    overviewMapControl: false,
-                    streetViewControl: false,
-                    zoomControl: false
-                };
-
-                var map = new Google.maps.Map($element[0], mapOptions);
-
-                $scope.onCreate({ map: map });
-
-                Google.maps.event.addDomListener($element[0], 'mousedown', function (e) {
-                    $scope.onClick();
-                    e.preventDefault();
-                    return false;
-                });
-            };
-
-            if (document.readyState === 'complete') {
-                init();
-            } else {
-                Google.maps.event.addDomListener(window, 'load', init);
-            }
-        }
-    };
-}]);
-'use strict';
-
-angular.module('retro').directive('mpCost', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            cost: '='
-        },
-        template: '\n                <span>\n                    <i class="icon ion-waterdrop positive"></i> {{cost}} mp\n                </span>\n            '
-    };
-});
-'use strict';
-
-angular.module('retro').directive('skillEffectDisplay', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            effects: '=',
-            multiplier: '='
-        },
-        template: '\n                <div class="row" ng-repeat="effect in effects">\n                    <div class="col col-20 col-offset-20 text-right">\n                        <strong>{{effect.name}}</strong>\n                    </div>\n\n                    <div class="col text-left">\n                        <span>{{effect.value.min_possible * multiplier}}</span>\n                        <span ng-if="effect.value.min_possible !== effect.value.max_possible">- {{effect.value.max_possible*multiplier}}</span>\n                        <ng-pluralize ng-if="effect.extra.string" count="effect.value.max_possible*multiplier" when="{\'one\': \' \'+effect.extra.string, \'other\': \' \'+effect.extra.string+\'s\'}"></ng-pluralize>\n                        <span ng-if="effect.extra.chance"> ({{effect.extra.chance + effect.accuracy}}% chance)</span>\n                    </div>\n                </div>\n            '
-    };
-});
-'use strict';
-
-angular.module('retro').directive('statBar', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            target: '=',
-            stat: '@'
-        },
-        template: '\n                <div class="stat-bar-container">\n                    <div class="stat-bar {{stat}}" style="width: {{target.stats[stat].__current/target.stats[stat].maximum*100}}%"></div>\n                </div>\n            '
-    };
-});
-'use strict';
-
 angular.module('retro').constant('CLASSES', {
     Cleric: 'Clerics specialize in healing their companions.',
     Fighter: 'Fighters specialize in making their enemies hurt via physical means.',
@@ -856,7 +711,7 @@ angular.module('retro').controller('PlayerController', ["$scope", "$stateWrapper
 }]);
 'use strict';
 
-angular.module('retro').controller('SkillChangeController', ["$scope", "$ionicModal", "Player", "Skills", "SkillChangeFlow", "Dice", function ($scope, $ionicModal, Player, Skills, SkillChangeFlow, Dice) {
+angular.module('retro').controller('SkillChangeController', ["$scope", "$ionicModal", "Player", "Skills", function ($scope, $ionicModal, Player, Skills) {
     $scope.player = Player.get();
 
     var getAllSkills = function getAllSkills(baseSkills) {
@@ -874,16 +729,14 @@ angular.module('retro').controller('SkillChangeController', ["$scope", "$ionicMo
 
     $scope.openSkillInfo = function (skill) {
         $scope.activeSkill = skill;
-        $scope.activeSkillAttrs = _(skill.spellEffects).keys().map(function (key) {
-            var stats = Dice.statistics(skill.spellEffects[key].roll, $scope.player.stats);
-            return { name: key, value: stats, extra: skill.spellEffects[key] };
-        })
-        // Damage always comes first
-        .sortBy(function (obj) {
-            return obj.name === 'Damage' ? '*' : obj.name;
-        }).value();
 
-        $scope.modal.show();
+        $ionicModal.fromTemplateUrl('changeskill.info', {
+            scope: $scope,
+            animation: 'slide-in-up'
+        }).then(function (modal) {
+            $scope.modal = modal;
+            $scope.modal.show();
+        });
     };
 
     $scope.countNumTimesSkillSet = function (skillName) {
@@ -891,28 +744,6 @@ angular.module('retro').controller('SkillChangeController', ["$scope", "$ionicMo
             return skill === skillName;
         }).length;
     };
-
-    $scope.setSkillInSlot = function (skill, slot) {
-        // unset skill
-        if ($scope.player.skills[slot] === skill) {
-            SkillChangeFlow.change(null, slot);
-            return;
-        }
-
-        // set skill
-        SkillChangeFlow.change(skill, slot);
-    };
-
-    $scope.closeSkillInfo = function () {
-        return $scope.modal.hide();
-    };
-
-    $ionicModal.fromTemplateUrl('changeskill.info', {
-        scope: $scope,
-        animation: 'slide-in-up'
-    }).then(function (modal) {
-        $scope.modal = modal;
-    });
 
     // clean up modal b/c memory
     $scope.$on('$destroy', function () {
@@ -926,6 +757,151 @@ angular.module('retro').controller('SkillChangeController', ["$scope", "$ionicMo
         return $scope.allSkills = getAllSkills(skills);
     });
 }]);
+'use strict';
+
+angular.module('retro').directive('blockedBy', ["BlockState", function (BlockState) {
+    return {
+        restrict: 'A',
+        link: function link($scope, element, attrs) {
+            $scope.$parent.$watch(function () {
+                return BlockState.get()[attrs.blockedBy];
+            }, function (newVal) {
+                element.prop('disabled', newVal);
+            });
+        }
+    };
+}]);
+'use strict';
+
+angular.module('retro').directive('colorText', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            value: '=',
+            preText: '@'
+        },
+        template: '\n                <span ng-class="{assertive: value < 0, balanced: value > 0}">{{preText}} {{value}}</span>\n            '
+    };
+});
+'use strict';
+
+angular.module('retro').directive('cooldown', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            turns: '='
+        },
+        template: '\n                <span>\n                    <i class="icon ion-clock"></i> <ng-pluralize count="turns", when="{\'0\': \'Instant\', \'one\': \'1 round\', \'other\': \'{} rounds\'}"></ng-pluralize>\n                </span>\n            '
+    };
+});
+'use strict';
+
+angular.module('retro').directive('healthDisplay', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            target: '='
+        },
+        template: '\n                <div>\n                    <i class="icon ion-heart assertive"></i> {{target.stats.hp.__current}} / {{target.stats.hp.maximum}}\n                </div>\n            '
+    };
+});
+'use strict';
+
+angular.module('retro').directive('manaDisplay', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            target: '='
+        },
+        template: '\n                <div>\n                    <i class="icon ion-waterdrop positive"></i> {{target.stats.mp.__current}} / {{target.stats.mp.maximum}}\n                </div>\n            '
+    };
+});
+'use strict';
+
+angular.module('retro').directive('map', ["MAP_STYLE", "Toaster", "Google", function (MAP_STYLE, Toaster, Google) {
+    return {
+        restrict: 'E',
+        scope: {
+            onCreate: '&',
+            onClick: '&'
+        },
+        link: function link($scope, $element) {
+
+            if (!Google || !Google.maps) {
+                Toaster.show('Could not reach google.');
+                return;
+            }
+
+            // this is the available list of places in the game
+            var init = function init() {
+                var mapOptions = {
+                    center: new Google.maps.LatLng(32.3078, -64.7505),
+                    zoom: 17,
+                    mapTypeId: Google.maps.MapTypeId.ROADMAP,
+                    draggable: true,
+                    minZoom: 15,
+                    maxZoom: 17,
+                    styles: MAP_STYLE,
+                    mapTypeControlOptions: { mapTypeIds: [] },
+                    overviewMapControl: false,
+                    streetViewControl: false,
+                    zoomControl: false
+                };
+
+                var map = new Google.maps.Map($element[0], mapOptions);
+
+                $scope.onCreate({ map: map });
+
+                Google.maps.event.addDomListener($element[0], 'mousedown', function (e) {
+                    $scope.onClick();
+                    e.preventDefault();
+                    return false;
+                });
+            };
+
+            if (document.readyState === 'complete') {
+                init();
+            } else {
+                Google.maps.event.addDomListener(window, 'load', init);
+            }
+        }
+    };
+}]);
+'use strict';
+
+angular.module('retro').directive('mpCost', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            cost: '='
+        },
+        template: '\n                <span>\n                    <i class="icon ion-waterdrop positive"></i> {{cost}} mp\n                </span>\n            '
+    };
+});
+'use strict';
+
+angular.module('retro').directive('skillEffectDisplay', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            effects: '=',
+            multiplier: '='
+        },
+        template: '\n                <div class="row" ng-repeat="effect in effects">\n                    <div class="col col-20 col-offset-20 text-right">\n                        <strong>{{effect.name}}</strong>\n                    </div>\n\n                    <div class="col text-left">\n                        <span>{{effect.value.min_possible * multiplier}}</span>\n                        <span ng-if="effect.value.min_possible !== effect.value.max_possible">- {{effect.value.max_possible*multiplier}}</span>\n                        <ng-pluralize ng-if="effect.extra.string" count="effect.value.max_possible*multiplier" when="{\'one\': \' \'+effect.extra.string, \'other\': \' \'+effect.extra.string+\'s\'}"></ng-pluralize>\n                        <span ng-if="effect.extra.chance"> ({{effect.extra.chance + effect.accuracy}}% chance)</span>\n                    </div>\n                </div>\n            '
+    };
+});
+'use strict';
+
+angular.module('retro').directive('statBar', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            target: '=',
+            stat: '@'
+        },
+        template: '\n                <div class="stat-bar-container">\n                    <div class="stat-bar {{stat}}" style="width: {{target.stats[stat].__current/target.stats[stat].maximum*100}}%"></div>\n                </div>\n            '
+    };
+});
 'use strict';
 
 angular.module('retro').service('Auth', ["$localStorage", "$stateWrapper", "auth", "AuthFlow", "AuthData", function ($localStorage, $stateWrapper, auth, AuthFlow, AuthData) {
@@ -1225,6 +1201,36 @@ angular.module('retro').service('Toaster', ["$cordovaToast", function ($cordovaT
     return {
         show: show,
         handleDefault: handleDefault
+    };
+}]);
+'use strict';
+
+angular.module('retro').controller('SkillChangeModalController', ["$scope", "Player", "Skills", "SkillChangeFlow", "Dice", function ($scope, Player, Skills, SkillChangeFlow, Dice) {
+
+    var skill = $scope.activeSkill;
+
+    $scope.activeSkillAttrs = _(skill.spellEffects).keys().map(function (key) {
+        var stats = Dice.statistics(skill.spellEffects[key].roll, $scope.player.stats);
+        return { name: key, value: stats, extra: skill.spellEffects[key] };
+    })
+    // Damage always comes first
+    .sortBy(function (obj) {
+        return obj.name === 'Damage' ? '*' : obj.name;
+    }).value();
+
+    $scope.setSkillInSlot = function (skill, slot) {
+        // unset skill
+        if ($scope.player.skills[slot] === skill) {
+            SkillChangeFlow.change(null, slot);
+            return;
+        }
+
+        // set skill
+        SkillChangeFlow.change(skill, slot);
+    };
+
+    $scope.closeSkillInfo = function () {
+        return $scope.modal.hide();
     };
 }]);
 'use strict';
