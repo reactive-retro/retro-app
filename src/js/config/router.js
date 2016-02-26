@@ -102,7 +102,7 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
             templateUrl: 'explore',
             controller: 'ExploreController',
             data: { requiresLogin: true },
-            cache: false,
+            // cache: false,
             resolve: {
                 playerLoaded: ($injector) => $injector.get('Settings').isReady
             }

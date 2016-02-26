@@ -22,6 +22,7 @@ angular.module('retro').controller('ExploreController',
 
         $scope.fight = () => {
             BattleFlow.start($scope.currentlySelected.monster);
+            $scope.reset();
         };
 
         $scope.centerOnMe = () => {
@@ -31,12 +32,12 @@ angular.module('retro').controller('ExploreController',
 
         const _setSelected = (opts) => {
             $scope.currentlySelected = opts;
-            $scope.$apply();
         };
 
         $scope.select = (opts) => {
             $scope.reset();
             _setSelected(opts);
+            $scope.$apply();
         };
 
         $scope.reset = () => {
@@ -65,6 +66,11 @@ angular.module('retro').controller('ExploreController',
 
             MapDrawing.setCurrentPosition(position);
         };
+
+        // this fixes google maps after battle
+        $scope.$on('$ionicView.afterEnter', () => {
+            ionic.trigger('resize');
+        });
 
         Monsters.observer.then(null, null, () => {
             MapDrawing.drawMonsters($scope.map, Monsters.get(), $scope.select);

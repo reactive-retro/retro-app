@@ -8,7 +8,8 @@
   },
   "globals": {
     "_": true,
-    "angular": true
+    "angular": true,
+    "ionic": true
   },
   "rules": {
     "no-var": 2,
