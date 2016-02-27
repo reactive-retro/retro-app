@@ -19,7 +19,7 @@ angular.module('retro').directive('map', (MAP_STYLE, Toaster, Google) => {
                     zoom: 17,
                     mapTypeId: Google.maps.MapTypeId.ROADMAP,
                     draggable: true,
-                    minZoom: 15,
+                    minZoom: 14,
                     maxZoom: 17,
                     styles: MAP_STYLE,
                     mapTypeControlOptions: { mapTypeIds: [] },
@@ -30,6 +30,7 @@ angular.module('retro').directive('map', (MAP_STYLE, Toaster, Google) => {
 
                 const map = new Google.maps.Map($element[0], mapOptions);
 
+                
                 $scope.onCreate({ map: map });
 
                 Google.maps.event.addDomListener($element[0], 'mousedown', (e) => {
