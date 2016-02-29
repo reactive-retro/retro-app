@@ -1,4 +1,4 @@
-# Reactive Retro App [![Build Status](https://travis-ci.org/reactive-retro/retro-app.svg)](https://travis-ci.org/reactive-retro/retro-app)
+# Reactive Retro App [![Build Status](https://travis-ci.org/reactive-retro/retro-app.svg)](https://travis-ci.org/reactive-retro/retro-app) [![bitHound Overall Score](https://www.bithound.io/github/reactive-retro/retro-app/badges/score.svg)](https://www.bithound.io/github/reactive-retro/retro-app)
 
 The Ionic app that runs the game.
 
