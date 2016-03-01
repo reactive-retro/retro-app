@@ -14,7 +14,7 @@ script(type="text/ng-template", id="inventory-tab-armor")
     ion-view(title="Armor")
         ion-content
             h3.subdued.header-bar-margin.text-center.vertical-center(ng-if="filteredArmor.length === 0") You have no armor.
-            div.card(
+            .card(
                 ng-include="'inventory-item'",
                 ng-repeat="item in filteredArmor = (player.inventory | filter:{type:'armor'})"
             )
@@ -23,7 +23,7 @@ script(type="text/ng-template", id="inventory-tab-weapons")
     ion-view(title="Weapons")
         ion-content
             h3.subdued.header-bar-margin.text-center.vertical-center(ng-if="filteredWeapons.length === 0") You have no weapons.
-            div.card(
+            .card(
                 ng-include="'inventory-item'",
                 ng-repeat="item in filteredWeapons = (player.inventory | filter:{type:'weapon'})"
             )
@@ -31,13 +31,13 @@ script(type="text/ng-template", id="inventory-tab-weapons")
 script(type="text/ng-template", id="inventory-tab-items")
     ion-content
         h3.subdued.header-bar-margin.text-center.vertical-center(ng-if="filteredItems.length === 0") You have no items.
-        div.card(
+        .card(
             ng-include="'inventory-item'",
             ng-repeat="item in filteredItems = (player.inventory | filter:{type:'item'})"
         )
 
 script(type="text/ng-template", id="inventory-item")
-    div.item.item-divider
+    .item.item-divider
         h2
             span {{item.name}}
             span.float-right
@@ -45,16 +45,19 @@ script(type="text/ng-template", id="inventory-item")
                     blocked-by="Player",
                     ng-click="EquipFlow.equip(item)")
                     i.icon.ion-arrow-swap
-    div.item.item-body
-        div.row
-            div.col(ng-if="item.stats.str")
+    .item.item-body
+        .row
+            .col(ng-if="item.stats.str")
                 color-text(pre-text="STR", value="item.stats.str")
-            div.col(ng-if="item.stats.dex")
+            .col(ng-if="item.stats.dex")
                 color-text(pre-text="DEX", value="item.stats.dex")
-            div.col(ng-if="item.stats.vit")
+            .col(ng-if="item.stats.vit")
                 color-text(pre-text="VIT", value="item.stats.vit")
-            div.col(ng-if="item.stats.mnt")
+            .col(ng-if="item.stats.mnt")
                 color-text(pre-text="MNT", value="item.stats.mnt")
-            div.col(ng-if="item.stats.luk")
+            .col(ng-if="item.stats.luk")
                 color-text(pre-text="LUK", value="item.stats.luk")
-            div.col(ng-if="isEmpty(item.stats)") No stats.
+            .col(ng-if="isEmpty(item.stats)") No stats.
+
+    .item.item-footer
+        gold-display(value="item.value", extra-info="item.isDefault ? 'Unsellable' : ''")

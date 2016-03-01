@@ -18,8 +18,7 @@ script(type="text/ng-template", id="player")
                         .col.col-center.text-center
                             mana-display(target="player")
                         .col.col-center.text-center
-                            i.icon.ion-social-usd
-                            span &nbsp;{{player.stats.gold}}
+                            gold-display(value="player.stats.gold")
 
                     .row
                         .col.col-center
