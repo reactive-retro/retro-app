@@ -101,8 +101,8 @@ angular.module('retro').controller('BattleController',
 
         // clean up modal b/c memory
         $scope.$on('$destroy', () => {
-            $scope.modals.targetModal.remove();
-            $scope.modals.resultsModal.remove();
+            if($scope.modals.targetModal) $scope.modals.targetModal.remove();
+            if($scope.modals.resultsModal) $scope.modals.resultsModal.remove();
         });
 
         setupBattleData();
