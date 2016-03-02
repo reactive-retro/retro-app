@@ -1,5 +1,5 @@
 angular.module('retro').controller('ExploreController',
-    ($scope, $ionicLoading, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, BattleFlow) => {
+    ($scope, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, BattleFlow) => {
 
         $scope.currentlySelected = null;
         $scope.centered = true;

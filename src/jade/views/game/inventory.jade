@@ -1,5 +1,5 @@
 script(type="text/ng-template", id="inventory")
-    ion-view(view-title="Inventory")
+    ion-view(view-title="Inventory ({{player.inventory.length}}/{{maxInvSize}})")
         ion-tabs
             ion-tab(title="Armor", icon-on="ion-tshirt", icon-off="ion-tshirt-outline", href="#/inventory/armor")
                 ion-nav-view(name="armor-tab")
@@ -11,7 +11,7 @@ script(type="text/ng-template", id="inventory")
                 ion-nav-view(name="items-tab")
 
 script(type="text/ng-template", id="inventory-tab-armor")
-    ion-view(title="Armor")
+    ion-view(title="Inventory ({{player.inventory.length}}/{{maxInvSize}}) - Armor")
         ion-content
             h3.subdued.header-bar-margin.text-center.vertical-center(ng-if="filteredArmor.length === 0") You have no armor.
             .card(
@@ -20,7 +20,7 @@ script(type="text/ng-template", id="inventory-tab-armor")
             )
 
 script(type="text/ng-template", id="inventory-tab-weapons")
-    ion-view(title="Weapons")
+    ion-view(title="Inventory ({{player.inventory.length}}/{{maxInvSize}}) - Weapons")
         ion-content
             h3.subdued.header-bar-margin.text-center.vertical-center(ng-if="filteredWeapons.length === 0") You have no weapons.
             .card(
@@ -60,4 +60,6 @@ script(type="text/ng-template", id="inventory-item")
             .col(ng-if="isEmpty(item.stats)") No stats.
 
     .item.item-footer
-        gold-display(value="item.value", extra-info="item.isDefault ? 'Unsellable' : ''")
+        div
+            button.button.button-small.button-xs.button-assertive(ng-click="tryToSell(item)", ng-if="!item.isDefault", blocked-by="Player") Sell
+            gold-display(value="item.value", extra-info="item.isDefault ? 'Unsellable' : ''")
