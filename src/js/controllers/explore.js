@@ -53,7 +53,7 @@ angular.module('retro').controller('ExploreController',
 
         $scope.watchMe = () => {
             LocationWatcher.watch.then(null, null, (coords) => {
-                $scope.centerOn(coords, !$scope.centered);
+                $scope.centerOn(coords, $scope.centered);
             });
         };
 
