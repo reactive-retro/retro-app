@@ -6,7 +6,6 @@ const jade = require('gulp-jade');
 const babel = require('gulp-babel');
 const concat = require('gulp-concat');
 const rename = require('gulp-rename');
-const eslint = require('gulp-eslint');
 const minifyCss = require('gulp-cssnano');
 const preprocess = require('gulp-preprocess');
 const ngAnnotate = require('gulp-ng-annotate');
@@ -23,13 +22,6 @@ const lib = [
     './www/lib/angular-jwt/dist/angular-jwt.js',
     './www/lib/auth0-lock/build/auth0-lock.js'
 ];
-
-gulp.task('eslint', () => {
-    return gulp.src(paths.js)
-        .pipe(eslint())
-        .pipe(eslint.format())
-        .pipe(eslint.failAfterError());
-});
 
 gulp.task('sass', (done) => {
     gulp.src('./src/scss/ionic.app.scss')

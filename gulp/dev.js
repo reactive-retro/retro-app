@@ -1,6 +1,7 @@
 
 const gulp = require('gulp');
 const sh = require('shelljs');
+const eslint = require('gulp-eslint');
 
 const paths = {
     sass: ['./src/scss/**/*.scss'],
@@ -8,6 +9,13 @@ const paths = {
     jsB:  ['./src/js/_init/app.js', './src/js/**/!(app)*.js'],
     js:   ['./src/js/**/*.js']
 };
+
+gulp.task('eslint', () => {
+    return gulp.src(paths.js)
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
+});
 
 gulp.task('watch', () => {
     gulp.watch(paths.sass, ['sass']);
