@@ -1,4 +1,4 @@
-angular.module('retro').directive('map', (MAP_STYLE, Toaster, Google) => {
+angular.module('retro').directive('map', ($window, $document, MAP_STYLE, Toaster, Google) => {
     return {
         restrict: 'E',
         scope: {
@@ -37,6 +37,19 @@ angular.module('retro').directive('map', (MAP_STYLE, Toaster, Google) => {
                     $scope.onClick();
                     e.preventDefault();
                     return false;
+                });
+
+                Google.maps.event.addListenerOnce(map, 'idle', () => {
+
+                    // Prevent anchors in google maps from breaking app by launching these anchors using InAppBrowser
+                    const googleMap = $document[0].getElementById('map');
+                    const anchors = googleMap.getElementsByTagName('a');
+                    _.each(anchors, anchor => {
+                        anchor.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            $window.open(anchor.href, '_blank', 'location=no');
+                        });
+                    });
                 });
             };
 
