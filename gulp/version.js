@@ -6,17 +6,17 @@ const bump = require('gulp-bump');
 const filter = require('gulp-filter');
 const tagVersion = require('gulp-tag-version');
 const runSequence = require('run-sequence');
-const changelog = require('conventional-changelog');
+const changelog = require('gulp-conventional-changelog');
 const sh = require('shelljs');
 const semver = require('semver');
 
-gulp.task('generate:changelog', (done) => {
-    return changelog({
-        releaseCount: 0,
-        preset: 'angular'
-    })
-    .pipe(fs.createWriteStream('CHANGELOG.md'))
-    .on('end', done);
+gulp.task('generate:changelog', () => {
+    return gulp.src('CHANGELOG.md')
+        .pipe(changelog({
+            preset: 'angular',
+            releaseCount: 0
+        }))
+        .pipe(gulp.dest('./'));
 });
 
 const versionStream = (type) => {
@@ -34,7 +34,7 @@ const versionStream = (type) => {
         .pipe(jsonFilter.restore)
         .pipe(git.commit(`chore(version): release ${type} version ${newVer}`))
         .pipe(filter('package.json'))
-        .pipe(tagVersion());
+        .pipe(tagVersion({ prefix: '' }));
 };
 
 const pushStream = () => {
@@ -46,6 +46,6 @@ gulp.task('bump:patch:tag', ['generate:changelog'], () => versionStream('patch')
 gulp.task('bump:minor:tag', ['generate:changelog'], () => versionStream('minor'));
 gulp.task('bump:major:tag', ['generate:changelog'], () => versionStream('major'));
 
-gulp.task('bump:patch', () => runSequence('bump:patch:tag', () => pushStream()));
-gulp.task('bump:minor', () => runSequence('bump:minor:tag', () => pushStream()));
-gulp.task('bump:major', () => runSequence('bump:major:tag', () => pushStream()));
+gulp.task('bump:patch', ['generate:changelog'], () => runSequence('bump:patch:tag', () => pushStream()));
+gulp.task('bump:minor', ['generate:changelog'], () => runSequence('bump:minor:tag', () => pushStream()));
+gulp.task('bump:major', ['generate:changelog'], () => runSequence('bump:major:tag', () => pushStream()));
