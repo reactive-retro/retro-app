@@ -34,7 +34,7 @@ angular.module('retro').controller('SkillChangeController',
 
         // clean up modal b/c memory
         $scope.$on('$destroy', () => {
-            $scope.modal.remove();
+            if($scope.modal) $scope.modal.remove();
         });
 
         Player.observer.then(null, null, (player) => $scope.player = player);
