@@ -3,8 +3,8 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
     const savedPlaces = [];
     const savedMonsters = [];
     let curPos = {};
-    let homepoint = {};
-    let miasma = {};
+    let homepoint = null;
+    let miasma = null;
 
     const MAX_VIEW_RADIUS = Settings.RADIUS; // meters
 
@@ -109,9 +109,16 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
     const drawHomepoint = (map, coords) => {
         const homepointCenter = new Google.maps.LatLng(coords.lat, coords.lon);
 
+        if(homepoint) {
+            homepoint.setMap(null);
+        }
+
         homepoint = new Google.maps.Marker({
             position: homepointCenter,
             map: map,
+
+            // no clicking this marker
+            clickable: false,
             icon: {
                 path: Google.maps.SymbolPath.CIRCLE,
                 strokeColor: MAP_COLORS.homepoint.outline,
@@ -122,7 +129,10 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
                 scale: 5
             }
         });
-        homepoint;
+
+        if(miasma) {
+            miasma.setMap(null);
+        }
 
         const miasmaOptions = {
             strokeColor: MAP_COLORS.miasma.outline,
@@ -135,11 +145,10 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
         };
 
         miasma = new Google.maps.Polygon(miasmaOptions);
-        miasma; // no unused vars
 
     };
 
-    const drawMe = (map, coords) => {
+    const drawMe = (map, coords, onclick = () => {}) => {
         curPos = new Google.maps.Marker({
             position: new Google.maps.LatLng(coords.latitude, coords.longitude),
             map: map,
@@ -153,6 +162,8 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
                 scale: 5
             }
         });
+
+        curPos.addListener('click', onclick);
 
         const affectRadius = new Google.maps.Circle({
             fillColor: MAP_COLORS.heroRadius.fill,

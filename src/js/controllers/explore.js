@@ -1,23 +1,49 @@
 angular.module('retro').controller('ExploreController',
-    ($scope, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, BattleFlow) => {
+    ($scope, $filter, $ionicPopup, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, Settings, ExploreFlow, BattleFlow) => {
 
         $scope.currentlySelected = null;
         $scope.centered = true;
         $scope.player = Player.get();
+        $scope.coords = null;
+        $scope.curHomepoint = $scope.player.homepoint;
 
         const unCenter = () => $scope.centered = false;
 
         $scope.mapCreated = (map) => {
             $scope.map = map;
             const position = LocationWatcher.current();
-            MapDrawing.drawMe(map, position);
+            MapDrawing.drawMe(map, position, $scope.changeHomepoint);
             $scope.centerOn(position);
-            MapDrawing.drawHomepoint(map, Player.get().homepoint);
+            MapDrawing.drawHomepoint(map, $scope.curHomepoint);
             $scope.findMe();
             $scope.watchMe();
             MapDrawing.drawPlaces(map, Places.get());
             MapDrawing.drawMonsters(map, Monsters.get(), $scope.select);
             MapDrawing.addMapEvents(map, unCenter);
+        };
+
+        $scope.changeHomepoint = () => {
+            if(!$scope.player.canChangeHomepoint) {
+                const newTime = new Date($scope.player.lastHomepointChange);
+                newTime.setHours(newTime.getHours() + Settings.HOMEPOINT_CHANGE_HOURS);
+                const timeDisplay = $filter('date')(newTime, 'MMM d, y h:mm a');
+
+                $ionicPopup.alert({
+                    title: 'Can\'t Move Beacon!',
+                    template: `Your beacon-moving powers have been exhausted until ${timeDisplay}.`
+                });
+                return;
+            }
+
+            const confirmPopup = $ionicPopup.confirm({
+                title: 'Place New Light Beacon',
+                template: 'Are you sure you want to place a new Beacon of Light? Doing so will reset all monsters and places, and you won\'t be able to do this for another 4 hours.'
+            });
+
+            confirmPopup.then((res) => {
+                if(!res) return;
+                ExploreFlow.moveHomepoint($scope.coords);
+            });
         };
 
         $scope.fight = () => {
@@ -60,6 +86,7 @@ angular.module('retro').controller('ExploreController',
         $scope.centerOn = (coords, centerMap = false) => {
             if(!$scope.map) return;
             if(!coords.latitude || !coords.longitude) return;
+            $scope.coords = { lat: coords.latitude, lon: coords.longitude };
             const position = new Google.maps.LatLng(coords.latitude, coords.longitude);
 
             if(centerMap) { $scope.map.setCenter(position); }
@@ -72,12 +99,20 @@ angular.module('retro').controller('ExploreController',
             ionic.trigger('resize');
         });
 
+        Places.observer.then(null, null, () => {
+            MapDrawing.drawPlaces($scope.map, Places.get());
+        });
+
         Monsters.observer.then(null, null, () => {
             MapDrawing.drawMonsters($scope.map, Monsters.get(), $scope.select);
         });
 
         Player.observer.then(null, null, () => {
             $scope.player = Player.get();
+            if($scope.player.homepoint.lat !== $scope.curHomepoint.lat || $scope.playear.homepoint.lon !== $scope.curHomepoint.lon) {
+                $scope.homepoint = $scope.player.homepoint;
+                MapDrawing.drawHomepoint($scope.map, $scope.homepoint);
+            }
         });
     }
 );
