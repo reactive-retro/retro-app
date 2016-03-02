@@ -8,7 +8,7 @@ angular.module('retro').service('ClassChangeFlow', (Toaster, $stateWrapper, Play
 
             BlockState.block('Player');
             socket.emit('player:change:class', opts, Toaster.handleDefault(() => {
-                $stateWrapper.go('player');
+                $stateWrapper.noGoingBack('changeskills');
                 BlockState.unblock('Player');
             }));
         }
