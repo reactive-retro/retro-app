@@ -1,9 +1,9 @@
 
 const gulp = require('gulp');
 const sh = require('shelljs');
-const eslint = require('gulp-eslint');
 
-import { paths } from './_constants';
+const constants = require('./_constants');
+const paths = constants.paths;
 
 gulp.task('watch', () => {
     gulp.watch(paths.sass, ['sass']);

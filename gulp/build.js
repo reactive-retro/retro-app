@@ -5,12 +5,15 @@ const sass = require('gulp-sass');
 const jade = require('gulp-jade');
 const babel = require('gulp-babel');
 const concat = require('gulp-concat');
+const eslint = require('gulp-eslint');
 const rename = require('gulp-rename');
 const minifyCss = require('gulp-cssnano');
 const preprocess = require('gulp-preprocess');
 const ngAnnotate = require('gulp-ng-annotate');
 
-import { paths, lib } from './_constants';
+const constants = require('./_constants');
+const paths = constants.paths;
+const lib = constants.lib;
 
 gulp.task('eslint', () => {
     return gulp.src(paths.js)

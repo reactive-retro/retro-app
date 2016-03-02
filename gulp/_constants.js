@@ -1,13 +1,13 @@
 
 
-export const paths = {
+module.exports.paths = {
     sass: ['./src/scss/**/*.scss'],
     jade: ['./src/jade/**/*.jade'],
     jsB:  ['./src/js/_init/app.js', './src/js/**/!(app)*.js'],
     js:   ['./src/js/**/*.js']
 };
 
-export const lib = [
+module.exports.lib = [
     './www/lib/lodash/lodash.js',
     './www/lib/dice.js/build/dice.js',
     './www/lib/ionic/release/js/ionic.bundle.js',
