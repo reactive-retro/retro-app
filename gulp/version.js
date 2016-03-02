@@ -11,7 +11,9 @@ const sh = require('shelljs');
 const semver = require('semver');
 
 gulp.task('generate:changelog', () => {
-    return gulp.src('CHANGELOG.md')
+    return gulp.src('CHANGELOG.md', {
+        buffer: false
+    })
         .pipe(changelog({
             preset: 'angular',
             releaseCount: 0
