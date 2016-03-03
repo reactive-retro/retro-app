@@ -1,6 +1,6 @@
 {
   "name": "reactive-retro",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "private": "true",
   "devDependencies": {
     "ionic": "driftyco/ionic-bower",
