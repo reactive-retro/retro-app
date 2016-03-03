@@ -11,6 +11,8 @@ const minifyCss = require('gulp-cssnano');
 const preprocess = require('gulp-preprocess');
 const ngAnnotate = require('gulp-ng-annotate');
 
+const sh = require('shelljs');
+
 const constants = require('./_constants');
 const paths = constants.paths;
 const lib = constants.lib;
