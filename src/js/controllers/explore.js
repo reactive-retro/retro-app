@@ -109,7 +109,7 @@ angular.module('retro').controller('ExploreController',
 
         Player.observer.then(null, null, () => {
             $scope.player = Player.get();
-            if($scope.player.homepoint.lat !== $scope.curHomepoint.lat || $scope.playear.homepoint.lon !== $scope.curHomepoint.lon) {
+            if($scope.player.homepoint.lat !== $scope.curHomepoint.lat || $scope.player.homepoint.lon !== $scope.curHomepoint.lon) {
                 $scope.homepoint = $scope.player.homepoint;
                 MapDrawing.drawHomepoint($scope.map, $scope.homepoint);
             }
