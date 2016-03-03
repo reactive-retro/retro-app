@@ -1,6 +1,6 @@
 {
   "name": "reactive-retro",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "reactive-retro: A GPS JRPG-styled game",
   "dependencies": {
     "cordova-plugin-whitelist": "^1.2.0"
