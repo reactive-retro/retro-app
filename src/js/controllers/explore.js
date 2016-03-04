@@ -1,5 +1,5 @@
 angular.module('retro').controller('ExploreController',
-    ($scope, $filter, $ionicPopup, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, Settings, ExploreFlow, BattleFlow) => {
+    ($scope, $timeout, $filter, $ionicPopup, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, Settings, ExploreFlow, BattleFlow) => {
 
         $scope.currentlySelected = null;
         $scope.centered = true;
@@ -57,13 +57,14 @@ angular.module('retro').controller('ExploreController',
         };
 
         const _setSelected = (opts) => {
-            $scope.currentlySelected = opts;
+            $timeout(() => {
+                $scope.currentlySelected = opts;
+            }, 0);
         };
 
         $scope.select = (opts) => {
             $scope.reset();
             _setSelected(opts);
-            $scope.$apply();
         };
 
         $scope.reset = () => {
