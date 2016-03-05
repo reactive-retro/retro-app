@@ -1,6 +1,6 @@
 angular.module('retro')
     .service('socketCluster', ($window) => $window.socketCluster)
-    .service('socket', (AuthData, $stateWrapper, Config, Toaster, socketCluster, socketManagement) => {
+    .service('socket', (AuthData, $window, $stateWrapper, Config, Toaster, socketCluster, socketManagement) => {
         AuthData.update({ canConnect: true });
 
         const socket = socketCluster.connect({
@@ -24,6 +24,7 @@ angular.module('retro')
         });
 
         socket.on('disconnect', () => {
+            $window.localStorage.removeItem('socketCluster.authToken');
             $stateWrapper.noGoingBackAndNoCache('home');
         });
 
