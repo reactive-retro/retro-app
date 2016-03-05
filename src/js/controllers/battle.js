@@ -24,12 +24,17 @@ angular.module('retro').controller('BattleController',
             }
         };
 
+        const battleSetter = ({ battle }) => {
+            Battle.set(battle);
+        };
+
         const setupBattleData = () => {
             $scope.battle = Battle.get();
             if(!$scope.battle) return;
             $scope.battle.actionChannel.watch($scope.setTarget);
 
             $scope.battle.resultsChannel.watch(resultHandler);
+            $scope.battle.updatesChannel.watch(battleSetter);
 
             // self shows up last
             $scope.orderedPlayers = _($scope.battle.players)
