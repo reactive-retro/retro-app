@@ -71,12 +71,28 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
         });
     };
 
+    const containsMonster = (bounds, pos) =>  bounds.contains(pos);
+
+    const refreshMonsters = (map) => {
+        const bounds = map.getBounds();
+        _.each(savedMonsters, monsterMarker => {
+            const contains = containsMonster(bounds, monsterMarker.position);
+            if(contains && monsterMarker.map || !contains && !monsterMarker.map) return;
+            monsterMarker.setMap(contains ? map : null);
+        });
+    };
+
     const drawMonsters = (map, monsters, click = () => {}) => {
+        const bounds = map.getBounds();
+
         _.each(savedMonsters, monster => monster.setMap(null));
         _.each(monsters, monster => {
+
+            const pos = new Google.maps.LatLng(monster.location.lat, monster.location.lon);
+
             const monsterMarker = new Google.maps.Marker({
-                position: new Google.maps.LatLng(monster.location.lat, monster.location.lon),
-                map: map,
+                position: pos,
+                map: bounds && containsMonster(bounds, pos) ? map : null,
                 icon: {
                     path: Google.maps.SymbolPath.CIRCLE,
                     strokeColor: MAP_COLORS.monster.outline,
@@ -180,6 +196,8 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
         let lastValidCenter = null;
 
         Google.maps.event.addListener(map, 'drag', dragCallback);
+
+        Google.maps.event.addListener(map, 'idle', refreshMonsters.bind(null, map));
 
         Google.maps.event.addListener(map, 'center_changed', () => {
             if (bounds.contains(map.getCenter())) {
