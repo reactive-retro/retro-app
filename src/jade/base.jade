@@ -34,6 +34,8 @@ html
                     ion-nav-back-button
                     ion-nav-buttons(side="left")
                         button.button.button-icon.icon.ion-navicon(menu-toggle="left", ng-if="!hideMenu")
+                    ion-nav-buttons(side="right")
+                        button.button.button-clear(ng-if="actionButton", ng-click="actionButton.callback()") {{actionButton.text}}
                 ion-nav-view
 
             ion-side-menu(side="left")

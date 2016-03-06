@@ -1,0 +1,4 @@
+script(type="text/ng-template", id="party")
+    ion-view(view-title="Party")
+        ion-content
+            .party-container(ng-include="'party-'+(party ? 'exists': 'none')")

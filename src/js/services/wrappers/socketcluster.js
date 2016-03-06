@@ -1,6 +1,6 @@
 angular.module('retro')
     .service('socketCluster', ($window) => $window.socketCluster)
-    .service('socket', (AuthData, $window, $stateWrapper, Config, Toaster, socketCluster, socketManagement) => {
+    .service('socket', (AuthData, $window, $timeout, $stateWrapper, Config, Toaster, socketCluster, socketManagement) => {
         AuthData.update({ canConnect: true });
 
         const socket = socketCluster.connect({
@@ -26,15 +26,17 @@ angular.module('retro')
         socket.on('disconnect', () => {
             $window.localStorage.removeItem('socketCluster.authToken');
             $stateWrapper.noGoingBackAndNoCache('home');
+            $timeout(() => $window.location.reload(true));
         });
 
         socketManagement.setUpEvents(socket);
 
         return socket;
     })
-    .service('socketManagement', (Player, Skills, Places, Monsters, Battle, Options) => {
+    .service('socketManagement', (Player, Skills, Places, Monsters, Battle, Options, Party) => {
         return {
             setUpEvents: (socket) => {
+                socket.on('update:party', Party.set);
                 socket.on('update:player', Player.set);
                 socket.on('update:skills', Skills.set);
                 socket.on('update:places', Places.set);
@@ -42,6 +44,7 @@ angular.module('retro')
                 socket.on('update:monsters', Monsters.set);
                 socket.on('combat:entered', Battle.set);
 
+                Party.setSocket(socket);
                 Battle.setSocket(socket);
             }
         };

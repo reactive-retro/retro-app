@@ -1,0 +1,33 @@
+script(type="text/ng-template", id="party-none")
+    .row.row-center.create-block
+        .col
+            .row
+                .col.col-center.text-center
+                    | Creating a party is simple, and lets you adventure with up to {{::maxPartyMembers-1}} of your friends.
+                    | You get a small XP bonus for every additional party member in your party.
+            .row
+                .col
+                    button.button.button-block.button-positive(blocked-by="Party", ng-click="partyFlow.create()") Create a Party
+
+    .row.row-center.separator-block
+        .col
+            hr
+
+        .col.col-center.text-center or
+
+        .col
+            hr
+
+    .row.row-center.join-block
+        .col
+            .row
+                .col.col-center.text-center
+                    | To join a party, you need to enter the party key of the party you want to join!
+                    | You can get this key by asking the party leader for it, or scanning their party QR code!
+            .row
+                .col
+                    .item.item-input-inset
+                        label.item-input-wrapper
+                            input(type="text", autocapitalize="none", ng-model="joinPartyId", placeholder="Party key")
+
+                        button.button.button-small.button-balanced(blocked-by="Party", ng-click="partyFlow.join(joinPartyId)") Join Party

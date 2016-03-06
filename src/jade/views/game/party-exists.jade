@@ -1,0 +1,25 @@
+script(type="text/ng-template", id="party-exists")
+    .row
+        .col.col-center.text-center
+            h3 {{party._id}}
+    .row.padding-0
+        .col.padding-0
+            ion-list
+                ion-item.padding-0(ng-repeat="member in party.playerData")
+                    .row
+                        .col.col-33
+                            .row
+                                .col.text-right {{member.name}}
+                            .row
+                                .col.text-right {{member.slug}}
+
+                        .col.col-66
+                            .row
+                                .col.text-center
+                                    health-display(target="member")
+                                .col.text-center
+                                    mana-display(target="member")
+
+                            .row
+                                .col
+                                    stat-bar(target="member", stat="xp")

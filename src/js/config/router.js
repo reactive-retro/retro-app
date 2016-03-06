@@ -113,5 +113,12 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
             controller: 'BattleController',
             cache: false,
             data: { requiresLogin: true }
+        })
+        .state('party', {
+            url: '/party',
+            templateUrl: 'party',
+            controller: 'PartyController',
+            cache: false,
+            data: { requiresLogin: true }
         });
 });

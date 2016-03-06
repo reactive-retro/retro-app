@@ -18,6 +18,7 @@ angular.module('retro').controller('MenuController',
             { icon: 'ion-earth', name: 'Explore', state: 'explore', requiresLocation: true },
             { icon: 'ion-briefcase', name: 'Inventory', state: 'inventory' },
             { icon: 'ion-university', name: 'Skills', state: 'changeskills' },
+            { icon: 'ion-ios-people', name: 'Party', state: 'party' },
             { icon: 'ion-gear-b', name: 'Options', state: 'options' },
             { icon: 'ion-android-exit', name: 'Logout', call: logoutCheck }
         ];

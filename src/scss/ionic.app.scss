@@ -177,3 +177,21 @@ map {
   min-height: 20px;
   line-height: 15px;
 }
+
+.party-container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+
+  .create-block {
+    flex: 2;
+  }
+
+  .separator-block {
+    flex: 1;
+  }
+
+  .join-block {
+    flex: 2;
+  }
+}

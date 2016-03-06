@@ -2,6 +2,7 @@ angular.module('retro').run(($rootScope, $ionicPlatform) => {
 
     $rootScope.$on('$stateChangeSuccess', (event, toState) => {
         $rootScope.hideMenu = toState.name === 'home' || toState.name === 'create' || toState.name === 'battle';
+        $rootScope.actionButton = null;
     });
 
     $ionicPlatform.registerBackButtonAction(e => {
