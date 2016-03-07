@@ -9,7 +9,7 @@ script(type="text/ng-template", id="battle")
 
             .row.inner-alignment-padding(ng-repeat-start="player in orderedPlayers")
                 .col.col-center.text-right
-                    div {{player.name}}
+                    .bold {{player.name}}
                     div {{player.slug}}
 
                 .col.col-center
@@ -24,9 +24,9 @@ script(type="text/ng-template", id="battle")
                         stat-bar(target="player", stat="mp")
 
             .row.inner-alignment-padding
-                .col
-                    span(ng-show="targets[player.name]") {{targets[player.name].skill}} > {{targets[player.name].name}}
-                .col.text-right
+                .col.col-66.text-center
+                    span.italic(ng-show="targets[player.name]") {{targets[player.name].skill}} > {{targets[player.name].name}}
+                .col.col-33.text-right
                     span(ng-show="canConfirm && player.name === currentPlayerName")
                         button.button.button-small.button-balanced(ng-click="confirmAction()") Confirm
 
