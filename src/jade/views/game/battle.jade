@@ -27,7 +27,7 @@ script(type="text/ng-template", id="battle")
                 .col
                     span(ng-show="targets[player.name]") {{targets[player.name].skill}} > {{targets[player.name].name}}
                 .col.text-right
-                    span(ng-show="canConfirm")
+                    span(ng-show="canConfirm && player.name === currentPlayerName")
                         button.button.button-small.button-balanced(ng-click="confirmAction()") Confirm
 
             .row.skill-row(ng-if="player.name === currentPlayerName", ng-repeat-end)

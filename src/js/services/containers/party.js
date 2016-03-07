@@ -1,4 +1,4 @@
-angular.module('retro').service('Party', ($q) => {
+angular.module('retro').service('Party', ($q, Battle) => {
 
     const defer = $q.defer();
 
@@ -12,8 +12,13 @@ angular.module('retro').service('Party', ($q) => {
             party.updateChannel.unwatch();
             socketRef.unsubscribe(`party:${party._id}`);
 
+            party.battleChannel.unsubscribe();
+            party.battleChannel.unwatch();
+            socketRef.unsubscribe(`party:${party._id}:battle`);
+
             if(!newParty) {
                 party.updateChannel.destroy();
+                party.battleChannel.destroy();
             }
         }
 
@@ -21,6 +26,8 @@ angular.module('retro').service('Party', ($q) => {
 
         if(party) {
             party.updateChannel = socketRef.subscribe(`party:${party._id}`);
+            party.battleChannel = socketRef.subscribe(`party:${party._id}:battle`);
+            party.battleChannel.watch(Battle.set);
         }
 
         defer.notify(party);
