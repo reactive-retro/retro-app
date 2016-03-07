@@ -7,7 +7,7 @@ angular.module('retro').service('SkillChangeFlow', (Toaster, $state, Player, Blo
             const opts = { name: player.name, skillName: skill, skillSlot: slot };
 
             BlockState.block('Player');
-            socket.emit('player:change:skill', opts, Toaster.handleDefault(() => {
+            socket.emit('player:change:skill', opts, Toaster.swallow(() => {
                 BlockState.unblock('Player');
             }));
         }

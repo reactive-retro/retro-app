@@ -3,7 +3,7 @@ angular.module('retro').service('OptionsFlow', (BlockState, Player, Toaster, soc
         changeMany: (options) => {
             const newOptions = { name: Player.get().name, optionsHash: options };
             BlockState.block('Options');
-            socket.emit('player:change:options', newOptions, Toaster.handleDefault(() => {
+            socket.emit('player:change:options', newOptions, Toaster.swallow(() => {
                 BlockState.unblock('Options');
             }));
         }

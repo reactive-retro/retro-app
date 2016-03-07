@@ -8,6 +8,8 @@ angular.module('retro').service('Toaster', ($cordovaToast) => {
         }
     };
 
+    const swallow = (callback = () => {}) => callback();
+
     const handleDefault = (callback = () => {}) => (err, success) => {
         const msgObj = err ? err : success;
         show(msgObj.msg);
@@ -17,6 +19,7 @@ angular.module('retro').service('Toaster', ($cordovaToast) => {
 
     return {
         show,
+        swallow,
         handleDefault
     };
 });
