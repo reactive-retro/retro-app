@@ -80,7 +80,11 @@ angular.module('retro').controller('BattleController',
 
             const options = Options.get();
             if(options.autoConfirmAttacks) {
-                $scope.confirmAction();
+                if(options.autoConfirmAttacksIfOnly && _.filter($scope.battle.playerData, p => p.stats.hp.__current !== 0).length === 1) {
+                    $scope.confirmAction();
+                } else {
+                    $scope.confirmAction();
+                }
             }
         };
 
