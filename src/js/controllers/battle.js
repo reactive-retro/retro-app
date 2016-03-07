@@ -69,9 +69,6 @@ angular.module('retro').controller('BattleController',
 
         $scope.closeModal = (modal) => {
             $scope.modals[modal].hide();
-            if($scope.isDone) {
-                BattleFlow.toExplore();
-            }
         };
 
         $scope.prepareTarget = (target) => {
@@ -102,6 +99,12 @@ angular.module('retro').controller('BattleController',
             animation: 'slide-in-up'
         }).then((modal) => {
             $scope.modals.resultsModal = modal;
+        });
+
+        $scope.$on('modal.hidden', () => {
+            if($scope.isDone || !Battle.get()) {
+                BattleFlow.toExplore();
+            }
         });
 
         // clean up modal b/c memory
