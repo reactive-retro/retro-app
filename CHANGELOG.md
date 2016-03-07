@@ -1,3 +1,9 @@
+<a name="0.1.1"></a>
+## [0.1.1](https://github.com/reactive-retro/retro-app/compare/0.1.0...0.1.1) (2016-03-03)
+
+
+
+
 <a name="0.1.0"></a>
 # [0.1.0](https://github.com/reactive-retro/retro-app/compare/0814d43...0.1.0) (2016-03-03)
 
