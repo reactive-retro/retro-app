@@ -1,3 +1,13 @@
+<a name="0.2.1"></a>
+## [0.2.1](https://github.com/reactive-retro/retro-app/compare/0.2.0...0.2.1) (2016-03-07)
+
+
+### Bug Fixes
+
+* **app:** the app will now be locked to portrait mode ([e326bb2](https://github.com/reactive-retro/retro-app/commit/e326bb2)), closes [#92](https://github.com/reactive-retro/retro-app/issues/92)
+
+
+
 <a name="0.2.0"></a>
 # [0.2.0](https://github.com/reactive-retro/retro-app/compare/0.1.1...0.2.0) (2016-03-07)
 
