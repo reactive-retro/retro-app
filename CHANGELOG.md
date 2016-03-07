@@ -1,3 +1,15 @@
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/reactive-retro/retro-app/compare/0.1.1...0.2.0) (2016-03-07)
+
+
+### Bug Fixes
+
+* **explore:** when tooltip vanishes, the selected monster will also unselect ([8ded110](https://github.com/reactive-retro/retro-app/commit/8ded110)), closes [#54](https://github.com/reactive-retro/retro-app/issues/54)
+* **logout:** trigger a full reload when logging out, clearing any cached data ([530be0b](https://github.com/reactive-retro/retro-app/commit/530be0b)), closes [#75](https://github.com/reactive-retro/retro-app/issues/75)
+* **performance:** the map now only renders visible monsters, increasing performance by a boatload ([d580402](https://github.com/reactive-retro/retro-app/commit/d580402)), closes [#46](https://github.com/reactive-retro/retro-app/issues/46)
+
+
+
 <a name="0.1.1"></a>
 ## [0.1.1](https://github.com/reactive-retro/retro-app/compare/0.1.0...0.1.1) (2016-03-03)
 
