@@ -24,7 +24,7 @@ angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorag
             };
 
             if($localStorage.profile.user_id) {
-                flow.login(_.cloneDeep($localStorage), true).then(null, fail);
+                flow.login(_.cloneDeep($localStorage)).then(null, fail);
 
             // only fail to the char create screen if there's a server connection
             } else if(AuthData.get().canConnect) {
@@ -50,7 +50,10 @@ angular.module('retro').service('AuthFlow', ($q, AuthData, Toaster, $localStorag
             socket.emit('login', NewHero, (err, success) => {
                 BlockState.unblock('Login');
                 if(err) {
-                    defer.reject(true);
+                    // do not continue if you're already logged in
+                    // continuing means going to the hero create screen
+                    // this is erroneous
+                    defer.reject(!_.contains(err.msg, 'You are already logged in!'));
                 } else {
                     defer.resolve();
                     _.extend(Settings, success.settings);
