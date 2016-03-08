@@ -52,12 +52,30 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
         return extp;
     };
 
+    const containsItem = (bounds, pos) =>  bounds.contains(pos);
+
+    const refreshMarkers = (map, arr) => {
+        const bounds = map.getBounds();
+
+        _.each(arr, marker => {
+            const contains = containsItem(bounds, marker.position);
+            if(contains && marker.map || !contains && !marker.map) return;
+            marker.setMap(contains ? map : null);
+        });
+    };
+
     const drawPlaces = (map, places) => {
+        const bounds = map.getBounds();
+
         _.each(savedPlaces, place => place.setMap(null));
         _.each(places, place => {
-            savedPlaces.push(new Google.maps.Marker({
-                position: place.geometry.location,
-                map: map,
+
+            const { lat, lng } = place.geometry.location;
+            const pos = new Google.maps.LatLng(lat, lng);
+
+            const placeMarker = new Google.maps.Marker({
+                position: pos,
+                map: bounds && containsItem(bounds, pos) ? map : null,
                 icon: {
                     path: Google.maps.SymbolPath.CIRCLE,
                     strokeColor: MAP_COLORS.poi.outline,
@@ -67,18 +85,9 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
                     fillOpacity: 1,
                     scale: 5
                 }
-            }));
-        });
-    };
+            });
 
-    const containsMonster = (bounds, pos) =>  bounds.contains(pos);
-
-    const refreshMonsters = (map) => {
-        const bounds = map.getBounds();
-        _.each(savedMonsters, monsterMarker => {
-            const contains = containsMonster(bounds, monsterMarker.position);
-            if(contains && monsterMarker.map || !contains && !monsterMarker.map) return;
-            monsterMarker.setMap(contains ? map : null);
+            savedPlaces.push(placeMarker);
         });
     };
 
@@ -92,7 +101,7 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
 
             const monsterMarker = new Google.maps.Marker({
                 position: pos,
-                map: bounds && containsMonster(bounds, pos) ? map : null,
+                map: bounds && containsItem(bounds, pos) ? map : null,
                 icon: {
                     path: Google.maps.SymbolPath.CIRCLE,
                     strokeColor: MAP_COLORS.monster.outline,
@@ -197,7 +206,10 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
 
         Google.maps.event.addListener(map, 'drag', dragCallback);
 
-        Google.maps.event.addListener(map, 'idle', refreshMonsters.bind(null, map));
+        Google.maps.event.addListener(map, 'idle', () => {
+            refreshMarkers(map, savedMonsters);
+            refreshMarkers(map, savedPlaces);
+        });
 
         Google.maps.event.addListener(map, 'center_changed', () => {
             if (bounds.contains(map.getCenter())) {
