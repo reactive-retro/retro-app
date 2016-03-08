@@ -25,15 +25,16 @@ script(type="text/ng-template", id="player")
                             stat-bar(target="player", stat="xp")
 
                     .row
-                        .col
+                        .col.text-center
                             color-text(pre-text="STR", value="player.stats.str")
-                        .col
-                            color-text(pre-text="DEX", value="player.stats.dex")
-                        .col
-                            color-text(pre-text="VIT", value="player.stats.vit")
-                        .col
+                        .col.text-center
                             color-text(pre-text="MNT", value="player.stats.mnt")
-                        .col
+                    .row
+                        .col.text-center
+                            color-text(pre-text="DEX", value="player.stats.dex")
+                        .col.text-center
+                            color-text(pre-text="VIT", value="player.stats.vit")
+                        .col.text-center
                             color-text(pre-text="LUK", value="player.stats.luk")
 
             .card
