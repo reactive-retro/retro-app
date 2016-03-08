@@ -25,7 +25,7 @@ angular.module('retro').controller('MenuController',
 
         $scope.doMenuAction = (menuObj) => {
             if(menuObj.call) return menuObj.call();
-            if(menuObj.requiresLocation && !$scope.coords) return Toaster.show('Your GPS needs to be enabled to see this.');
+            if(menuObj.requiresLocation && (!$scope.coords || !$scope.coords.latitude || !$scope.coords.longitude)) return Toaster.show('Your GPS needs to be enabled to see this.');
             $stateWrapper.noGoingBackAndNoCache(menuObj.state);
         };
 
