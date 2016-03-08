@@ -1,7 +1,7 @@
 angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => {
 
-    const savedPlaces = [];
-    const savedMonsters = [];
+    let savedPlaces = [];
+    let savedMonsters = [];
     let curPos = {};
     let homepoint = null;
     let miasma = null;
@@ -64,13 +64,15 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
         });
     };
 
-    const drawPlaces = (map, places) => {
+    const drawPlaces = (map, places, click = () => {}) => {
         const bounds = map.getBounds();
 
         _.each(savedPlaces, place => place.setMap(null));
+        savedPlaces = [];
+
         _.each(places, place => {
 
-            const { lat, lng } = place.geometry.location;
+            const { lat, lng } = place.location;
             const pos = new Google.maps.LatLng(lat, lng);
 
             const placeMarker = new Google.maps.Marker({
@@ -87,6 +89,19 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
                 }
             });
 
+            placeMarker.addListener('click', () => {
+
+                const infoWindow = new Google.maps.InfoWindow({
+                    content: `<strong>${place.name}</strong><br>
+                    Type: ${place.derivedType}
+                    `
+                });
+
+                infoWindow.open(map, placeMarker);
+
+                click({ place, infoWindow });
+            });
+
             savedPlaces.push(placeMarker);
         });
     };
@@ -95,6 +110,8 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
         const bounds = map.getBounds();
 
         _.each(savedMonsters, monster => monster.setMap(null));
+        savedMonsters = [];
+
         _.each(monsters, monster => {
 
             const pos = new Google.maps.LatLng(monster.location.lat, monster.location.lon);
@@ -116,7 +133,7 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
             monsterMarker.addListener('click', () => {
 
                 const infoWindow = new Google.maps.InfoWindow({
-                    content: `${monster.name}<br>
+                    content: `<strong>${monster.name}</strong><br>
                     Class: ${monster.profession}<br>
                     Rating: ${monster.rating > 0 ? '+' : ''}${monster.rating}
                     `

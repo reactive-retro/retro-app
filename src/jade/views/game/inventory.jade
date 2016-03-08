@@ -45,6 +45,7 @@ script(type="text/ng-template", id="inventory-item")
                     blocked-by="Player",
                     ng-click="EquipFlow.equip(item)")
                     i.icon.ion-arrow-swap
+        p(ng-class="{ assertive: player.professionLevels[player.profession] >= item.levelRequirement }") Level {{item.levelRequirement || 1}}
     .item.item-body
         .row
             .col(ng-if="item.stats.str")

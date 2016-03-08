@@ -44,7 +44,7 @@ script(type="text/ng-template", id="player")
                         span.float-right
                             button.button.button-small(ng-click="go('inventory.weapons')")
                                 i.icon.ion-arrow-swap
-                    p Weapon
+                    p Level {{player.equipment.weapon.levelRequirement || 1}} Weapon
 
                 .item.item-body
                     .row
@@ -72,7 +72,7 @@ script(type="text/ng-template", id="player")
                         span.float-right
                             button.button.button-small(ng-click="go('inventory.armor')")
                                 i.icon.ion-arrow-swap
-                    p Armor
+                    p Level {{player.equipment.armor.levelRequirement || 1}} Armor
                 .item.item-body
                     .row
                         .col(ng-if="player.equipment.armor.stats.str")

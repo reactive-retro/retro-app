@@ -17,7 +17,7 @@ angular.module('retro').controller('ExploreController',
             MapDrawing.drawHomepoint(map, $scope.curHomepoint);
             $scope.findMe();
             $scope.watchMe();
-            MapDrawing.drawPlaces(map, Places.get());
+            MapDrawing.drawPlaces(map, Places.get(), $scope.select);
             MapDrawing.drawMonsters(map, Monsters.get(), $scope.select);
             MapDrawing.addMapEvents(map, unCenter);
         };
