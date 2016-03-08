@@ -1,0 +1,20 @@
+
+.combat {
+  .monster-row {
+    margin-bottom: 50px;
+  }
+
+  .skill-row {
+    .skill-grid {
+      flex-wrap: wrap;
+
+      button.battle-button {
+        display: flex;
+      }
+    }
+  }
+}
+
+.battle-button {
+  height: 80px !important;
+}

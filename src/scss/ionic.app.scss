@@ -4,51 +4,13 @@ $ionicons-font-path: "../lib/ionic/release/fonts" !default;
 
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
-
-.pull-right {
-  float: right;
-}
-
-.padding-0 {
-  padding: 0 !important;
-}
-
-.margin-0 {
-  margin: 0 !important;
-}
-
-.float-right {
-  float: right;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.text-right {
-  text-align: right;
-}
-
-.bold {
-  font-weight: bold;
-}
-
-.italic {
-  font-style: italic;
-}
+@import "helpers";
+@import "map";
+@import "combat";
+@import "skillchange";
 
 ion-content .scroll {
   min-height: 70%;
-}
-
-.subdued {
-  color: #888;
-}
-
-.vertical-center {
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
 .stat-bar-container {
@@ -71,113 +33,4 @@ ion-content .scroll {
       background-color: green;
     }
   }
-}
-
-map {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-.scroll {
-  height: 100%;
-}
-
-.above-gmaps {
-  position: absolute;
-  z-index: 20;
-
-  &.findme-button {
-    bottom: 30px;
-    left: 15px;
-
-    .icon {
-      font-size: smaller;
-    }
-  }
-
-  &.fight-button {
-    bottom: 30px;
-    right: 15px;
-  }
-}
-
-.skill-modal-container {
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-
-  .data-area {
-    flex: 1;
-  }
-
-  .desc-area {
-    flex: 1;
-  }
-
-  .effects-area {
-    flex: 2;
-  }
-
-  .assign-area {
-    flex: 5;
-  }
-
-  .col-flex {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .skill-container {
-    flex: 0.5;
-
-    .skill-row {
-      flex: 0.5;
-      flex-wrap: wrap;
-
-      .skill-slot {
-        text-align: center;
-        align-self: center;
-      }
-    }
-  }
-}
-
-.skill-button {
-  line-height: inherit;
-  font-size: inherit;
-  padding: inherit;
-}
-
-.combat {
-  .monster-row {
-    margin-bottom: 50px;
-  }
-
-  .skill-row {
-    .skill-grid {
-      flex-wrap: wrap;
-
-      button.battle-button {
-        display: flex;
-      }
-    }
-  }
-}
-
-.inner-alignment-padding {
-  padding-left: 15px;
-  padding-right: 15px;
-}
-
-.battle-button {
-  height: 80px !important;
-}
-
-.row-center.text-center {
-  justify-content: center;
-}
-
-.button-small.button-xs {
-  min-height: 20px;
-  line-height: 15px;
 }

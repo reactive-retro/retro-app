@@ -1,0 +1,28 @@
+
+map {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.scroll {
+  height: 100%;
+}
+
+.above-gmaps {
+  position: absolute;
+  z-index: 20;
+
+  &.findme-button {
+    bottom: 30px;
+    left: 15px;
+
+    .icon {
+      font-size: smaller;
+    }
+  }
+
+  &.fight-button {
+    bottom: 30px;
+    right: 15px;
+  }
+}

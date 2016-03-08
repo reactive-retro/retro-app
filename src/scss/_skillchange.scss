@@ -1,0 +1,47 @@
+
+.skill-modal-container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+
+  .data-area {
+    flex: 1;
+  }
+
+  .desc-area {
+    flex: 1;
+  }
+
+  .effects-area {
+    flex: 2;
+  }
+
+  .assign-area {
+    flex: 5;
+  }
+
+  .col-flex {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .skill-container {
+    flex: 0.5;
+
+    .skill-row {
+      flex: 0.5;
+      flex-wrap: wrap;
+
+      .skill-slot {
+        text-align: center;
+        align-self: center;
+      }
+    }
+  }
+}
+
+.skill-button {
+  line-height: inherit;
+  font-size: inherit;
+  padding: inherit;
+}

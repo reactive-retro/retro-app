@@ -1,0 +1,56 @@
+
+.pull-right {
+  float: right;
+}
+
+.padding-0 {
+  padding: 0 !important;
+}
+
+.margin-0 {
+  margin: 0 !important;
+}
+
+.float-right {
+  float: right;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.subdued {
+  color: #888;
+}
+
+.vertical-center {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.inner-alignment-padding {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.row-center.text-center {
+  justify-content: center;
+}
+
+.button-small.button-xs {
+  min-height: 20px;
+  line-height: 15px;
+}
