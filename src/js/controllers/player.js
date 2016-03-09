@@ -3,7 +3,7 @@ angular.module('retro').controller('PlayerController',
         $scope.player = Player.get();
         $scope.isEmpty = _.isEmpty;
 
-        $scope.go = $stateWrapper.goBreakCache;
+        $scope.go = (state) => () => $stateWrapper.goBreakCache(state);
         Player.observer.then(null, null, (player) => $scope.player = player);
     }
 );

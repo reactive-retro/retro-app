@@ -1,4 +1,4 @@
-angular.module('retro').service('EquipFlow', (Toaster, $stateWrapper, Player, BlockState, socket) => {
+angular.module('retro').service('EquipFlow', (Toaster, Player, BlockState, socket) => {
     return {
         equip: (newItem) => {
 
@@ -8,7 +8,6 @@ angular.module('retro').service('EquipFlow', (Toaster, $stateWrapper, Player, Bl
 
             BlockState.block('Player');
             socket.emit('player:change:equipment', opts, Toaster.handleDefault(() => {
-                $stateWrapper.go('player');
                 BlockState.unblock('Player');
             }));
         },

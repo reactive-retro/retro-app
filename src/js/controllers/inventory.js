@@ -1,13 +1,17 @@
 angular.module('retro').controller('InventoryController',
-    ($scope, $ionicPopup, Player, EquipFlow, Settings) => {
+    ($scope, $stateWrapper, $ionicPopup, Player, EquipFlow, Settings) => {
         $scope.player = Player.get();
         Player.observer.then(null, null, (player) => $scope.player = player);
         $scope.isEmpty = _.isEmpty;
 
-        $scope.EquipFlow = EquipFlow;
+        $scope.equip = (item) => () => {
+            EquipFlow.equip(item);
+            $stateWrapper.go('player');
+        };
+
         $scope.maxInvSize = Settings.INVENTORY_SIZE;
 
-        $scope.tryToSell = (item) => {
+        $scope.tryToSell = (item) => () => {
             const value = Math.floor(item.value/$scope.player.sellModifier);
             const confirmPopup = $ionicPopup.confirm({
                 title: `Sell ${item.name}`,

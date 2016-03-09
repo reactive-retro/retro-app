@@ -37,52 +37,14 @@ script(type="text/ng-template", id="player")
                         .col.text-center
                             color-text(pre-text="LUK", value="player.stats.luk")
 
-            .card
-                .item.item-divider
-                    h2
-                        span {{player.equipment.weapon.name}}
-                        span.float-right
-                            button.button.button-small(ng-click="go('inventory.weapons')")
-                                i.icon.ion-arrow-swap
-                    p Level {{player.equipment.weapon.levelRequirement || 1}} Weapon
+            item-display(
+                item="player.equipment.weapon",
+                header-icon-button="{ iconClass: 'ion-arrow-swap', click: go('inventory.weapons') }"
+                show-tagline="true"
+            )
 
-                .item.item-body
-                    .row
-                        .col(ng-if="player.equipment.weapon.stats.str")
-                            color-text(pre-text="STR", value="player.equipment.weapon.stats.str")
-
-                        .col(ng-if="player.equipment.weapon.stats.dex")
-                            color-text(pre-text="DEX", value="player.equipment.weapon.stats.dex")
-
-                        .col(ng-if="player.equipment.weapon.stats.vit")
-                            color-text(pre-text="VIT", value="player.equipment.weapon.stats.vit")
-
-                        .col(ng-if="player.equipment.weapon.stats.mnt")
-                            color-text(pre-text="MNT", value="player.equipment.weapon.stats.mnt")
-
-                        .col(ng-if="player.equipment.weapon.stats.luk")
-                            color-text(pre-text="LUK", value="player.equipment.weapon.stats.luk")
-
-                        .col(ng-if="isEmpty(player.equipment.weapon.stats)") No stats.
-
-            .card
-                .item.item-divider
-                    h2
-                        span {{player.equipment.armor.name}}
-                        span.float-right
-                            button.button.button-small(ng-click="go('inventory.armor')")
-                                i.icon.ion-arrow-swap
-                    p Level {{player.equipment.armor.levelRequirement || 1}} Armor
-                .item.item-body
-                    .row
-                        .col(ng-if="player.equipment.armor.stats.str")
-                            color-text(pre-text="STR", value="player.equipment.armor.stats.str")
-                        .col(ng-if="player.equipment.armor.stats.dex")
-                            color-text(pre-text="DEX", value="player.equipment.armor.stats.dex")
-                        .col(ng-if="player.equipment.armor.stats.vit")
-                            color-text(pre-text="VIT", value="player.equipment.armor.stats.vit")
-                        .col(ng-if="player.equipment.armor.stats.mnt")
-                            color-text(pre-text="MNT", value="player.equipment.armor.stats.mnt")
-                        .col(ng-if="player.equipment.armor.stats.luk")
-                            color-text(pre-text="LUK", value="player.equipment.armor.stats.luk")
-                        .col(ng-if="isEmpty(player.equipment.armor.stats)") No stats.
+            item-display(
+                item="player.equipment.armor",
+                header-icon-button="{ iconClass: 'ion-arrow-swap', click: go('inventory.armor') }"
+                show-tagline="true"
+            )
