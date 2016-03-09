@@ -14,7 +14,7 @@ angular.module('retro').directive('itemDisplay', () => {
         template: `
             <div class="card">
                 <div class="item item-divider">
-                    <h2>
+                    <h2 class="item-display">
                         <span>{{item.name}}</span>
                         <span class="pull-right" ng-if="headerIconButton">
                             <button
@@ -39,7 +39,7 @@ angular.module('retro').directive('itemDisplay', () => {
                     <button
                         ng-if="!item.isDefault"
                         blocked-by="{{footerButton.blockedBy}}"
-                        ng-click="footerButton.click()"
+                        ng-click="footerButton.click(item)"
                         class="button button-small button-xs button-assertive">
                         {{footerButton.text}}
                     </button>

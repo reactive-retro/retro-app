@@ -1,5 +1,5 @@
 angular.module('retro').controller('ExploreController',
-    ($scope, $timeout, $filter, $ionicPopup, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, Settings, ExploreFlow, BattleFlow) => {
+    ($scope, $timeout, $filter, $ionicPopup, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, Settings, ExploreFlow, BattleFlow, ItemContainerFlow) => {
 
         $scope.currentlySelected = null;
         $scope.centered = true;
@@ -44,6 +44,11 @@ angular.module('retro').controller('ExploreController',
                 if(!res) return;
                 ExploreFlow.moveHomepoint($scope.coords);
             });
+        };
+
+        $scope.shop = () => {
+            ItemContainerFlow.enter($scope.currentlySelected.place);
+            $scope.reset();
         };
 
         $scope.fight = () => {
@@ -101,7 +106,7 @@ angular.module('retro').controller('ExploreController',
         });
 
         Places.observer.then(null, null, () => {
-            MapDrawing.drawPlaces($scope.map, Places.get());
+            MapDrawing.drawPlaces($scope.map, Places.get(), $scope.select);
         });
 
         Monsters.observer.then(null, null, () => {

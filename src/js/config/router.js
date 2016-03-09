@@ -119,6 +119,34 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
             templateUrl: 'party',
             controller: 'PartyController',
             cache: false,
-            data: { requiresLogin: true }
-        });
+            data: { requiresLogin: true },
+            resolve: {
+                playerLoaded: ($injector) => $injector.get('Settings').isReady
+            }
+        })
+        .state('shop', {
+            url: '/shop',
+            controller: 'ShopController',
+            templateUrl: 'item-container',
+            data: { requiresLogin: true },
+            resolve: {
+                playerLoaded: ($injector) => $injector.get('Settings').isReady
+            },
+            params: {
+                containerData: null
+            }
+        })
+        .state('chest', {
+            url: '/chest',
+            controller: 'TreasureChestController',
+            templateUrl: 'item-container',
+            data: { requiresLogin: true },
+            resolve: {
+                playerLoaded: ($injector) => $injector.get('Settings').isReady
+            },
+            params: {
+                containerData: null
+            }
+        })
+    ;
 });

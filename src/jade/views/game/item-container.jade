@@ -1,0 +1,12 @@
+script(type="text/ng-template", id="item-container")
+    ion-view(view-title="{{pageTitle}}")
+        ion-content
+            h3.margin-top-10.text-center {{name}}
+            h3.subdued.header-bar-margin.text-center.vertical-center(ng-if="contents.length === 0") This place is empty.
+            item-display(
+                ng-repeat="item in contents",
+                item="item",
+                footer-button="footerButton"
+                show-tagline="true",
+                player-level="player.professionLevels[player.profession]"
+            )
