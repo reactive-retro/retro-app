@@ -30,7 +30,7 @@ angular.module('retro').directive('itemDisplay', () => {
                 <div class="item item-divider">
                     <h2 class="item-display">
                         <span>{{item.name}}</span>
-                        <span class="pull-right" ng-if="headerIconButton">
+                        <span class="pull-right" ng-if="headerIconButton && !headerIconButton.hide(item)">
                             <button
                                 ng-click="headerIconButton.click()"
                                 class="button button-small">
@@ -38,8 +38,11 @@ angular.module('retro').directive('itemDisplay', () => {
                             </button>
                         </span>
                     </h2>
-                    <p ng-if="showTagline" ng-class="{ assertive: playerLevel > item.levelRequirement }">
-                        <i class="icon ion-star {{qualityColor}}" ng-if="item.quality > 1"></i> Level {{item.levelRequirement || 1}} {{item.type}}
+                    <p ng-if="showTagline">
+                        <i class="icon ion-star {{qualityColor}}" ng-if="item.quality > 1"></i>
+                        <span ng-class="{ assertive: playerLevel < item.levelRequirement }">
+                            Level {{item.levelRequirement || 1}} {{item.type}}
+                        </span>
                     </p>
                 </div>
                 <div class="item item-body" ng-if="!isEmpty(item.stats)">

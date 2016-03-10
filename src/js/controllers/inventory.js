@@ -9,6 +9,8 @@ angular.module('retro').controller('InventoryController',
             $stateWrapper.go('player');
         };
 
+        $scope.hideEquip = (item) => item.levelRequirement > $scope.player.professionLevels[$scope.player.profession];
+
         $scope.maxInvSize = Settings.INVENTORY_SIZE;
 
         $scope.tryToSell = (item) => () => {

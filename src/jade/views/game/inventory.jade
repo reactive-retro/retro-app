@@ -17,7 +17,7 @@ script(type="text/ng-template", id="inventory-tab-armor")
             item-display(
                 ng-repeat="item in filteredArmor = (player.inventory | filter:{type:'armor'})",
                 item="item",
-                header-icon-button="{ iconClass: 'ion-arrow-swap', click: equip(item), blockedBy: 'Player' }"
+                header-icon-button="{ iconClass: 'ion-arrow-swap', click: equip(item), hide: hideEquip, blockedBy: 'Player' }"
                 footer-button="{ text: 'Sell', click: tryToSell(item), blockedBy: 'Player' }"
                 show-tagline="true",
                 player-level="player.professionLevels[player.profession]",
@@ -31,7 +31,7 @@ script(type="text/ng-template", id="inventory-tab-weapons")
             item-display(
                 ng-repeat="item in filteredWeapons = (player.inventory | filter:{type:'weapon'})",
                 item="item",
-                header-icon-button="{ iconClass: 'ion-arrow-swap', click: equip(item), blockedBy: 'Player' }"
+                header-icon-button="{ iconClass: 'ion-arrow-swap', click: equip(item), hide: hideEquip, blockedBy: 'Player' }"
                 footer-button="{ text: 'Sell', click: tryToSell(item), blockedBy: 'Player' }"
                 show-tagline="true",
                 player-level="player.professionLevels[player.profession]",
