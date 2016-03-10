@@ -13,7 +13,7 @@ angular.module('retro').directive('itemDisplay', () => {
             $scope.isEmpty = _.isEmpty;
             $scope.value = () => Math.floor($scope.item.value / ($scope.sellModifier || 1));
 
-            $scope.determineQualityColor = (quality) => {
+            const determineQualityColor = (quality) => {
                 switch(quality) {
                     case 2:  return 'dark';
                     case 3:  return 'energized';
@@ -22,6 +22,8 @@ angular.module('retro').directive('itemDisplay', () => {
                     default: return '';
                 }
             };
+
+            $scope.qualityColor = determineQualityColor($scope.item.quality);
         },
         template: `
             <div class="card">
@@ -37,7 +39,7 @@ angular.module('retro').directive('itemDisplay', () => {
                         </span>
                     </h2>
                     <p ng-if="showTagline" ng-class="{ assertive: playerLevel > item.levelRequirement }">
-                        <i class="icon ion-star {{determineQualityColor(item.quality)}}" ng-if="item.quality > 1"></i> Level {{item.levelRequirement || 1}} {{item.type}}
+                        <i class="icon ion-star {{qualityColor}}" ng-if="item.quality > 1"></i> Level {{item.levelRequirement || 1}} {{item.type}}
                     </p>
                 </div>
                 <div class="item item-body" ng-if="!isEmpty(item.stats)">
