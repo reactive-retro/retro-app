@@ -45,6 +45,10 @@
   transform: translateY(-50%);
 }
 
+.no-pointer-events {
+  pointer-events: none;
+}
+
 .inner-alignment-padding {
   padding-left: 15px;
   padding-right: 15px;
