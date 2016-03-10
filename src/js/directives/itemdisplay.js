@@ -8,9 +8,6 @@ angular.module('retro').directive('itemDisplay', () => {
             showTagline: '=',
             playerLevel: '=',
             sellModifier: '='
-
-            // TODO cut value by whatever player.sellModifier(?) is
-            // TODO probably just pass in player instead of player level where needed
         },
         controller: ($scope) => {
             $scope.isEmpty = _.isEmpty;

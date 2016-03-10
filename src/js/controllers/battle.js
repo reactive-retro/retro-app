@@ -1,5 +1,5 @@
 angular.module('retro').controller('BattleController',
-    ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills, Options) => {
+    ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills, MapDrawing, Options) => {
         $scope.battleFlow = BattleFlow;
         $scope.currentPlayerName = Player.get().name;
         $scope.targets = {};
@@ -20,6 +20,7 @@ angular.module('retro').controller('BattleController',
             $scope.isDone = isDone;
             $scope.modals.resultsModal.show();
             if(isDone) {
+                _.each(battle.monsters, monster => MapDrawing.hideMonster(monster.id));
                 Battle.set(null);
             }
         };

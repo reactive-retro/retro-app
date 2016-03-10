@@ -20,6 +20,7 @@ angular.module('retro').service('ItemContainerFlow', ($state, BlockState, Player
     };
 
     return {
+
         getNotYetActivatedItems,
 
         enter: (data) => {

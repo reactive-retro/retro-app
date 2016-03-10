@@ -1,4 +1,4 @@
-angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => {
+angular.module('retro').service('MapDrawing', (Player, Google, Settings, MAP_COLORS) => {
 
     let savedPlaces = [];
     let savedMonsters = [];
@@ -60,8 +60,15 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
         _.each(arr, marker => {
             const contains = containsItem(bounds, marker.position);
             if(contains && marker.map || !contains && !marker.map) return;
-            marker.setMap(contains ? map : null);
+            marker.setMap(contains && !marker.hidden ? map : null);
         });
+    };
+
+    const hideMonster = (id) => {
+        const monster = _.find(savedMonsters, { monsterId: id });
+        if(!monster) return;
+        monster.hidden = true;
+        monster.setMap(null);
     };
 
     const drawPlaces = (map, places, click = () => {}) => {
@@ -112,7 +119,12 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
         _.each(savedMonsters, monster => monster.setMap(null));
         savedMonsters = [];
 
+        const player = Player.get();
+
         _.each(monsters, monster => {
+
+            // don't draw dead monsters
+            if(monster.hidden || _.contains(player.actionsTaken.monster, monster.id)) return;
 
             const pos = new Google.maps.LatLng(monster.location.lat, monster.location.lon);
 
@@ -129,6 +141,8 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
                     scale: 5
                 }
             });
+
+            monsterMarker.monsterId = monster.id;
 
             monsterMarker.addListener('click', () => {
 
@@ -246,6 +260,8 @@ angular.module('retro').service('MapDrawing', (Google, Settings, MAP_COLORS) => 
         drawHomepoint,
         drawMe,
         drawMonsters,
+
+        hideMonster,
 
         setCurrentPosition
     };
