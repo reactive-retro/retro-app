@@ -21,12 +21,17 @@ angular.module('retro').service('ItemContainerFlow', ($state, BlockState, Player
 
     return {
         getNotYetActivatedItems,
+
         enter: (data) => {
             $state.go(getStateFromType(data.derivedType), { containerData: data });
         },
 
-        buyItem: () => {
-            socket.emit('poop');
+        buyItem: (shop, itemId, callback) => {
+            BlockState.block('Shop');
+            socket.emit('shop:buy', { name: Player.get().name, place: fixContents(shop), itemId }, Toaster.handleDefault(() => {
+                BlockState.unblock('Shop');
+                callback(getNotYetActivatedItems(shop));
+            }));
         },
 
         takeItem: (shop, itemId, callback) => {

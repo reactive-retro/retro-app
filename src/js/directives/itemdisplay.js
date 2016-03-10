@@ -6,10 +6,15 @@ angular.module('retro').directive('itemDisplay', () => {
             footerButton: '=',
             headerIconButton: '=',
             showTagline: '=',
-            playerLevel: '='
+            playerLevel: '=',
+            sellModifier: '='
+
+            // TODO cut value by whatever player.sellModifier(?) is
+            // TODO probably just pass in player instead of player level where needed
         },
         controller: ($scope) => {
             $scope.isEmpty = _.isEmpty;
+            $scope.value = () => Math.floor($scope.item.value / ($scope.sellModifier || 1));
         },
         template: `
             <div class="card">
@@ -39,11 +44,12 @@ angular.module('retro').directive('itemDisplay', () => {
                     <button
                         ng-if="!item.isDefault"
                         blocked-by="{{footerButton.blockedBy}}"
+                        ng-disabled="footerButton.disabled(item)"
                         ng-click="footerButton.click(item)"
                         class="button button-small button-xs button-assertive">
                         {{footerButton.text}}
                     </button>
-                    <gold-display value="item.value" extra-info="item.isDefault ? 'Unsellable' : ''"></gold-display>
+                    <gold-display value="value()" extra-info="item.isDefault ? 'Unsellable' : ''"></gold-display>
                 </div>
             </div>
             `
