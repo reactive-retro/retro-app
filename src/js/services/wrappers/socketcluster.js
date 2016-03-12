@@ -42,6 +42,7 @@ angular.module('retro')
                 socket.on('update:places', Places.set);
                 socket.on('update:options', Options.set);
                 socket.on('update:monsters', Monsters.set);
+                socket.on('update:monsters:push', Monsters.push);
                 socket.on('combat:entered', Battle.set);
 
                 Party.setSocket(socket);

@@ -116,27 +116,35 @@ angular.module('retro').service('MapDrawing', (Player, Google, Settings, MAP_COL
     const drawMonsters = (map, monsters, click = () => {}) => {
         const bounds = map.getBounds();
 
-        _.each(savedMonsters, monster => monster.setMap(null));
-        savedMonsters = [];
+        // support the patching of monster array
+        if(!monsters.patch) {
+            _.each(savedMonsters, monster => monster.setMap(null));
+            savedMonsters = [];
+        } else {
+            monsters = monsters.patch;
+        }
 
         const player = Player.get();
+        const concatdMonsters = player.actionsTaken.monster.concat(player.actionsTaken.dungeonMonster || []);
 
         _.each(monsters, monster => {
 
             // don't draw dead monsters
-            if(monster.hidden || _.contains(player.actionsTaken.monster, monster.id)) return;
+            if(monster.hidden || _.contains(concatdMonsters, monster.id)) return;
 
             const pos = new Google.maps.LatLng(monster.location.lat, monster.location.lon);
+
+            const key = monster.isDungeon ? 'dungeonMonster' : 'monster';
 
             const monsterMarker = new Google.maps.Marker({
                 position: pos,
                 map: bounds && containsItem(bounds, pos) ? map : null,
                 icon: {
                     path: Google.maps.SymbolPath.CIRCLE,
-                    strokeColor: MAP_COLORS.monster.outline,
+                    strokeColor: MAP_COLORS[key].outline,
                     strokeOpacity: 0.8,
                     strokeWeight: 2,
-                    fillColor: MAP_COLORS.monster.fill,
+                    fillColor: MAP_COLORS[key].fill,
                     fillOpacity: 1,
                     scale: 5
                 }

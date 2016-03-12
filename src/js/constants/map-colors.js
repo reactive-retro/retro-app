@@ -3,6 +3,10 @@ angular.module('retro').constant('MAP_COLORS', {
         outline: '#ff0000',
         fill: '#aa0000'
     },
+    dungeonMonster: {
+        outline: '#ff0000',
+        fill: '#510808'
+    },
     poi: {
         outline: '#ffff00',
         fill: '#aaaa00'

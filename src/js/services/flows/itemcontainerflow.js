@@ -23,6 +23,15 @@ angular.module('retro').service('ItemContainerFlow', ($state, BlockState, Player
 
         getNotYetActivatedItems,
 
+        canEnter: (data) => {
+            const requirements = data.requirements;
+            const killed = Player.get().actionsTaken.dungeonMonster;
+            const intersectionLength = _.intersection(killed, requirements).length;
+
+            if(intersectionLength !== requirements.length) return requirements.length - intersectionLength;
+            return 0;
+        },
+
         enter: (data) => {
             $state.go(getStateFromType(data.derivedType), { containerData: data });
         },

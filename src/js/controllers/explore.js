@@ -1,5 +1,5 @@
 angular.module('retro').controller('ExploreController',
-    ($scope, $timeout, $filter, $ionicPopup, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, Settings, ExploreFlow, BattleFlow, ItemContainerFlow) => {
+    ($scope, $timeout, $filter, $ionicPopup, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, Settings, ExploreFlow, BattleFlow, ItemContainerFlow, Toaster) => {
 
         $scope.currentlySelected = null;
         $scope.centered = true;
@@ -47,6 +47,10 @@ angular.module('retro').controller('ExploreController',
         };
 
         $scope.shop = () => {
+            const monstersNeeded = ItemContainerFlow.canEnter($scope.currentlySelected.place);
+            if(monstersNeeded !== 0) {
+                return Toaster.show(`You need to kill ${monstersNeeded} more monster${monstersNeeded > 1 ? 's' : ''} to open this chest!`);
+            }
             ItemContainerFlow.enter($scope.currentlySelected.place);
             $scope.reset();
         };

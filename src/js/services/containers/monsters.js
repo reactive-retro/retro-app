@@ -1,12 +1,31 @@
-angular.module('retro').service('Monsters', ($q) => {
+angular.module('retro').service('Monsters', ($q, Player) => {
 
     const defer = $q.defer();
 
+    let shopToken = Player.get().shopToken;
     let monsters = [];
+    let dungeonMonsters = [];
+
+    const allMonsters = () => monsters.concat(dungeonMonsters);
 
     const updateMonsters = (newMonsters) => {
         monsters = newMonsters;
-        defer.notify(monsters);
+        defer.notify(allMonsters());
+    };
+
+    const updateDungeonMonsters = (newMonsters) => {
+        const checkToken = Player.get().shopToken;
+        if(checkToken !== shopToken) {
+            shopToken = checkToken;
+            dungeonMonsters = [];
+        }
+
+        dungeonMonsters.push(...newMonsters);
+
+        // monkey-patch the array so it doesn't take forever to load
+        const allFoundMonsters = allMonsters();
+        allFoundMonsters.patch = newMonsters;
+        defer.notify(allFoundMonsters);
     };
 
     return {
@@ -15,6 +34,7 @@ angular.module('retro').service('Monsters', ($q) => {
             defer.notify(monsters);
         },
         set: updateMonsters,
-        get: () => monsters
+        push: updateDungeonMonsters,
+        get: allMonsters
     };
 });
