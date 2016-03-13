@@ -36,7 +36,7 @@ script(type="text/ng-template", id="changeskill.info")
                     .row.skill-container
                         .col.col-flex
 
-                            .row.skill-row
+                            .row.skill-row(ng-if="!activeSkill.spellUnstackable")
                                 .col.col-33.skill-slot(ng-repeat="idx in [0,1,2,3,4,5]")
                                     .row
                                         .col Slot {{idx+1}}
@@ -47,3 +47,6 @@ script(type="text/ng-template", id="changeskill.info")
                                                 ng-class="{'button-stable': !player.skills[idx], 'button-balanced': player.skills[idx]}",
                                                 ng-click="setSkillInSlot(activeSkill.spellName, idx)")
                                                 span.skill-text {{player.skills[idx] || 'none'}}
+
+                            .row.skill-row.row-center(ng-if="activeSkill.spellUnstackable")
+                                .col.col-center.text-center This skill is not stackable.
