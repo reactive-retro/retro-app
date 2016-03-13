@@ -99,7 +99,8 @@ angular.module('retro').service('MapDrawing', (Player, Google, Settings, MAP_COL
             placeMarker.addListener('click', () => {
 
                 const infoWindow = new Google.maps.InfoWindow({
-                    content: `<strong>${place.name}</strong><br>
+                    content: `<strong>${place.dungeonName ? place.dungeonName : place.name}</strong><br>
+                    ${place.dungeonName ? `<small>AKA ${place.name}</small><br>` : ''}
                     Type: ${place.derivedType}
                     `
                 });
@@ -125,7 +126,7 @@ angular.module('retro').service('MapDrawing', (Player, Google, Settings, MAP_COL
         }
 
         const player = Player.get();
-        const concatdMonsters = player.actionsTaken.monster.concat(player.actionsTaken.dungeonMonster || []);
+        const concatdMonsters = (player.actionsTaken.monster || []).concat(player.actionsTaken.dungeonMonster || []);
 
         _.each(monsters, monster => {
 
