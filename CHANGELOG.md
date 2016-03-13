@@ -1,3 +1,22 @@
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/reactive-retro/retro-app/compare/0.2.2...0.3.0) (2016-03-13)
+
+
+### Bug Fixes
+
+* **explore:** monsters now die when they are killed ([3ac4847](https://github.com/reactive-retro/retro-app/commit/3ac4847)), closes [#95](https://github.com/reactive-retro/retro-app/issues/95)
+* **map:** prevent map from showing player in the proper position in some rare cases ([f1e15c1](https://github.com/reactive-retro/retro-app/commit/f1e15c1))
+* **player:** player stats are now shown in a pyramid to fix some line-breaking ([49d45bb](https://github.com/reactive-retro/retro-app/commit/49d45bb)), closes [#94](https://github.com/reactive-retro/retro-app/issues/94)
+
+### Features
+
+* **dungeons:** dungeons can now have names, attributes, and specific monsters ([f11ec8c](https://github.com/reactive-retro/retro-app/commit/f11ec8c)), closes [#99](https://github.com/reactive-retro/retro-app/issues/99)
+* **explore:** the map now shows dungeon chests and requires monster kills ([c317ae1](https://github.com/reactive-retro/retro-app/commit/c317ae1)), closes [#65](https://github.com/reactive-retro/retro-app/issues/65)
+* **explore:** you can now open shops and treasure chests ([217fefc](https://github.com/reactive-retro/retro-app/commit/217fefc)), closes [#60](https://github.com/reactive-retro/retro-app/issues/60)
+* **player:** display item quality next to item level requirement ([846cff2](https://github.com/reactive-retro/retro-app/commit/846cff2))
+
+
+
 <a name="0.2.2"></a>
 ## [0.2.2](https://github.com/reactive-retro/retro-app/compare/0.2.1...0.2.2) (2016-03-07)
 
