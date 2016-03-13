@@ -6,7 +6,7 @@ script(type="text/ng-template", id="player")
                     h2
                         span {{player.name}}
                         span.float-right
-                            button.button.button-small(ng-click="go('changeclass')")
+                            button.button.button-small(ng-click="go('changeclass')()")
                                 i.icon.ion-arrow-swap
 
                     p Level {{player.professionLevels[player.profession]}} {{player.profession}}
