@@ -1,3 +1,13 @@
+<a name="0.2.2"></a>
+## [0.2.2](https://github.com/reactive-retro/retro-app/compare/0.2.1...0.2.2) (2016-03-07)
+
+
+### Bug Fixes
+
+* **party:** the party screen no longer squishes ([d197218](https://github.com/reactive-retro/retro-app/commit/d197218)), closes [#83](https://github.com/reactive-retro/retro-app/issues/83)
+
+
+
 <a name="0.2.1"></a>
 ## [0.2.1](https://github.com/reactive-retro/retro-app/compare/0.2.0...0.2.1) (2016-03-07)
 
