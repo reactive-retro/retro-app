@@ -4,7 +4,7 @@ script(type="text/ng-template", id="changeclass")
             div.card(ng-repeat="prof in player.unlockedProfessions | orderBy:'toString()'")
                 div.item.item-divider
                     h2
-                        span {{prof}} (level {{player.professionLevels[prof]}})
+                        span {{prof}} (level {{player.professionLevels[prof] || 1}})
                         span.float-right
                             button.button.button-small(
                                 blocked-by="Player",

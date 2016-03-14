@@ -1,4 +1,4 @@
-angular.module('retro').service('Battle', ($q, $stateWrapper, Player) => {
+angular.module('retro').service('Battle', ($q, $stateWrapper, Player, Skills) => {
 
     let defer = $q.defer();
 
@@ -36,6 +36,10 @@ angular.module('retro').service('Battle', ($q, $stateWrapper, Player) => {
             const myName = Player.get().name;
             const me = _.find(battle.playerData, { name: myName });
             Player.set(me);
+
+            if(me.newSkills) {
+                Skills.set(me.newSkills);
+            }
 
             $stateWrapper.noGoingBack('battle');
             battle.actionChannel = socketRef.subscribe(`battle:${battle._id}:actions`);
