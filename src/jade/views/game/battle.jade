@@ -40,7 +40,7 @@ script(type="text/ng-template", id="battle")
                             button.button.button-stable.button-block.margin-0(disabled) Item
 
                         .col.text-center
-                            button.button.button-stable.button-block.margin-0(disabled) Flee
+                            button.button.button-stable.button-block.margin-0(ng-click="openSkillInfo('Flee')", ng-disabled="disableActions") Flee
 
                     .row.text-center.skill-grid
                         .col.col-33(ng-repeat="skill in uniqueSkills")

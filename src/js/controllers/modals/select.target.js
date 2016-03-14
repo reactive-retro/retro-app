@@ -1,5 +1,5 @@
 angular.module('retro').controller('SelectTargetController',
-    ($scope, BattleFlow, Battle, Dice) => {
+    ($scope, BattleFlow, Battle, Dice, Player) => {
         $scope.battleFlow = BattleFlow;
         $scope.battle = Battle.get();
         $scope.targets = {};
@@ -14,7 +14,8 @@ angular.module('retro').controller('SelectTargetController',
         $scope.activeSkillAttrs = _(skillRef.spellEffects)
             .keys()
             .map(key => {
-                const stats = Dice.statistics(skillRef.spellEffects[key].roll, $scope.me.stats, 1);
+                const roll = skillRef.spellEffects[key].roll;
+                const stats = roll ? Dice.statistics(roll, Player.get().stats, 1) : null;
                 return { name: key, value: stats, extra: skillRef.spellEffects[key], accuracy: $scope.me.stats.acc };
             })
             // Damage always comes first
