@@ -16,7 +16,7 @@ angular.module('retro').controller('MenuController',
         $scope.menu = [
             { icon: 'ion-person', name: 'Player', state: 'player' },
             { icon: 'ion-earth', name: 'Explore', state: 'explore', requiresLocation: true },
-            { icon: 'ion-briefcase', name: 'Inventory', state: 'inventory' },
+            { icon: 'ion-briefcase', name: 'Inventory', state: 'inventory.armor' },
             { icon: 'ion-university', name: 'Skills', state: 'changeskills' },
             { icon: 'ion-ios-people', name: 'Party', state: 'party' },
             { icon: 'ion-gear-b', name: 'Options', state: 'options' },

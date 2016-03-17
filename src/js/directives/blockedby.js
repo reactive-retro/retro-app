@@ -1,9 +1,9 @@
-angular.module('retro').directive('blockedBy', (BlockState) => {
+angular.module('retro').directive('blockedBy', ($timeout, BlockState) => {
     return {
         restrict: 'A',
         link: ($scope, element, attrs) => {
             $scope.$parent.$watch(() => BlockState.get()[attrs.blockedBy], (newVal) => {
-                element.prop('disabled', newVal);
+                $timeout(() => element.prop('disabled', newVal));
             });
         }
     };

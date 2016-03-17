@@ -7,8 +7,10 @@ angular.module('retro').service('BattleFlow', (Player, Battle, Toaster, BlockSta
         }));
     };
 
-    const confirmAction = ({ origin, id, skill }) => {
-        socket.emit('combat:confirmaction', { skill, target: id, name: origin });
+    const confirmAction = ({ origin, id, skill, itemName }) => {
+        socket.emit('combat:confirmaction', { skill, itemName, target: id, name: origin }, Toaster.swallow(() => {
+            BlockState.unblock('Battle');
+        }));
     };
 
     const toExplore = () => {

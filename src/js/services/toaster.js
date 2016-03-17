@@ -17,9 +17,18 @@ angular.module('retro').service('Toaster', ($cordovaToast) => {
         callback();
     };
 
+    const swallowSuccess = (callback = () => {}) => (err) => {
+        if(err && err.msg) {
+            show(err.msg);
+        }
+
+        callback();
+    };
+
     return {
         show,
         swallow,
+        swallowSuccess,
         handleDefault
     };
 });

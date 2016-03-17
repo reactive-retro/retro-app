@@ -1,0 +1,35 @@
+
+script(type="text/ng-template", id="changeitem.info")
+    ion-modal-view(ng-controller="ItemChangeModalController")
+        ion-header-bar.bar-balanced
+            .buttons
+                button.button(ng-click="closeItemInfo()")
+                    i.icon.ion-close
+            h1.title {{activeItem.name}}
+
+        ion-content.skill-modal-container
+            .row.effects-area
+                .col.text-center
+                    skill-effect-display(effects="activeItemAttrs", multiplier="1")
+
+
+            .row.assign-area
+                .col.col-flex
+                    .row
+                        .col.text-center
+                            h3.title Assign Item
+
+                    .row.skill-container
+                        .col.col-flex
+
+                            .row.skill-row
+                                .col.col-33.skill-slot(ng-repeat="idx in [0,1,2,3,4,5]")
+                                    .row
+                                        .col Slot {{idx+1}}
+                                    .row
+                                        .col
+                                            button.button.button-full.skill-button.button-block(
+                                                blocked-by="Player",
+                                                ng-class="{'button-stable': !player.items[idx], 'button-balanced': player.items[idx]}",
+                                                ng-click="setItemInSlot(activeItem, idx)")
+                                                span.skill-text {{player.items[idx] || 'none'}}

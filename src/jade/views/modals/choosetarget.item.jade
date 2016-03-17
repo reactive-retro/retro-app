@@ -1,0 +1,28 @@
+
+script(type="text/ng-template", id="choosetarget.item")
+    ion-modal-view(ng-controller="SelectItemTargetController")
+        ion-header-bar.bar-balanced
+            .buttons
+                button.button(ng-click="closeModal()")
+                    i.icon.ion-close
+            h1.title {{activeItem.name}}
+        ion-content.skill-modal-container
+
+            .row.effects-area
+                .col.text-center
+                    skill-effect-display(effects="activeItemAttrs", multiplier="1")
+
+            .row.assign-area
+                .col.col-flex
+                    .row
+                        .col.text-center
+                            h3.title Choose Target
+
+                    .row.skill-container
+                        .col.col-flex
+
+                            .row
+                                .col.col-33.monster-slot(ng-repeat="player in orderedPlayers", ng-include="'target-player-block'")
+
+                            .row
+                                .col.col-33.monster-slot(ng-repeat="monster in battle.monsters", ng-include="'target-enemy-block'")

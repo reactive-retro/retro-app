@@ -12,10 +12,10 @@ angular.module('retro').service('EquipFlow', (Toaster, Player, BlockState, socke
             }));
         },
 
-        sell: (item) => {
+        sell: (item, quantity = 1) => {
             const player = Player.get();
 
-            const opts = { name: player.name, itemId: item.itemId };
+            const opts = { name: player.name, itemId: item.itemId, itemQuantity: quantity };
 
             BlockState.block('Player');
             socket.emit('player:sell:equipment', opts, Toaster.handleDefault(() => {

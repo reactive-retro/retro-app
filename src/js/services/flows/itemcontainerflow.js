@@ -15,7 +15,10 @@ angular.module('retro').service('ItemContainerFlow', ($state, BlockState, Player
     };
 
     const fixContents = (shop) => {
-        _.each(shop.contents, item => delete item.$$hashKey);
+        _.each(shop.contents, item => {
+            delete item.$$hashKey;
+            _.each(item.effects, effect => delete effect.$$hashKey);
+        });
         return shop;
     };
 

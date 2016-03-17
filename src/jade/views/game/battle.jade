@@ -25,7 +25,7 @@ script(type="text/ng-template", id="battle")
 
             .row.inner-alignment-padding
                 .col.col-66.text-center
-                    span.italic(ng-show="targets[player.name]") {{targets[player.name].skill}} > {{targets[player.name].name}}
+                    span.italic(ng-show="targets[player.name]") {{targets[player.name].itemName ? targets[player.name].itemName : targets[player.name].skill}} > {{targets[player.name].name}}
                 .col.col-33.text-right
                     span(ng-show="canConfirm && player.name === currentPlayerName")
                         button.button.button-small.button-balanced(ng-click="confirmAction()") Confirm
@@ -37,12 +37,13 @@ script(type="text/ng-template", id="battle")
                             button.button.button-stable.button-block.margin-0(ng-click="openSkillInfo('Attack')", ng-disabled="disableActions") Attack
 
                         .col.text-center
-                            button.button.button-stable.button-block.margin-0(disabled) Item
+                            button.button.button-stable.button-block.margin-0(ng-init="mode = 'Skills'", ng-click="mode = mode === 'Skills' ? 'Items' : 'Skills'") {{mode === 'Skills' ? 'Items' : 'Skills'}}
 
                         .col.text-center
                             button.button.button-stable.button-block.margin-0(ng-click="openSkillInfo('Flee')", ng-disabled="disableActions") Flee
 
-                    .row.text-center.skill-grid
+                    .row.text-center.skill-grid(ng-if="mode === 'Skills'")
+                        .col.col-60.col-offset-20.text-center(ng-if="!uniqueSkills.length") You have no assigned skills.
                         .col.col-33(ng-repeat="skill in uniqueSkills")
                             button.button.button-balanced.skill-button.button-block.margin-0.battle-button(
                                 ng-click="openSkillInfo(skill.spellName)",
@@ -56,3 +57,11 @@ script(type="text/ng-template", id="battle")
                                             i.icon.ion-waterdrop
                                         span(ng-if="!battleFlow.canCastSkillCD(skill, me)")
                                             i.icon.ion-clock
+
+                    .row.text-center.skill-grid(ng-if="mode === 'Items'")
+                        .col.col-60.col-offset-20.text-center(ng-if="!hasItems") You have no assigned items remaining.
+                        .col.col-33(ng-repeat="(item, count) in me.itemUses track by $index", ng-show="item && count > 0")
+                            button.button.button-balanced.skill-button.button-block.margin-0.battle-button(
+                            ng-click="openItemInfo(item)",
+                            ng-disabled="disableActions"
+                            ) {{item}} (x{{count}})

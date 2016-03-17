@@ -29,7 +29,10 @@ angular.module('retro').directive('itemDisplay', () => {
             <div class="card">
                 <div class="item item-divider">
                     <h2 class="item-display">
-                        <span>{{item.name}}</span>
+                        <span>
+                            {{item.name}}
+                            <span ng-if="item.quantity > 1">(x{{item.quantity}})</span>
+                        </span>
                         <span class="pull-right" ng-if="headerIconButton && !headerIconButton.hide(item)">
                             <button
                                 ng-click="headerIconButton.click()"
@@ -45,10 +48,15 @@ angular.module('retro').directive('itemDisplay', () => {
                         </span>
                     </p>
                 </div>
-                <div class="item item-body" ng-if="!isEmpty(item.stats)">
+                <div class="item item-body" ng-if="!isEmpty(item.stats) || item.effects.length">
                     <div class="row">
                         <div class="col" ng-repeat="stat in ['str', 'mnt', 'dex', 'vit', 'luk']" ng-if="item.stats[stat]">
                             <color-text pre-text="{{stat.toUpperCase()}}" value="item.stats[stat]"></color-text>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col" ng-repeat="effect in item.effects">
+                            {{effect.name}} ({{effect.statBuff || effect.duration}})
                         </div>
                     </div>
                 </div>

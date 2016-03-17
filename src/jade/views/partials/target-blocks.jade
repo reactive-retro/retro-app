@@ -1,0 +1,26 @@
+
+script(type="text/ng-template", id="target-player-block")
+    .row
+        .col
+            button.button.button-full.skill-button.button-block.button-stable(
+            ng-click="target.player(player)")
+                span.skill-text {{player.name}}
+
+    .row
+        .col.text-center
+            div
+                health-display(target="player")
+            div
+                mana-display(target="player")
+
+script(type="text/ng-template", id="target-enemy-block")
+    .row
+        .col
+            button.button.button-full.skill-button.button-block.button-stable(
+            ng-click="target.monster(monster)",
+            ng-disabled="monster.stats.hp.__current === 0")
+                span.skill-text {{monster.name}}
+
+    .row
+        .col
+            stat-bar(target="monster", stat="hp")

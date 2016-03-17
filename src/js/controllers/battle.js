@@ -1,5 +1,5 @@
 angular.module('retro').controller('BattleController',
-    ($scope, $ionicModal, BattleFlow, Battle, Dice, Player, Skills, MapDrawing, Options) => {
+    ($scope, $ionicModal, $timeout, BattleFlow, Battle, Dice, Player, Skills, MapDrawing, Options) => {
         $scope.battleFlow = BattleFlow;
         $scope.currentPlayerName = Player.get().name;
         $scope.targets = {};
@@ -32,7 +32,7 @@ angular.module('retro').controller('BattleController',
         const setupBattleData = () => {
             $scope.battle = Battle.get();
             if(!$scope.battle) return;
-            $scope.battle.actionChannel.watch($scope.setTarget);
+            $scope.battle.actionChannel.watch((target) => $timeout($scope.setTarget(target)));
 
             $scope.battle.resultsChannel.watch(resultHandler);
             $scope.battle.updatesChannel.watch(battleSetter);
@@ -54,12 +54,26 @@ angular.module('retro').controller('BattleController',
                 .uniq()
                 .map(skill => _.find(Skills.get(), { spellName: skill }))
                 .value();
+
+            $scope.hasItems = _($scope.me.itemUses).values().reduce((prev, cur) => prev + cur, 0);
         };
 
         $scope.openSkillInfo = (skill) => {
             $scope.activeSkill = _.find(Skills.get(), { spellName: skill });
 
-            $ionicModal.fromTemplateUrl('choosetarget.info', {
+            $ionicModal.fromTemplateUrl('choosetarget.skill', {
+                scope: $scope,
+                animation: 'slide-in-up'
+            }).then((modal) => {
+                $scope.modals.targetModal = modal;
+                $scope.modals.targetModal.show();
+            });
+        };
+
+        $scope.openItemInfo = (item) => {
+            $scope.activeItem = _.find(Player.get().inventory, { name: item });
+
+            $ionicModal.fromTemplateUrl('choosetarget.item', {
                 scope: $scope,
                 animation: 'slide-in-up'
             }).then((modal) => {

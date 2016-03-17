@@ -1,18 +1,7 @@
 angular.module('retro').controller('SkillChangeModalController',
-    ($scope, Player, Skills, SkillChangeFlow, Dice) => {
+    ($scope, Player, Skills, SkillChangeFlow, AttributeCalculator) => {
 
-        const skill = $scope.activeSkill;
-
-        $scope.activeSkillAttrs = _(skill.spellEffects)
-            .keys()
-            .map(key => {
-                const roll = skill.spellEffects[key].roll;
-                const stats = roll ? Dice.statistics(roll, $scope.player.stats, 1) : null;
-                return { name: key, value: stats, extra: skill.spellEffects[key] };
-            })
-            // Damage always comes first
-            .sortBy((obj) => obj.name === 'Damage' ? '*' : obj.name)
-            .value();
+        $scope.activeSkillAttrs = AttributeCalculator.skillEffects($scope.activeSkill, false);
 
         $scope.setSkillInSlot = (skill, slot) => {
             // unset skill

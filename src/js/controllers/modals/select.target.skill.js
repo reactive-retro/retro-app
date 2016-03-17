@@ -1,5 +1,5 @@
-angular.module('retro').controller('SelectTargetController',
-    ($scope, BattleFlow, Battle, Dice, Player) => {
+angular.module('retro').controller('SelectSkillTargetController',
+    ($scope, BattleFlow, Battle, AttributeCalculator) => {
         $scope.battleFlow = BattleFlow;
         $scope.battle = Battle.get();
         $scope.targets = {};
@@ -11,16 +11,7 @@ angular.module('retro').controller('SelectTargetController',
             $scope.multiplier += 1;
         }
 
-        $scope.activeSkillAttrs = _(skillRef.spellEffects)
-            .keys()
-            .map(key => {
-                const roll = skillRef.spellEffects[key].roll;
-                const stats = roll ? Dice.statistics(roll, Player.get().stats, 1) : null;
-                return { name: key, value: stats, extra: skillRef.spellEffects[key], accuracy: $scope.me.stats.acc };
-            })
-            // Damage always comes first
-            .sortBy((obj) => obj.name === 'Damage' ? '*' : obj.name)
-            .value();
+        $scope.activeSkillAttrs = AttributeCalculator.skillEffects(skillRef, true);
 
         $scope.target = {
             monster: (monster) => $scope.prepareTarget({ name: monster.name, id: monster.id, skill: $scope.activeSkill.spellName }),
@@ -30,10 +21,6 @@ angular.module('retro').controller('SelectTargetController',
 
         $scope.closeModal = () => {
             $scope.modals.targetModal.hide();
-        };
-
-        $scope.setTarget = (target) => {
-            $scope.targets[target.origin] = target;
         };
     }
 );
