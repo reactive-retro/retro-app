@@ -1,3 +1,14 @@
+<a name="0.3.1"></a>
+## [0.3.1](https://github.com/reactive-retro/retro-app/compare/0.3.0...0.3.1) (2016-03-13)
+
+
+### Bug Fixes
+
+* **player:** class changing is possible again ([89834b0](https://github.com/reactive-retro/retro-app/commit/89834b0))
+* **skills:** you can no longer stack attack ([aa3ae86](https://github.com/reactive-retro/retro-app/commit/aa3ae86)), closes [#100](https://github.com/reactive-retro/retro-app/issues/100)
+
+
+
 <a name="0.3.0"></a>
 # [0.3.0](https://github.com/reactive-retro/retro-app/compare/0.2.2...0.3.0) (2016-03-13)
 
