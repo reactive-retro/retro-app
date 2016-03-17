@@ -19,7 +19,7 @@ angular.module('retro').controller('BattleController',
             $scope.results = actions;
             $scope.isDone = isDone;
             $scope.modals.resultsModal.show();
-            if(isDone) {
+            if(isDone && !battle.isFled) {
                 _.each(battle.monsters, monster => MapDrawing.hideMonster(monster.id));
                 Battle.set(null);
             }
