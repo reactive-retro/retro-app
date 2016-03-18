@@ -11,6 +11,6 @@ script(type="text/ng-template", id="changeskills")
                             small.italic.subdued Level {{skill.spellLevel}}
                         .col.padding-0.text-right
                             span(ng-if="countNumTimesSkillSet(skill.spellName) > 0")
-                                i.icon.ion-star
+                                i.icon.game-icon.game-icon-item-tier-1
                                 | &nbsp;
                                 | {{countNumTimesSkillSet(skill.spellName)}}
