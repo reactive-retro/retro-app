@@ -24,7 +24,7 @@ angular.module('retro').directive('skillEffectDisplay', () => {
                                       count="effect.value.max_possible*multiplier"
                                       when="{'one': ' '+effect.extra.string, 'other': ' '+effect.extra.string+'s'}"></ng-pluralize>
                         <span ng-if="effect.extra.string && effect.extra.pluralize === false">{{effect.extra.string}}</span>
-                        <span ng-if="effect.extra.chance"> ({{effect.extra.chance + effect.accuracy}}% chance)</span>
+                        <span ng-if="effect.extra.chance"> ({{effect.extra.chance + (effect.accuracy || 0)}}% chance)</span>
                     </div>
                 </div>
             `

@@ -22,6 +22,13 @@ angular.module('retro').directive('itemDisplay', () => {
             };
 
             $scope.qualityColor = determineQualityColor($scope.item.quality);
+            $scope.effectName = (effectName) => {
+                switch(effectName) {
+                    case 'Heal':    return 'HPs';
+                    case 'Refresh': return 'MPs';
+                    default:        return effectName.toLowerCase().split('-').join('').split('+').join('');
+                }
+            };
         },
         template: `
             <div class="card">
@@ -54,7 +61,7 @@ angular.module('retro').directive('itemDisplay', () => {
                     </div>
                     <div class="row">
                         <div class="col" ng-repeat="effect in item.effects">
-                            {{effect.name}} ({{effect.statBuff || effect.duration}})
+                            {{effect.name}} ({{effect.duration || effect.statBuff}} {{effect.duration ? 'rounds' : effectName(effect.name)}})
                         </div>
                     </div>
                 </div>

@@ -1,10 +1,10 @@
 angular.module('retro').service('AttributeCalculator', (Player, Dice) => {
 
-    const displayString = (effectName) => {
+    const displayData = (effectName) => {
         switch(effectName) {
-            case 'Heal': return { string: 'HP' };
-            case 'Refresh': return { string: 'MP' };
-            default: return { string: effectName.split('+').join('').split('-').join(''), pluralize: false };
+            case 'Heal':        return { chance: 100, string: 'HP' };
+            case 'Refresh':     return { chance: 100, string: 'MP' };
+            default:            return { chance: 100, string: 'round' };
         }
     };
 
@@ -12,8 +12,8 @@ angular.module('retro').service('AttributeCalculator', (Player, Dice) => {
         itemEffects: (item) => {
             return _.map(item.effects, effect => ({
                 name: effect.name,
-                value: { min_possible: effect.statBuff, max_possible: effect.statBuff },
-                extra: displayString(effect.name)
+                value: { min_possible: effect.statBuff || effect.duration, max_possible: effect.statBuff || effect.duration },
+                extra: displayData(effect.name)
             }));
         },
         skillEffects: (skillRef, useAccuracy = true) => {
