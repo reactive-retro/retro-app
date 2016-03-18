@@ -1,0 +1,64 @@
+
+.icon-larger {
+  font-size: 1.3em;
+}
+
+.game-icon-global-mp {
+  font-size: 1.4em;
+  color: #387ef5;
+
+  &.skill-display-mp {
+    font-size: 1.6em;
+  }
+}
+
+.game-icon-global-hp {
+  padding-right: 1px;
+  color: #ef473a;
+}
+
+.game-icon-global-money {
+  color: gold;
+  padding-right: 2px;
+  font-size: 1.4em;
+  text-shadow: -1px 0 #9b7617, 0 1px #9b7617, 1px 0 #9b7617, 0 -1px #9b7617;
+}
+
+.game-icon-item-tier-1,
+.game-icon-item-tier-2,
+.game-icon-item-tier-3 {
+  padding-right: 3px;
+  text-shadow: -1px 0 #aaa, 0 1px #aaa, 1px 0 #aaa, 0 -1px #aaa;
+}
+
+.game-icon-gear-swap:before {
+  font-size: 22px !important;
+}
+
+.game-icon-menu-player,
+.game-icon-menu-world,
+.game-icon-menu-inventory,
+.game-icon-menu-skills,
+.game-icon-menu-traits,
+.game-icon-menu-party,
+.game-icon-menu-options,
+.game-icon-menu-logout {
+  font-size: 1.5em;
+}
+
+.game-icon-skill-cooldown {
+  font-size: 1.5em;
+}
+
+.game-icon-skill-target {
+  font-size: 1.5em;
+  padding-right: 2px;
+}
+
+.game-icon-status-stealth {
+  text-shadow: -1px 0 #aaa, 0 1px #aaa, 1px 0 #aaa, 0 -1px #aaa;
+}
+
+.game-icon-extra-fight {
+  padding-right: 1px;
+}

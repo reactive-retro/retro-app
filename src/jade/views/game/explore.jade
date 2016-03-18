@@ -1,22 +1,26 @@
 script(type="text/ng-template", id="explore")
     ion-view(view-title="Explore")
         ion-content(scroll="false")
-            .row.above-gmaps.text-center.no-pointer-events
+            .row.above-gmaps.no-pointer-events
                 .col
                     health-display(target="player")
                 .col
                     mana-display(target="player")
             map#map(on-create="mapCreated(map)", on-click="reset()")
             button.above-gmaps.findme-button.button(ng-if="!centered", ng-click="centerOnMe()")
-                i.icon.ion-android-locate
+                i.icon.game-icon.game-icon-extra-gps
                 | &nbsp;Find Me
 
             button.above-gmaps.fight-button.button(
                 blocked-by="Shop",
                 ng-if="currentlySelected.place",
-                ng-click="shop()") Open {{currentlySelected.place.derivedType}}
+                ng-click="shop()")
+                i.icon.game-icon.game-icon-global-money
+                | Open {{currentlySelected.place.derivedType}}
 
             button.above-gmaps.fight-button.button(
                 blocked-by="Battle",
                 ng-if="currentlySelected.monster",
-                ng-click="fight()") Fight {{currentlySelected.monster.name}}
+                ng-click="fight()")
+                i.icon.game-icon.game-icon-extra-fight
+                | Fight {{currentlySelected.monster.name}}

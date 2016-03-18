@@ -14,13 +14,11 @@ angular.module('retro').directive('itemDisplay', () => {
             $scope.value = () => Math.floor($scope.item.value / ($scope.sellModifier || 1));
 
             const determineQualityColor = (quality) => {
-                switch(quality) {
-                    case 2:  return 'dark';
-                    case 3:  return 'energized';
-                    case 4:  return 'assertive';
-                    case 10: return 'royal';
-                    default: return '';
-                }
+                if(quality >= 10) return 'game-icon-item-tier-2 royal';
+                if(quality >= 4)  return 'game-icon-item-tier-2 assertive';
+                if(quality === 3) return 'game-icon-item-tier-1 energized';
+                if(quality === 2) return 'game-icon-item-tier-1 dark';
+                return '';
             };
 
             $scope.qualityColor = determineQualityColor($scope.item.quality);
@@ -41,8 +39,8 @@ angular.module('retro').directive('itemDisplay', () => {
                             </button>
                         </span>
                     </h2>
-                    <p ng-if="showTagline">
-                        <i class="icon ion-star {{qualityColor}}" ng-if="item.quality > 1"></i>
+                    <p ng-if="showTagline" class="icon-container">
+                        <i class="icon game-icon {{qualityColor}}" ng-if="item.quality > 1"></i>
                         <span ng-class="{ assertive: playerLevel < item.levelRequirement }">
                             Level {{item.levelRequirement || 1}} {{item.type}}
                         </span>
@@ -69,7 +67,7 @@ angular.module('retro').directive('itemDisplay', () => {
                         class="button button-small button-xs button-assertive">
                         {{footerButton.text}}
                     </button>
-                    <gold-display value="value()" extra-info="item.isDefault ? 'Unsellable' : ''"></gold-display>
+                    <gold-display class="inline-block" value="value()" extra-info="item.isDefault ? 'Unsellable' : ''"></gold-display>
                 </div>
             </div>
             `

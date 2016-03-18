@@ -15,9 +15,7 @@ script(type="text/ng-template", id="changeskill.info")
                         .col.text-center
                             mp-cost(cost="activeSkill.spellCost")
                         .col.text-center
-                            i.icon.ion-android-contact
-                            span &nbsp;
-                            span {{activeSkill.spellTargets}}
+                            skill-target(target="activeSkill.spellTargets")
 
             .row.desc-area
                 .col.text-center {{activeSkill.spellDescription}}

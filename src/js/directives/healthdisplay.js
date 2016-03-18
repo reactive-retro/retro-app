@@ -5,8 +5,8 @@ angular.module('retro').directive('healthDisplay', () => {
             target: '='
         },
         template: `
-                <div>
-                    <i class="icon ion-heart assertive"></i> {{target.stats.hp.__current}} / {{target.stats.hp.maximum}}
+                <div class="icon-container centered">
+                    <i class="icon game-icon game-icon-global-hp"></i> {{target.stats.hp.__current | number:0}} / {{target.stats.hp.maximum | number:0}}
                 </div>
             `
     };

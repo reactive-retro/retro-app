@@ -54,9 +54,9 @@ script(type="text/ng-template", id="battle")
                                 .row.padding-0.skill-disabled(ng-if="!battleFlow.canCastSkillMP(skill, me) || !battleFlow.canCastSkillCD(skill, me)")
                                     .col.col-center.assertive
                                         span(ng-if="!battleFlow.canCastSkillMP(skill, me)")
-                                            i.icon.ion-waterdrop
+                                            i.icon.game-icon.game-icon-global-mp
                                         span(ng-if="!battleFlow.canCastSkillCD(skill, me)")
-                                            i.icon.ion-clock
+                                            i.icon.game-icon.game-icon-skill-cooldown
 
                     .row.text-center.skill-grid(ng-if="mode === 'Items'")
                         .col.col-60.col-offset-20.text-center(ng-if="!hasItems") You have no assigned items remaining.

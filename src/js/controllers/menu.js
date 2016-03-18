@@ -14,13 +14,13 @@ angular.module('retro').controller('MenuController',
         $scope.stateHref = $state.href;
 
         $scope.menu = [
-            { icon: 'ion-person', name: 'Player', state: 'player' },
-            { icon: 'ion-earth', name: 'Explore', state: 'explore', requiresLocation: true },
-            { icon: 'ion-briefcase', name: 'Inventory', state: 'inventory.armor' },
-            { icon: 'ion-university', name: 'Skills', state: 'changeskills' },
-            { icon: 'ion-ios-people', name: 'Party', state: 'party' },
-            { icon: 'ion-gear-b', name: 'Options', state: 'options' },
-            { icon: 'ion-android-exit', name: 'Logout', call: logoutCheck }
+            { icon: 'game-icon-menu-player',    name: 'Player', state: 'player' },
+            { icon: 'game-icon-menu-world',     name: 'Explore', state: 'explore', requiresLocation: true },
+            { icon: 'game-icon-menu-inventory', name: 'Inventory', state: 'inventory.armor' },
+            { icon: 'game-icon-menu-skills',    name: 'Skills', state: 'changeskills' },
+            { icon: 'game-icon-menu-party',     name: 'Party', state: 'party' },
+            { icon: 'game-icon-menu-options',   name: 'Options', state: 'options' },
+            { icon: 'game-icon-menu-logout',    name: 'Logout', call: logoutCheck }
         ];
 
         $scope.doMenuAction = (menuObj) => {

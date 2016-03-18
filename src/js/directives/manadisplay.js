@@ -5,8 +5,8 @@ angular.module('retro').directive('manaDisplay', () => {
             target: '='
         },
         template: `
-                <div>
-                    <i class="icon ion-waterdrop positive"></i> {{target.stats.mp.__current}} / {{target.stats.mp.maximum}}
+                <div class="icon-container centered">
+                    <i class="icon game-icon game-icon-global-mp"></i> {{target.stats.mp.__current | number:0}} / {{target.stats.mp.maximum | number:0}}
                 </div>
             `
     };

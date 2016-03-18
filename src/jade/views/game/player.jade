@@ -7,7 +7,7 @@ script(type="text/ng-template", id="player")
                         span {{player.name}}
                         span.float-right
                             button.button.button-small(ng-click="go('changeclass')()")
-                                i.icon.ion-arrow-swap
+                                i.icon.game-icon.game-icon.game-icon-gear-swap
 
                     p Level {{player.professionLevels[player.profession]}} {{player.profession}}
 
@@ -39,12 +39,12 @@ script(type="text/ng-template", id="player")
 
             item-display(
                 item="player.equipment.weapon",
-                header-icon-button="{ iconClass: 'ion-arrow-swap', click: go('inventory.weapons') }"
+                header-icon-button="{ iconClass: 'game-icon game-icon-gear-swap', click: go('inventory.weapons') }"
                 show-tagline="true"
             )
 
             item-display(
                 item="player.equipment.armor",
-                header-icon-button="{ iconClass: 'ion-arrow-swap', click: go('inventory.armor') }"
+                header-icon-button="{ iconClass: 'game-icon game-icon-gear-swap', click: go('inventory.armor') }"
                 show-tagline="true"
             )

@@ -19,3 +19,7 @@ module.exports.lib = [
     './www/lib/angular-jwt/dist/angular-jwt.js',
     './www/lib/auth0-lock/build/auth0-lock.js'
 ];
+
+module.exports.copyAssets = [
+    './www/lib/retro-app-icons/dist/**/*'
+];

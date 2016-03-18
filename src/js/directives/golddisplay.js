@@ -6,8 +6,8 @@ angular.module('retro').directive('goldDisplay', () => {
             extraInfo: '='
         },
         template: `
-                <span>
-                    <i class="icon ion-social-usd"></i> {{value}}
+                <span class="icon-container">
+                    <i class="icon game-icon game-icon-global-money"></i> {{value | number:0}}
                     <span class="pull-right italic">{{extraInfo}}</span>
                 </span>
             `

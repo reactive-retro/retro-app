@@ -5,10 +5,16 @@ angular.module('retro').directive('skillEffectDisplay', () => {
             effects: '=',
             multiplier: '='
         },
+        controller: ($scope) => {
+            $scope.getEffectIcon = (effectName) => effectName.toLowerCase().split('-').join('-minus').split('+').join('-plus');
+        },
         template: `
                 <div class="row" ng-repeat="effect in effects">
-                    <div class="col col-20 col-offset-20 text-right">
-                        <strong>{{effect.name}}</strong>
+                    <div class="col col-30 text-right icon-container">
+                        <span class="pull-right">
+                            <i class="icon game-icon game-icon-status-{{getEffectIcon(effect.name)}}"></i>
+                            <strong class="valign-top">{{effect.name}}</strong>
+                        </span>
                     </div>
 
                     <div class="col text-left">

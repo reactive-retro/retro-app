@@ -24,6 +24,11 @@ gulp.task('eslint', () => {
         .pipe(eslint.failAfterError());
 });
 
+gulp.task('copy:assets', () => {
+    return gulp.src(constants.copyAssets)
+        .pipe(gulp.dest('./www/css'));
+});
+
 gulp.task('sass', (done) => {
     gulp.src('./src/scss/ionic.app.scss')
         .pipe(sass())

@@ -5,8 +5,8 @@ angular.module('retro').directive('cooldown', () => {
             turns: '='
         },
         template: `
-                <span>
-                    <i class="icon ion-clock"></i> <ng-pluralize count="turns", when="{'0': 'Instant', 'one': '1 round', 'other': '{} rounds'}"></ng-pluralize>
+                <span class="icon-container">
+                    <i class="icon game-icon game-icon-skill-cooldown"></i> <ng-pluralize count="turns", when="{'0': 'Instant', 'one': '1 round', 'other': '{} rounds'}"></ng-pluralize>
                 </span>
             `
     };

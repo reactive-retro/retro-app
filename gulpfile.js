@@ -6,6 +6,6 @@ require('./gulp/build');
 require('./gulp/dev');
 require('./gulp/version');
 
-gulp.task('default', ['sass', 'lib', 'html', 'build:dev', 'ionic:start', 'watch']);
+gulp.task('default', ['sass', 'lib', 'html', 'copy:assets', 'build:dev', 'ionic:start', 'watch']);
 gulp.task('test', ['build:dev']);
 gulp.task('build:production', ['build:production:compile', 'build:production:apk']);

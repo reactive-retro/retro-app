@@ -10,9 +10,9 @@ script(type="text/ng-template", id="changeclass")
                                 blocked-by="Player",
                                 ng-click="ClassChangeFlow.change(prof)",
                                 ng-if="prof !== player.profession")
-                                i.icon.ion-arrow-swap
+                                i.icon.game-icon.game-icon-gear-swap
                             button.button.button-small(disabled, ng-if="prof === player.profession")
-                                i.icon.ion-star
+                                i.icon.game-icon.game-icon-item-tier-1
                 div.item.item-body
                     div.row
                         div.col {{CLASSES[prof]}}

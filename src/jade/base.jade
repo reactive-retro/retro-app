@@ -12,7 +12,8 @@ html
             "connect-src 'self' https://api.rollbar.com http://localhost:* ws://retro:1024 ws://127.0.0.1:8080 ws://reactive-retro.herokuapp.com https://reactive-retro.auth0.com")
 
         title Reactive Retro
-        link(href="css/ionic.app.css",rel="stylesheet")
+        link(href="css/ionic.app.css",  rel="stylesheet")
+        link(href="css/game-icons.css", rel="stylesheet")
         script(src="js/lib.js")
         script(src="https://maps.googleapis.com/maps/api/js")
         script(src="cordova.js")
@@ -43,8 +44,8 @@ html
                     h1.title Menu
                 ion-content.has-header
                     ion-list
-                        ion-item(menu-close, ng-repeat="place in menu", ng-click="doMenuAction(place)")
-                            i(ng-class="place.icon")
+                        ion-item.icon-container(menu-close, ng-repeat="place in menu", ng-click="doMenuAction(place)")
+                            i.game-icon(ng-class="place.icon")
                             span &nbsp;{{place.name}}
                             span.pull-right(ng-if="!coords && place.requiresLocation")
-                                i.icon.ion-pinpoint
+                                i.icon.game-icon.game-icon-extra-gps.icon-larger
