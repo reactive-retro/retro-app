@@ -1,4 +1,4 @@
-angular.module('retro').service('ItemContainerFlow', ($state, BlockState, Player, Toaster, socket) => {
+angular.module('retro').service('ItemContainerFlow', ($stateWrapper, BlockState, Player, Toaster, socket) => {
 
     const getNotYetActivatedItems = (place) => {
         const player = Player.get();
@@ -36,7 +36,7 @@ angular.module('retro').service('ItemContainerFlow', ($state, BlockState, Player
         },
 
         enter: (data) => {
-            $state.go(getStateFromType(data.derivedType), { containerData: data });
+            $stateWrapper.go(getStateFromType(data.derivedType), { containerData: data });
         },
 
         buyItem: (shop, itemId, callback) => {
