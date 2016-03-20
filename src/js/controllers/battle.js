@@ -19,13 +19,17 @@ angular.module('retro').controller('BattleController',
             $scope.results = actions;
             $scope.isDone = isDone;
 
-            $ionicModal.fromTemplateUrl('results.info', {
-                scope: $scope,
-                animation: 'slide-in-up'
-            }).then((modal) => {
-                $scope.modals.resultsModal = modal;
-                $scope.modals.resultsModal.show();
-            });
+            const options = Options.get();
+
+            if(!options.skipRoundResults || isDone) {
+                $ionicModal.fromTemplateUrl('results.info', {
+                    scope: $scope,
+                    animation: 'slide-in-up'
+                }).then((modal) => {
+                    $scope.modals.resultsModal = modal;
+                    $scope.modals.resultsModal.show();
+                });
+            }
 
             if(isDone && !battle.isFled) {
                 _.each(battle.monsters, monster => MapDrawing.hideMonster(monster.id));

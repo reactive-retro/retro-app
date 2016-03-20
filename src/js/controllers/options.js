@@ -46,6 +46,11 @@ angular.module('retro').controller('OptionsController',
                     checkVal: true,
                     varName: 'autoConfirmAttacks'
                 }]
+            },
+            {
+                type: 'toggle',
+                label: 'Skip round results',
+                variable: 'skipRoundResults'
             }
         ];
     }
