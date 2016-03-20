@@ -1,13 +1,14 @@
-angular.module('retro').run(($rootScope, $ionicPlatform) => {
+angular.module('retro').run(($rootScope, $ionicPlatform, $ionicHistory) => {
 
     $rootScope.$on('$stateChangeSuccess', (event, toState) => {
         $rootScope.hideMenu = toState.name === 'home' || toState.name === 'create' || toState.name === 'battle';
         $rootScope.actionButton = null;
     });
 
-    $ionicPlatform.registerBackButtonAction(e => {
-        e.preventDefault();
+    $ionicPlatform.registerBackButtonAction(() => {
+        $ionicHistory.goBack();
     }, 100);
+
 
     $ionicPlatform.ready(() => {
         if(window.cordova && window.cordova.plugins.Keyboard) {
