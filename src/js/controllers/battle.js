@@ -18,7 +18,15 @@ angular.module('retro').controller('BattleController',
             $scope.targets = {};
             $scope.results = actions;
             $scope.isDone = isDone;
-            $scope.modals.resultsModal.show();
+
+            $ionicModal.fromTemplateUrl('results.info', {
+                scope: $scope,
+                animation: 'slide-in-up'
+            }).then((modal) => {
+                $scope.modals.resultsModal = modal;
+                $scope.modals.resultsModal.show();
+            });
+
             if(isDone && !battle.isFled) {
                 _.each(battle.monsters, monster => MapDrawing.hideMonster(monster.id));
                 Battle.set(null);
@@ -112,13 +120,6 @@ angular.module('retro').controller('BattleController',
             $scope.disableActions = true;
             BattleFlow.confirmAction($scope.targets[$scope.currentPlayerName]);
         };
-
-        $ionicModal.fromTemplateUrl('results.info', {
-            scope: $scope,
-            animation: 'slide-in-up'
-        }).then((modal) => {
-            $scope.modals.resultsModal = modal;
-        });
 
         $scope.$on('modal.hidden', () => {
             if($scope.isDone || !Battle.get()) {
