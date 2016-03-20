@@ -21,10 +21,11 @@ angular.module('retro').service('AttributeCalculator', (Player, Dice) => {
             return _(skillRef.spellEffects)
                 .keys()
                 .map(key => {
-                    const roll = skillRef.spellEffects[key].roll;
+                    const effectData = skillRef.spellEffects[key];
+                    const roll = effectData.roll;
                     const stats = roll ? Dice.statistics(roll, me.stats, 1) : null;
 
-                    const retVal = { name: key, value: stats, extra: skillRef.spellEffects[key] };
+                    const retVal = { name: key, value: stats, extra: effectData };
                     if(useAccuracy) retVal.accuracy = me.stats.acc;
 
                     return retVal;

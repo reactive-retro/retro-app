@@ -38,7 +38,7 @@ script(type="text/ng-template", id="choosetarget.skill")
                     .row.skill-container(ng-if="!battleFlow.canCastSkillCD(activeSkill, me)")
                         .col.col-flex.col-center
                             .row.row-center.text-center
-                                div You to wait <cooldown turns="me.cooldowns[activeSkill.spellName]"></cooldown> to cast this spell.
+                                div You need to wait <cooldown turns="me.cooldowns[activeSkill.spellName]"></cooldown> to cast this spell.
 
                     .row.skill-container(ng-if="battleFlow.canCastSkillMP(activeSkill, me) && battleFlow.canCastSkillCD(activeSkill, me)")
                         .col.col-flex

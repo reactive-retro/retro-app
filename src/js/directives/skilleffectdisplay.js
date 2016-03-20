@@ -13,7 +13,7 @@ angular.module('retro').directive('skillEffectDisplay', () => {
                     <div class="col col-30 text-right icon-container">
                         <span class="pull-right">
                             <i class="icon game-icon game-icon-status-{{getEffectIcon(effect.name)}}"></i>
-                            <strong class="valign-top">{{effect.name}}</strong>
+                            <strong class="valign-top">{{effect.extra.displayName || effect.name}}</strong>
                         </span>
                     </div>
 

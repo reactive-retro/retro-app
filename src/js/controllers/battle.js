@@ -21,15 +21,16 @@ angular.module('retro').controller('BattleController',
 
             const options = Options.get();
 
-            if(!options.skipRoundResults || isDone) {
-                $ionicModal.fromTemplateUrl('results.info', {
-                    scope: $scope,
-                    animation: 'slide-in-up'
-                }).then((modal) => {
-                    $scope.modals.resultsModal = modal;
+            $ionicModal.fromTemplateUrl('results.info', {
+                scope: $scope,
+                animation: 'slide-in-up'
+            }).then((modal) => {
+                $scope.modals.resultsModal = modal;
+
+                if(!options.skipRoundResults || isDone) {
                     $scope.modals.resultsModal.show();
-                });
-            }
+                }
+            });
 
             if(isDone && !battle.isFled) {
                 _.each(battle.monsters, monster => MapDrawing.hideMonster(monster.id));
