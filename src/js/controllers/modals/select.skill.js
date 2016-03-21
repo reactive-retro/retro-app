@@ -14,6 +14,9 @@ angular.module('retro').controller('SkillChangeModalController',
             SkillChangeFlow.change(skill, slot);
         };
 
-        $scope.closeSkillInfo = () => $scope.modal.hide();
+        $scope.closeSkillInfo = () => {
+            $scope.modal.hide();
+            $scope.modal.remove();
+        };
     }
 );

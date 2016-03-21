@@ -32,11 +32,6 @@ angular.module('retro').controller('SkillChangeController',
 
         $scope.countNumTimesSkillSet = (skillName) => _.filter($scope.player.skills, skill => skill === skillName).length;
 
-        // clean up modal b/c memory
-        $scope.$on('$destroy', () => {
-            if($scope.modal) $scope.modal.remove();
-        });
-
         Player.observer.then(null, null, (player) => $scope.player = player);
         Skills.observer.then(null, null, (skills) => $scope.allSkills = getAllSkills(skills));
     }
