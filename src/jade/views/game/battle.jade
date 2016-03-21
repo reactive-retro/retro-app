@@ -3,7 +3,7 @@ script(type="text/ng-template", id="battle")
         ion-content.combat
             .row.inner-alignment-padding.monster-row.text-center
                 .col.col-33(ng-repeat="monster in battle.monsters")
-                    div {{monster.name}}
+                    .monster-name {{monster.name}}
                     div
                         stat-bar(target="monster", stat="hp")
 
