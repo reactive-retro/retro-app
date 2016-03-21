@@ -6,7 +6,10 @@ script(type="text/ng-template", id="choosetarget.item")
                 button.button(ng-click="closeModal()")
                     i.icon.ion-close
             h1.title {{activeItem.name}}
+
         ion-content.skill-modal-container
+            .row.desc-area
+                .col.text-center {{activeItem.description}}
 
             .row.effects-area
                 .col.text-center

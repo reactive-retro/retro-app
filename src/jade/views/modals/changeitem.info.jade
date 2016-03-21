@@ -8,6 +8,9 @@ script(type="text/ng-template", id="changeitem.info")
             h1.title {{activeItem.name}}
 
         ion-content.skill-modal-container
+            .row.desc-area
+                .col.text-center {{activeItem.description}}
+
             .row.effects-area
                 .col.text-center
                     skill-effect-display(effects="activeItemAttrs", multiplier="1")

@@ -60,7 +60,10 @@ angular.module('retro').directive('itemDisplay', () => {
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col" ng-repeat="effect in item.effects">
+                        <div class="col">{{item.description}}</div>
+                    </div>
+                    <div class="row wrap">
+                        <div class="col col-50" ng-repeat="effect in item.effects | orderBy:'name'">
                             {{effect.name}} ({{effect.duration || effect.statBuff}} {{effect.duration ? 'rounds' : effectName(effect.name)}})
                         </div>
                     </div>
