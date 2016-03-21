@@ -130,8 +130,11 @@ angular.module('retro').service('MapDrawing', (Player, Google, Settings, MAP_COL
 
         _.each(monsters, monster => {
 
+            const ref = monster.monsters ? monster.monsters[0] : monster;
+
             // don't draw dead monsters
-            if(monster.hidden || _.contains(concatdMonsters, monster.id)) return;
+            // if there are multiple monsters, the id of the first one is the leader
+            if(monster.hidden || _.contains(concatdMonsters, ref.id)) return;
 
             const pos = new Google.maps.LatLng(monster.location.lat, monster.location.lon);
 
@@ -151,14 +154,15 @@ angular.module('retro').service('MapDrawing', (Player, Google, Settings, MAP_COL
                 }
             });
 
-            monsterMarker.monsterId = monster.id;
+            monsterMarker.monsterId = ref.id;
+            const calculatedName = monster.monsters ? _.map(monster.monsters, 'name').join(', ') : monster.name;
+            const calculatedRating = monster.monsters ? Math.round(_.sum(monster.monsters, monster => monster.rating) / monster.monsters.length) : monster.rating;
 
             monsterMarker.addListener('click', () => {
 
                 const infoWindow = new Google.maps.InfoWindow({
-                    content: `<strong>${monster.name}</strong><br>
-                    Class: ${monster.profession}<br>
-                    Rating: ${monster.rating > 0 ? '+' : ''}${monster.rating}
+                    content: `<strong>${calculatedName}</strong><br>
+                    Rating: ${calculatedRating > 0 ? '+' : ''}${calculatedRating}
                     `
                 });
 

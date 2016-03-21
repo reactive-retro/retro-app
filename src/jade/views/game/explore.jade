@@ -23,4 +23,4 @@ script(type="text/ng-template", id="explore")
                 ng-if="currentlySelected.monster",
                 ng-click="fight()")
                 i.icon.game-icon.game-icon-extra-fight
-                | Fight {{currentlySelected.monster.name}}
+                | Fight {{getMonsterName()}}

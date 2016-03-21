@@ -104,6 +104,14 @@ angular.module('retro').controller('ExploreController',
             MapDrawing.setCurrentPosition(position);
         };
 
+        $scope.getMonsterName = () => {
+            const monster = $scope.currentlySelected.monster;
+            if(!monster.monsters) return monster.name;
+
+            if(monster.monsters.length === 1) return monster.monsters[0].name;
+            return `${monster.monsters.length} monsters`;
+        };
+
         // this fixes google maps after battle
         $scope.$on('$ionicView.afterEnter', () => {
             ionic.trigger('resize');

@@ -2,7 +2,8 @@ angular.module('retro').service('BattleFlow', (Player, Battle, Toaster, BlockSta
 
     const start = (monster) => {
         BlockState.block('Battle');
-        socket.emit('combat:enter', { name: Player.get().name, monsters: [monster] }, Toaster.handleDefault(() => {
+        const monsters = monster.monsters ? monster.monsters : [monster];
+        socket.emit('combat:enter', { name: Player.get().name, monsters }, Toaster.handleDefault(() => {
             BlockState.unblock('Battle');
         }));
     };
@@ -16,7 +17,6 @@ angular.module('retro').service('BattleFlow', (Player, Battle, Toaster, BlockSta
     const toExplore = () => {
         $stateWrapper.noGoingBack('explore');
     };
-
 
     const getMultiplier = (skill, me) => _.filter(me.skills, check => check === skill).length;
 
