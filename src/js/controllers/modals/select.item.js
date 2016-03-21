@@ -14,6 +14,9 @@ angular.module('retro').controller('ItemChangeModalController',
             ItemChangeFlow.change(item, slot);
         };
 
-        $scope.closeItemInfo = () => $scope.modal.hide();
+        $scope.closeItemInfo = () => {
+            $scope.modal.hide();
+            $scope.modal.remove();
+        };
     }
 );
