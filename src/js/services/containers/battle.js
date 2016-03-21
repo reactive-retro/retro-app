@@ -2,37 +2,29 @@ angular.module('retro').service('Battle', ($q, $stateWrapper, Player, Skills) =>
 
     let defer = $q.defer();
 
-    let battle = '';
+    let battle = null;
     let socketRef = null;
+    let channels = null;
 
     const update = (newBattle) => {
 
-        if(battle) {
-            battle.actionChannel.unsubscribe();
-            battle.actionChannel.unwatch();
-            battle.resultsChannel.unsubscribe();
-            battle.resultsChannel.unwatch();
-            battle.updatesChannel.unsubscribe();
-            battle.updatesChannel.unwatch();
-            socketRef.unsubscribe(`battle:${battle._id}:actions`);
-            socketRef.unsubscribe(`battle:${battle._id}:results`);
-            socketRef.unsubscribe(`battle:${battle._id}:updates`);
+        if(battle && !newBattle) {
+            defer.resolve(battle);
 
-            if(!newBattle) {
-                battle.actionChannel.destroy();
-                battle.resultsChannel.destroy();
-                battle.updatesChannel.destroy();
+            channels.actions.destroy();
+            channels.results.destroy();
+            channels.updates.destroy();
 
-                // when the battle is over, reset the defer
-                defer.resolve();
-                defer = $q.defer();
-            }
+            channels = null;
+
+            // when the battle is over, reset the defer
+            defer = $q.defer();
         }
 
 
         battle = newBattle;
 
-        if(newBattle) {
+        if(battle) {
             const myName = Player.get().name;
             const me = _.find(battle.playerData, { name: myName });
             Player.set(me);
@@ -41,10 +33,18 @@ angular.module('retro').service('Battle', ($q, $stateWrapper, Player, Skills) =>
                 Skills.set(me.newSkills);
             }
 
+            // new battle
+            if(!channels) {
+                channels =  {
+                    actions: socketRef.subscribe(`battle:${battle._id}:actions`),
+                    results: socketRef.subscribe(`battle:${battle._id}:results`),
+                    updates: socketRef.subscribe(`battle:${battle._id}:updates`)
+                };
+            }
+
+            battle.channels = channels;
+
             $stateWrapper.noGoingBack('battle');
-            battle.actionChannel = socketRef.subscribe(`battle:${battle._id}:actions`);
-            battle.resultsChannel = socketRef.subscribe(`battle:${battle._id}:results`);
-            battle.updatesChannel = socketRef.subscribe(`battle:${battle._id}:updates`);
         }
 
         defer.notify(battle);

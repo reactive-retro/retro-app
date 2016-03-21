@@ -18,9 +18,5 @@ angular.module('retro').controller('SelectSkillTargetController',
             player: (player) => $scope.prepareTarget({ name: player.name, id: player.name, skill: $scope.activeSkill.spellName }),
             other: (other) => $scope.prepareTarget({ name: other, id: other, skill: $scope.activeSkill.spellName })
         };
-
-        $scope.closeModal = () => {
-            $scope.modals.targetModal.hide();
-        };
     }
 );

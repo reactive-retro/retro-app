@@ -5,11 +5,6 @@ angular.module('retro').controller('BattleController',
         $scope.targets = {};
         $scope.multiplier = 1;
 
-        $scope.modals = {
-            targetModal: null,
-            resultsModal: null
-        };
-
         $scope.me = null;
 
         const resultHandler = ({ battle, actions, isDone }) => {
@@ -21,19 +16,20 @@ angular.module('retro').controller('BattleController',
 
             const options = Options.get();
 
-            $ionicModal.fromTemplateUrl('results.info', {
-                scope: $scope,
-                animation: 'slide-in-up'
-            }).then((modal) => {
-                $scope.modals.resultsModal = modal;
+            if(!options.skipRoundResults || isDone) {
+                $ionicModal.fromTemplateUrl('results.info', {
+                    scope: $scope,
+                    animation: 'slide-in-up'
+                }).then((modal) => {
+                    $scope.modal = modal;
+                    $scope.modal.show();
+                });
+            }
 
-                if(!options.skipRoundResults || isDone) {
-                    $scope.modals.resultsModal.show();
+            if(isDone) {
+                if(!battle.isFled) {
+                    _.each(battle.monsters, monster => MapDrawing.hideMonster(monster.id));
                 }
-            });
-
-            if(isDone && !battle.isFled) {
-                _.each(battle.monsters, monster => MapDrawing.hideMonster(monster.id));
                 Battle.set(null);
             }
         };
@@ -42,13 +38,11 @@ angular.module('retro').controller('BattleController',
             Battle.set(battle);
         };
 
-        const setupBattleData = () => {
+        const actionHandler = (target) => $timeout($scope.setTarget(target));
+
+        const updateBattleData = () => {
             $scope.battle = Battle.get();
             if(!$scope.battle) return;
-            $scope.battle.actionChannel.watch((target) => $timeout($scope.setTarget(target)));
-
-            $scope.battle.resultsChannel.watch(resultHandler);
-            $scope.battle.updatesChannel.watch(battleSetter);
 
             // self shows up last
             $scope.orderedPlayers = _($scope.battle.players)
@@ -61,6 +55,16 @@ angular.module('retro').controller('BattleController',
 
             $scope.me = _.find($scope.battle.playerData, { name: $scope.currentPlayerName });
 
+            $scope.hasItems = _($scope.me.itemUses).values().reduce((prev, cur) => prev + cur, 0);
+        };
+
+        const initBattleData = () => {
+            $scope.battle = Battle.get();
+            $scope.battle.channels.actions.watch(actionHandler);
+            $scope.battle.channels.results.watch(resultHandler);
+            $scope.battle.channels.updates.watch(battleSetter);
+
+            $scope.me = _.find($scope.battle.playerData, { name: $scope.currentPlayerName });
             $scope.uniqueSkills = _($scope.me.skills)
                 .reject(skill => skill === 'Attack')
                 .compact()
@@ -68,7 +72,13 @@ angular.module('retro').controller('BattleController',
                 .map(skill => _.find(Skills.get(), { spellName: skill }))
                 .value();
 
-            $scope.hasItems = _($scope.me.itemUses).values().reduce((prev, cur) => prev + cur, 0);
+            updateBattleData();
+        };
+
+        const clearBattleData = (battle) => {
+            battle.channels.actions.unwatch(actionHandler);
+            battle.channels.results.unwatch(resultHandler);
+            battle.channels.updates.unwatch(battleSetter);
         };
 
         $scope.openSkillInfo = (skill) => {
@@ -78,8 +88,8 @@ angular.module('retro').controller('BattleController',
                 scope: $scope,
                 animation: 'slide-in-up'
             }).then((modal) => {
-                $scope.modals.targetModal = modal;
-                $scope.modals.targetModal.show();
+                $scope.modal = modal;
+                $scope.modal.show();
             });
         };
 
@@ -90,21 +100,22 @@ angular.module('retro').controller('BattleController',
                 scope: $scope,
                 animation: 'slide-in-up'
             }).then((modal) => {
-                $scope.modals.targetModal = modal;
-                $scope.modals.targetModal.show();
+                $scope.modal = modal;
+                $scope.modal.show();
             });
         };
 
-        $scope.closeModal = (modal) => {
-            $scope.modals[modal].hide();
+        $scope.closeModal = () => {
+            $scope.modal.hide();
+            $scope.modal.remove();
         };
 
         $scope.prepareTarget = (target) => {
             target.origin = $scope.currentPlayerName;
             $scope.setTarget(target);
-            $scope.battle.actionChannel.publish(target);
+            $scope.battle.channels.actions.publish(target);
             $scope.canConfirm = true;
-            $scope.closeModal('targetModal');
+            $scope.closeModal();
 
             const options = Options.get();
             if(options.autoConfirmAttacks) {
@@ -132,13 +143,7 @@ angular.module('retro').controller('BattleController',
             }
         });
 
-        // clean up modal b/c memory
-        $scope.$on('$destroy', () => {
-            if($scope.modals.targetModal) $scope.modals.targetModal.remove();
-            if($scope.modals.resultsModal) $scope.modals.resultsModal.remove();
-        });
-
-        setupBattleData();
-        Battle.observer().then(null, null, setupBattleData);
+        initBattleData();
+        Battle.observer().then(clearBattleData, null, updateBattleData);
     }
 );

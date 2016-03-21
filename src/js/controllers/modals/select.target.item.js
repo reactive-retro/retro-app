@@ -11,10 +11,5 @@ angular.module('retro').controller('SelectItemTargetController',
             player: (player) => $scope.prepareTarget({ name: player.name, id: player.name, skill: 'Item', itemName: $scope.activeItem.name }),
             other: (other) => $scope.prepareTarget({ name: other, id: other, skill: 'Item', itemName: $scope.activeItem.name })
         };
-
-        $scope.closeModal = () => {
-            $scope.modals.targetModal.hide();
-        };
-
     }
 );
