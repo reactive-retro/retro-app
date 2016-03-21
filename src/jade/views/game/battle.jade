@@ -7,21 +7,30 @@ script(type="text/ng-template", id="battle")
                     div
                         stat-bar(target="monster", stat="hp")
 
+                    .margin-top-5
+                        effect-bar(target="monster", max-items="5")
+
             .row.inner-alignment-padding(ng-repeat-start="player in orderedPlayers")
-                .col.col-center.text-right
+                .col.col-33.col-center.text-right
                     .bold {{player.name}}
                     div {{player.slug}}
 
-                .col.col-center
-                    div
-                        health-display(target="player")
-                    div
-                        stat-bar(target="player", stat="hp")
-                .col.col-center
-                    div
-                        mana-display(target="player")
-                    div
-                        stat-bar(target="player", stat="mp")
+                .col-66
+                    .row
+                        .col.col-center
+                            div
+                                health-display(target="player")
+                            div
+                                stat-bar(target="player", stat="hp")
+                        .col.col-center
+                            div
+                                mana-display(target="player")
+                            div
+                                stat-bar(target="player", stat="mp")
+
+                    .row
+                        .col
+                            effect-bar(target="player", max-items="10")
 
             .row.inner-alignment-padding
                 .col.col-66.text-center

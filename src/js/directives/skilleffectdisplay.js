@@ -1,4 +1,4 @@
-angular.module('retro').directive('skillEffectDisplay', () => {
+angular.module('retro').directive('skillEffectDisplay', (AttributeCalculator) => {
     return {
         restrict: 'E',
         scope: {
@@ -6,13 +6,14 @@ angular.module('retro').directive('skillEffectDisplay', () => {
             multiplier: '='
         },
         controller: ($scope) => {
-            $scope.getEffectIcon = (effectName) => effectName.toLowerCase().split('-').join('-minus').split('+').join('-plus');
+            $scope.getEffectIcon = AttributeCalculator.getEffectIcon;
+            $scope.getEffectColor = AttributeCalculator.getEffectColor;
         },
         template: `
                 <div class="row" ng-repeat="effect in effects">
                     <div class="col col-30 text-right icon-container">
                         <span class="pull-right">
-                            <i class="icon game-icon game-icon-status-{{getEffectIcon(effect.name)}}"></i>
+                            <i class="icon game-icon game-icon-status-{{getEffectIcon(effect.name)}} {{getEffectColor(effect.name)}}"></i>
                             <strong class="valign-top">{{effect.extra.displayName || effect.name}}</strong>
                         </span>
                     </div>

@@ -1,0 +1,14 @@
+
+script(type="text/ng-template", id="effects.info")
+    ion-modal-view
+        ion-header-bar.bar-balanced
+            .buttons
+                button.button(ng-click="closeModal()")
+                    i.icon.ion-close
+            h1.title {{target.name}}'s effects ({{target.statusEffects.length}})
+
+        ion-content
+            ion-list.list
+                ion-item.item.item-text-wrap.icon-container(ng-repeat="effect in target.statusEffects track by $index")
+                    i.icon.game-icon.icon-effect-display(class="game-icon-status-{{getEffectIcon(effect.effectName)}} {{getEffectColor(effect.effectName)}}")
+                    span {{effect.effectName}} ({{effect.turnsLeft}} rounds left)

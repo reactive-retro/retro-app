@@ -8,7 +8,16 @@ angular.module('retro').service('AttributeCalculator', (Player, Dice) => {
         }
     };
 
+    const goodEffects = ['Regenerate', 'Stealth'];
+    const badEffects  = ['Blind', 'Burn', 'Freeze', 'Shock', 'Stun'];
+
     return {
+        getEffectColor: (effectName) => {
+            if(_.contains(effectName, '+') || _.contains(goodEffects, effectName)) return 'icon-beneficial';
+            if(_.contains(effectName, '-') || _.contains(badEffects, effectName))  return 'icon-detrimental';
+            return '';
+        },
+        getEffectIcon: (effectName) => effectName.toLowerCase().split('-').join('-minus').split('+').join('-plus'),
         itemEffects: (item) => {
             return _.map(item.effects, effect => ({
                 name: effect.name,
