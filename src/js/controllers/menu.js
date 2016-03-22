@@ -18,6 +18,7 @@ angular.module('retro').controller('MenuController',
             { icon: 'game-icon-menu-world',     name: 'Explore', state: 'explore', requiresLocation: true },
             { icon: 'game-icon-menu-inventory', name: 'Inventory', state: 'inventory.armor' },
             { icon: 'game-icon-menu-skills',    name: 'Skills', state: 'changeskills' },
+            { icon: 'game-icon-menu-traits',    name: 'Traits', state: 'changetraits' },
             { icon: 'game-icon-menu-party',     name: 'Party', state: 'party' },
             { icon: 'game-icon-menu-options',   name: 'Options', state: 'options' },
             { icon: 'game-icon-menu-logout',    name: 'Logout', call: logoutCheck }

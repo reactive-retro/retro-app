@@ -1,0 +1,14 @@
+script(type="text/ng-template", id="changetraits")
+    ion-view(view-title="Traits")
+        ion-content
+            .list.margin-0(ng-repeat="traitData in allTraits | orderBy:'prof'")
+                .item.item-divider {{traitData.prof}}
+                .item(ng-repeat="trait in traitData.profTraits", ng-click="openTraitInfo(trait)")
+                    .row.padding-0
+                        .col.padding-0
+                            span {{trait.traitName}}
+                            span &nbsp;
+                            small.italic.subdued Level {{trait.traitLevel}}
+                        .col.padding-0.text-right
+                            span(ng-if="isTraitSet(trait.traitName)")
+                                i.icon.game-icon.game-icon-item-tier-1

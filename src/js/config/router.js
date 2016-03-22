@@ -43,6 +43,15 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
                 playerLoaded: ($injector) => $injector.get('Settings').isReady
             }
         })
+        .state('changetraits', {
+            url: '/changetraits',
+            templateUrl: 'changetraits',
+            controller: 'TraitChangeController',
+            data: { requiresLogin: true },
+            resolve: {
+                playerLoaded: ($injector) => $injector.get('Settings').isReady
+            }
+        })
         .state('inventory', {
             url: '/inventory',
             templateUrl: 'inventory',

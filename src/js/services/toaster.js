@@ -1,4 +1,4 @@
-angular.module('retro').service('Toaster', ($cordovaToast) => {
+angular.module('retro').service('Toaster', ($cordovaToast, $timeout) => {
 
     const show = (msg) => {
         try {
@@ -14,7 +14,7 @@ angular.module('retro').service('Toaster', ($cordovaToast) => {
         const msgObj = err ? err : success;
         show(msgObj.msg);
 
-        callback();
+        $timeout(callback);
     };
 
     const swallowSuccess = (callback = () => {}) => (err) => {
@@ -22,7 +22,7 @@ angular.module('retro').service('Toaster', ($cordovaToast) => {
             show(err.msg);
         }
 
-        callback();
+        $timeout(callback);
     };
 
     return {

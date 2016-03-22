@@ -18,6 +18,7 @@ angular.module('retro').service('AttributeCalculator', (Player, Dice) => {
             return '';
         },
         getEffectIcon: (effectName) => effectName.toLowerCase().split('-').join('-minus').split('+').join('-plus'),
+        traitEffects: (trait) => trait.traitEffects,
         itemEffects: (item) => {
             return _.map(item.effects, effect => ({
                 name: effect.name,

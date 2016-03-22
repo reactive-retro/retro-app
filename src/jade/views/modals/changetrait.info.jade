@@ -1,0 +1,38 @@
+
+script(type="text/ng-template", id="changetrait.info")
+    ion-modal-view(ng-controller="TraitChangeModalController")
+        ion-header-bar.bar-balanced
+            .buttons
+                button.button(ng-click="closeTraitInfo()")
+                    i.icon.ion-close
+            h1.title {{activeTrait.traitName}} (Level {{activeTrait.traitLevel}})
+        ion-content.skill-modal-container
+
+            .row.desc-area
+                .col.text-center {{activeTrait.traitDescription}}
+
+            .row.effects-area
+                .col.text-center
+                    trait-effect-display(effects="activeTraitAttrs")
+
+
+            .row.assign-area
+                .col.col-flex
+                    .row
+                        .col.text-center
+                            h3.title Assign Trait
+
+                    .row.skill-container
+                        .col.col-flex
+
+                            .row.skill-row
+                                .col.col-33.skill-slot(ng-repeat="idx in [0,1,2,3,4,5]")
+                                    .row
+                                        .col Slot {{idx+1}}
+                                    .row
+                                        .col
+                                            button.button.button-full.skill-button.button-block(
+                                                blocked-by="Player",
+                                                ng-class="{'button-stable': !player.traits[idx], 'button-balanced': player.traits[idx]}",
+                                                ng-click="setTraitInSlot(activeTrait.traitName, idx)")
+                                                span.skill-text {{player.traits[idx] || 'none'}}
