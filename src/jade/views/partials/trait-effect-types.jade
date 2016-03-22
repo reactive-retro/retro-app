@@ -11,6 +11,11 @@ script(type="text/ng-template", id="trait-effect-type-damage")
     span(ng-if="effectData.damage.multiplier") {{effectData.damage.multiplier > 0 ? '+' : ''}}{{effectData.damage.multiplier * 100}}%
     span &nbsp;damage
 
+script(type="text/ng-template", id="trait-effect-type-hitchance")
+    span(ng-if="effectData.hitchance.boost")      {{effectData.hitchance.boost > 0 ? '+' : ''}}{{effectData.hitchance.boost}}
+    span(ng-if="effectData.hitchance.multiplier") {{effectData.hitchance.multiplier > 0 ? '+' : ''}}{{effectData.hitchance.multiplier * 100}}%
+    span &nbsp;hit chance
+
 script(type="text/ng-template", id="trait-effect-type-cooldown")
     span(ng-if="effectData.cooldown.boost")      {{effectData.cooldown.boost > 0 ? '+' : ''}}{{effectData.cooldown.boost}}
     span(ng-if="effectData.cooldown.multiplier") {{effectData.cooldown.multiplier > 0 ? '+' : ''}}{{effectData.cooldown.multiplier * 100}}%

@@ -11,6 +11,7 @@ angular.module('retro').directive('traitEffectDisplay', (AttributeCalculator) =>
             $scope.subEffects = [
                 { name: 'effect', string: 'round' },
                 { name: 'damage', string: 'damage' },
+                { name: 'hitchance', string: 'hit%' },
                 { name: 'cooldown', string: 'round' },
                 { name: 'duration', string: 'round' },
                 { name: 'cost', string: 'MP' },
