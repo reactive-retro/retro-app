@@ -1,5 +1,5 @@
 angular.module('retro').controller('BattleController',
-    ($scope, $ionicModal, $timeout, BattleFlow, Battle, Dice, Player, Skills, MapDrawing, Options) => {
+    ($scope, $ionicModal, $timeout, BattleFlow, Battle, Dice, Player, Skills, MapDrawing, Options, AttributeCalculator) => {
         $scope.battleFlow = BattleFlow;
         $scope.currentPlayerName = Player.get().name;
         $scope.targets = {};
@@ -82,7 +82,7 @@ angular.module('retro').controller('BattleController',
         };
 
         $scope.openSkillInfo = (skill) => {
-            $scope.activeSkill = _.find(Skills.get(), { spellName: skill });
+            $scope.activeSkill = AttributeCalculator.modifySkill(_.find(Skills.get(), { spellName: skill }));
 
             $ionicModal.fromTemplateUrl('choosetarget.skill', {
                 scope: $scope,

@@ -1,5 +1,5 @@
 angular.module('retro').controller('SkillChangeController',
-    ($scope, $ionicModal, Player, Skills) => {
+    ($scope, $ionicModal, Player, Skills, AttributeCalculator) => {
         $scope.player = Player.get();
 
         const getAllSkills = (baseSkills) => _(baseSkills)
@@ -19,7 +19,7 @@ angular.module('retro').controller('SkillChangeController',
         $scope.allSkills = getAllSkills(Skills.get());
 
         $scope.openSkillInfo = (skill) => {
-            $scope.activeSkill = skill;
+            $scope.activeSkill = AttributeCalculator.modifySkill(skill);
 
             $ionicModal.fromTemplateUrl('changeskill.info', {
                 scope: $scope,

@@ -10,9 +10,9 @@ script(type="text/ng-template", id="changeskill.info")
             .row.data-area
                 .col
                     .row
-                        .col.text-center
+                        .col.text-center(ng-class="{ 'effect-modified': activeSkill.cooldownTraitModified }")
                             cooldown(turns="activeSkill.spellCooldown")
-                        .col.text-center
+                        .col.text-center(ng-class="{ 'effect-modified': activeSkill.costTraitModified }")
                             mp-cost(cost="activeSkill.spellCost")
                         .col.text-center
                             skill-target(target="activeSkill.spellTargets")

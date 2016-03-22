@@ -20,7 +20,6 @@ angular.module('retro').directive('effectBar', ($ionicModal, AttributeCalculator
                     scope: $scope,
                     animation: 'slide-in-up'
                 }).then((modal) => {
-                    console.log(modal);
                     $scope.modal = modal;
                     $scope.modal.show();
                 });
@@ -28,7 +27,7 @@ angular.module('retro').directive('effectBar', ($ionicModal, AttributeCalculator
         },
         template: `
                 <div class="effect-bar-container" ng-click="expandEffects()">
-                    <i class="effect icon game-icon game-icon-status-{{getEffectIcon(effect.effectName)}} {{getEffectColor(effect.effectName)}}"
+                    <i class="effect icon game-icon game-icon-status-{{getEffectIcon(effect.effectName)}} {{getEffectColor(effect)}}"
                        ng-repeat="effect in target.statusEffects | limitTo:maxItems"></i>
                 </div>
             `

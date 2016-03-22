@@ -22,7 +22,7 @@ angular.module('retro').directive('traitEffectDisplay', (AttributeCalculator) =>
                 <div class="row" ng-repeat="(effectName, effectData) in effects">
                     <div class="col col-30 text-right icon-container">
                         <span class="pull-right">
-                            <i class="icon game-icon game-icon-status-{{getEffectIcon(effectName)}} {{getEffectColor(effectName)}}"></i>
+                            <i class="icon game-icon game-icon-status-{{getEffectIcon(effectName)}} {{getEffectColor(effectData)}}"></i>
                             <strong class="valign-top">{{effectName}}</strong>
                         </span>
                     </div>

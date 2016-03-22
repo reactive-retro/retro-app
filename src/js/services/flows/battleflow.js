@@ -1,4 +1,4 @@
-angular.module('retro').service('BattleFlow', (Player, Battle, Toaster, BlockState, $stateWrapper, socket) => {
+angular.module('retro').service('BattleFlow', (Player, Battle, Toaster, BlockState, AttributeCalculator, $stateWrapper, socket) => {
 
     const start = (monster) => {
         BlockState.block('Battle');
