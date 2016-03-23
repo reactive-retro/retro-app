@@ -101,7 +101,7 @@ angular.module('retro').service('AttributeCalculator', (Player, Traits, Dice) =>
 
                     retVal.displayData = {
                         min:    { value: (multiplier) => stats ? applyBoostAndMultiplier(stats.min_possible * multiplier, modData) : '',
-                                  display: true,
+                                  display: stats.min_possible > 0,
                                   traitModified: isModified(modData) },
 
                         max:    { value: (multiplier) => stats ? applyBoostAndMultiplier(stats.max_possible * multiplier, modData) : '',
