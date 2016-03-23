@@ -8,17 +8,17 @@ script(type="text/ng-template", id="trait-effect-type-effect")
 
 script(type="text/ng-template", id="trait-effect-type-damage")
     span(ng-if="effectData.damage.boost")      {{effectData.damage.boost > 0 ? '+' : ''}}{{effectData.damage.boost}}
-    span(ng-if="effectData.damage.multiplier") {{effectData.damage.multiplier > 0 ? '+' : ''}}{{effectData.damage.multiplier * 100}}%
+    span(ng-if="effectData.damage.multiplier") {{effectData.damage.multiplier > 0 ? '+' : ''}}{{(effectData.damage.multiplier * 100).toFixed(0)}}%
     span &nbsp;damage
 
 script(type="text/ng-template", id="trait-effect-type-hitchance")
     span(ng-if="effectData.hitchance.boost")      {{effectData.hitchance.boost > 0 ? '+' : ''}}{{effectData.hitchance.boost}}
-    span(ng-if="effectData.hitchance.multiplier") {{effectData.hitchance.multiplier > 0 ? '+' : ''}}{{effectData.hitchance.multiplier * 100}}%
+    span(ng-if="effectData.hitchance.multiplier") {{effectData.hitchance.multiplier > 0 ? '+' : ''}}{{(effectData.hitchance.multiplier * 100).toFixed(0)}}%
     span &nbsp;hit chance
 
 script(type="text/ng-template", id="trait-effect-type-cooldown")
     span(ng-if="effectData.cooldown.boost")      {{effectData.cooldown.boost > 0 ? '+' : ''}}{{effectData.cooldown.boost}}
-    span(ng-if="effectData.cooldown.multiplier") {{effectData.cooldown.multiplier > 0 ? '+' : ''}}{{effectData.cooldown.multiplier * 100}}%
+    span(ng-if="effectData.cooldown.multiplier") {{effectData.cooldown.multiplier > 0 ? '+' : ''}}{{(effectData.cooldown.multiplier * 100).toFixed(0)}}%
     ng-pluralize(
         count="effectData.cooldown.boost || effectData.cooldown.multiplier",
         when="{ 'one': ' cooldown round', '-1': ' cooldown round', 'other': ' cooldown rounds' }"
@@ -26,7 +26,7 @@ script(type="text/ng-template", id="trait-effect-type-cooldown")
 
 script(type="text/ng-template", id="trait-effect-type-duration")
     span(ng-if="effectData.duration.boost")      {{effectData.duration.boost > 0 ? '+' : ''}}{{effectData.duration.boost}}
-    span(ng-if="effectData.duration.multiplier") {{effectData.duration.multiplier > 0 ? '+' : ''}}{{effectData.duration.multiplier * 100}}%
+    span(ng-if="effectData.duration.multiplier") {{effectData.duration.multiplier > 0 ? '+' : ''}}{{(effectData.duration.multiplier * 100).toFixed(0)}}%
     ng-pluralize(
         count="effectData.duration.boost || effectData.duration.multiplier",
         when="{ 'one': ' effect round', '-1': ' effect round', 'other': ' effect rounds' }"
@@ -34,12 +34,12 @@ script(type="text/ng-template", id="trait-effect-type-duration")
 
 script(type="text/ng-template", id="trait-effect-type-cost")
     span(ng-if="effectData.cost.boost")      {{effectData.cost.boost > 0 ? '+' : ''}}{{effectData.cost.boost}}
-    span(ng-if="effectData.cost.multiplier") {{effectData.cost.multiplier > 0 ? '+' : ''}}{{effectData.cost.multiplier * 100}}%
+    span(ng-if="effectData.cost.multiplier") {{effectData.cost.multiplier > 0 ? '+' : ''}}{{).toFixed(0)effectData.cost.multiplier * 100).toFixed(0)}}%
     span &nbsp;MP consumed
 
 script(type="text/ng-template", id="trait-effect-type-stats")
     .row.padding-0(ng-repeat="(stat, statData) in effectData.stats")
         .col.padding-0
             span(ng-if="statData.boost")      {{statData.boost > 0 ? '+' : ''}}{{statData.boost}}
-            span(ng-if="statData.multiplier") {{statData.multiplier > 0 ? '+' : ''}}{{statData.multiplier * 100}}%
+            span(ng-if="statData.multiplier") {{statData.multiplier > 0 ? '+' : ''}}{{(statData.multiplier * 100).toFixed(0)}}%
             span &nbsp;{{stat.toUpperCase()}}

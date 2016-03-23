@@ -6,7 +6,7 @@ angular.module('retro').directive('manaDisplay', () => {
         },
         template: `
                 <div class="icon-container centered">
-                    <i class="icon game-icon game-icon-global-mp"></i> {{target.stats.mp.__current | number:0}} / {{target.stats.mp.maximum | number:0}}
+                    <i class="icon game-icon game-icon-global-mp"></i> {{target.stats.mp.__current | number:0}}/{{target.stats.mp.maximum | number:0}}
                 </div>
             `
     };
