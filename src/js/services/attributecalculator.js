@@ -2,9 +2,9 @@ angular.module('retro').service('AttributeCalculator', (Player, Traits, Dice) =>
 
     const displayData = (effectName) => {
         switch(effectName) {
-            case 'Heal':        return { chance: 100, string: 'HP' };
-            case 'Refresh':     return { chance: 100, string: 'MP' };
-            default:            return { chance: 100, string: 'round' };
+            case 'Heal':        return { chance: { value: () => 100 }, string: 'HP' };
+            case 'Refresh':     return { chance: { value: () => 100 }, string: 'MP' };
+            default:            return { chance: { value: () => 100 }, string: 'round' };
         }
     };
 
@@ -81,6 +81,11 @@ angular.module('retro').service('AttributeCalculator', (Player, Traits, Dice) =>
         itemEffects: (item) => {
             return _.map(item.effects, effect => ({
                 name: effect.name,
+                displayData: {
+                    min: { value: () => effect.statBuff || effect.duration, display: true },
+                    max: { value: () => effect.statBuff || effect.duration, display: false },
+                    chance: { value: () => 100 }
+                },
                 value: { min_possible: effect.statBuff || effect.duration, max_possible: effect.statBuff || effect.duration },
                 extra: displayData(effect.name)
             }));
@@ -115,7 +120,7 @@ angular.module('retro').service('AttributeCalculator', (Player, Traits, Dice) =>
                         chance: { value: () => applyBoostAndMultiplier(effectData.chance + retVal.accuracy, hitModData),
                                   traitModified: isModified(hitModData)  }
                     };
-                    
+
                     return retVal;
                 })
                 // Damage always comes first
