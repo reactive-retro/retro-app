@@ -35,9 +35,11 @@ angular.module('retro').service('AttributeCalculator', (Player, Traits, Dice) =>
 
                     if(!copyEffect.chance) copyEffect.chance = 0;
                     if(!copyEffect.roll)   copyEffect.roll = '0';
-                    copyEffect.string = 'round';
-                    copyEffect.chance += thisEffect.chance;
-                    copyEffect.roll   += `+ ${thisEffect.duration}`;
+                    copyEffect.string = thisEffect.roll ? '' : 'round';
+                    copyEffect.chance += thisEffect.chance || 0;
+                    copyEffect.roll   += `+ ${thisEffect.duration || thisEffect.roll || 0}`;
+
+                    copyEffect.effectDisplay = traitEffect.effectDisplay;
 
                     copyEffect.traitModified = true;
                 }
@@ -100,6 +102,8 @@ angular.module('retro').service('AttributeCalculator', (Player, Traits, Dice) =>
                     const hitModData = _.get(skillRef, 'traitMods.hitchance', { multiplier: 1, boost: 0 });
 
                     retVal.displayData = {
+                        effectDisplay: { value: effectData.effectDisplay, traitModified: effectData.traitModified },
+
                         min:    { value: (multiplier) => stats ? applyBoostAndMultiplier(stats.min_possible * multiplier, modData) : '',
                                   display: stats && stats.min_possible > 0,
                                   traitModified: isModified(modData) },
@@ -111,7 +115,7 @@ angular.module('retro').service('AttributeCalculator', (Player, Traits, Dice) =>
                         chance: { value: () => applyBoostAndMultiplier(effectData.chance + retVal.accuracy, hitModData),
                                   traitModified: isModified(hitModData)  }
                     };
-
+                    
                     return retVal;
                 })
                 // Damage always comes first

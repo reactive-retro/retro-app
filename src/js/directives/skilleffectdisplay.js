@@ -18,7 +18,8 @@ angular.module('retro').directive('skillEffectDisplay', (AttributeCalculator) =>
                         </span>
                     </div>
 
-                    <div class="col text-left">
+                    <div class="col text-left" ng-if="effect.displayData.effectDisplay.value && !effect.displayData.min.display" ng-class="{ 'effect-modified': effect.displayData.effectDisplay.traitModified }" >{{effect.displayData.effectDisplay.value}}</div>
+                    <div class="col text-left" ng-if="effect.displayData.min.display">
                         <span ng-class="{ 'effect-modified': effect.displayData.min.traitModified }" ng-if="effect.displayData.min.display">{{effect.displayData.min.value(multiplier)}}</span>
                         <span ng-class="{ 'effect-modified': effect.displayData.max.traitModified }" ng-if="effect.displayData.max.display">- {{effect.displayData.max.value(multiplier)}}</span>
                         <ng-pluralize ng-if="effect.extra.string && effect.extra.pluralize !== false"
