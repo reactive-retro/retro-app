@@ -7,9 +7,6 @@ angular.module('retro').controller('SelectSkillTargetController',
         $scope.multiplier = BattleFlow.getMultiplier($scope.activeSkill.spellName, $scope.me);
 
         const skillRef = $scope.activeSkill;
-        if(skillRef.spellName === 'Attack') {
-            $scope.multiplier += 1;
-        }
 
         $scope.activeSkillAttrs = AttributeCalculator.skillEffects(skillRef, true);
 

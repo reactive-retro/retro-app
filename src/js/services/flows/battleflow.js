@@ -18,7 +18,7 @@ angular.module('retro').service('BattleFlow', (Player, Battle, Toaster, BlockSta
         $stateWrapper.noGoingBack('explore');
     };
 
-    const getMultiplier = (skill, me) => _.filter(me.skills, check => check === skill).length;
+    const getMultiplier = (skill, me) => 1 + Math.max(0, (_.filter(me.skills, check => check === skill).length - 1)) * 0.25;
 
     const skillCooldown = (skill, me) => getMultiplier(skill ? skill.spellName : '', me) * (skill ? skill.spellCooldown : 0);
     const canCastSkillCD = (skill, me) => {
