@@ -74,10 +74,10 @@ angular.module('retro').directive('itemDisplay', () => {
                         blocked-by="{{footerButton.blockedBy}}"
                         ng-disabled="footerButton.disabled(item)"
                         ng-click="footerButton.click(item)"
-                        class="button button-small button-xs button-assertive">
-                        {{footerButton.text}}
+                        class="button button-small button-xs button-assertive item-display-sell-button">
+                        <i class="icon ion-alert-circled" ng-show="footerButton.showFooterIcon(item)"></i> {{footerButton.text}}
                     </button>
-                    <gold-display class="inline-block" value="value()" extra-info="item.isDefault ? 'Unsellable' : ''"></gold-display>
+                    <gold-display class="inline-block valign-bottom" value="value()" extra-info="item.isDefault ? 'Unsellable' : ''"></gold-display>
                 </div>
             </div>
             `

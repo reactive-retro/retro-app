@@ -25,6 +25,10 @@ angular.module('retro').controller('InventoryController',
 
         $scope.maxInvSize = Settings.INVENTORY_SIZE;
 
+        $scope.isEquipped = (item) => () => {
+            return _.any(_.values($scope.player.storedClassPreferences || {}), pref => pref[`${item.type}Id`] === item.itemId);
+        };
+
         $scope.tryToSell = (item) => () => {
             const value = Math.floor(item.value/$scope.player.sellModifier);
 
@@ -52,9 +56,11 @@ angular.module('retro').controller('InventoryController',
                 return;
             }
 
+            const isEquippedString = '<br>This is currently equipped to another class!';
+
             const confirmPopup = $ionicPopup.confirm({
                 title: `Sell ${item.name}`,
-                template: `Are you sure you want to sell this for ${value} gold?`
+                template: `Are you sure you want to sell this for ${value} gold?${$scope.isEquipped(item)() ? isEquippedString : ''}`
             });
 
             confirmPopup.then((res) => {
