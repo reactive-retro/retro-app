@@ -1,5 +1,5 @@
 angular.module('retro').controller('ExploreController',
-    ($scope, $timeout, $filter, $ionicPopup, Player, LocationWatcher, Google, MapDrawing, Places, Monsters, Settings, ExploreFlow, BattleFlow, ItemContainerFlow, Toaster) => {
+    ($scope, $timeout, $filter, $ionicPopup, Player, DistanceCalculator, LocationWatcher, Google, MapDrawing, Places, Monsters, Settings, ExploreFlow, BattleFlow, ItemContainerFlow, Toaster) => {
 
         $scope.currentlySelected = null;
         $scope.centered = true;
@@ -65,9 +65,43 @@ angular.module('retro').controller('ExploreController',
             $scope.centered = true;
         };
 
+        const distBetween = () => {
+            if(!$scope.currentlySelected) return -1;
+            const ref = $scope.currentlySelected.monster || $scope.currentlySelected.place;
+            if(!ref || !$scope.player.location) return -1;
+            return (1000 * DistanceCalculator.gps($scope.player.location.lat, $scope.player.location.lon, ref.location.lat, ref.location.lon)).toFixed(0);
+        };
+
+        const wrapContent = (content) => {
+            return `
+            <div class="popup-data-container" id="popup-data-content-container">
+                ${content}<br>
+                Distance: ${distBetween()}m
+            </div>`;
+        };
+
+        const updatePopupContent = () => {
+            if(!$scope.currentInfoWindow) return;
+            $scope.currentInfoWindow.setContent(wrapContent($scope.currentInfoContent));
+        };
+
         const _setSelected = (opts) => {
             $timeout(() => {
                 $scope.currentlySelected = opts;
+                if(opts && opts.infoWindowContent) {
+
+                    $scope.currentInfoContent = opts.infoWindowContent;
+
+                    if(!$scope.currentInfoWindow) {
+                        $scope.currentInfoWindow = new Google.maps.InfoWindow({
+                            content: opts.infoWindowContent
+                        });
+                    }
+
+                    updatePopupContent();
+
+                    $scope.currentInfoWindow.open($scope.map, opts.infoWindowMarker);
+                }
             }, 0);
         };
 
@@ -77,8 +111,8 @@ angular.module('retro').controller('ExploreController',
         };
 
         $scope.reset = () => {
-            if($scope.currentlySelected && $scope.currentlySelected.infoWindow) {
-                $scope.currentlySelected.infoWindow.close();
+            if($scope.currentlySelected && $scope.currentInfoWindow) {
+                $scope.currentInfoWindow.close();
             }
             _setSelected(null);
         };
@@ -90,6 +124,7 @@ angular.module('retro').controller('ExploreController',
         $scope.watchMe = () => {
             LocationWatcher.watch.then(null, null, (coords) => {
                 $scope.centerOn(coords, $scope.centered);
+                updatePopupContent();
             });
         };
 

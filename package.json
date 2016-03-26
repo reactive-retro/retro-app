@@ -40,7 +40,8 @@
     "cordova-plugin-inappbrowser",
     "cordova-plugin-crosswalk-webview",
     "cordova-plugin-whitelist",
-    "cordova-plugin-splashscreen"
+    "cordova-plugin-splashscreen",
+    "cc.fovea.cordova.purchase"
   ],
   "cordovaPlatforms": []
 }

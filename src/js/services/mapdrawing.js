@@ -79,8 +79,8 @@ angular.module('retro').service('MapDrawing', (Player, Google, Settings, MAP_COL
 
         _.each(places, place => {
 
-            const { lat, lng } = place.location;
-            const pos = new Google.maps.LatLng(lat, lng);
+            const { lat, lon } = place.location;
+            const pos = new Google.maps.LatLng(lat, lon);
 
             const placeMarker = new Google.maps.Marker({
                 position: pos,
@@ -97,17 +97,13 @@ angular.module('retro').service('MapDrawing', (Player, Google, Settings, MAP_COL
             });
 
             placeMarker.addListener('click', () => {
-
-                const infoWindow = new Google.maps.InfoWindow({
-                    content: `<strong>${place.dungeonName ? place.dungeonName : place.name}</strong><br>
+                const infoWindowContent = `
+                    <strong>${place.dungeonName ? place.dungeonName : place.name}</strong><br>
                     ${place.dungeonName ? `<small>AKA ${place.name}</small><br>` : ''}
                     Type: ${place.derivedType}
-                    `
-                });
+                `;
 
-                infoWindow.open(map, placeMarker);
-
-                click({ place, infoWindow });
+                click({ place, infoWindowContent, infoWindowMarker: placeMarker });
             });
 
             savedPlaces.push(placeMarker);
@@ -160,15 +156,12 @@ angular.module('retro').service('MapDrawing', (Player, Google, Settings, MAP_COL
 
             monsterMarker.addListener('click', () => {
 
-                const infoWindow = new Google.maps.InfoWindow({
-                    content: `<strong>${calculatedName}</strong><br>
+                const infoWindowContent = `
+                    <strong>${calculatedName}</strong><br>
                     Rating: ${calculatedRating > 0 ? '+' : ''}${calculatedRating}
-                    `
-                });
+                `;
 
-                infoWindow.open(map, monsterMarker);
-
-                click({ monster, infoWindow });
+                click({ monster, infoWindowContent, infoWindowMarker: monsterMarker });
             });
 
             savedMonsters.push(monsterMarker);
