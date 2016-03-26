@@ -7,8 +7,11 @@ angular.module('retro').service('LocationWatcher', (socket, Player, $q) => {
         console.log('GPS turned off, or connection errored.');
     };
 
-    const updateLocation = () => {
+    const updateLocation = ({ coords }) => {
+        currentCoords = coords;
         Player.get().location = { lat: currentCoords.latitude, lon: currentCoords.longitude };
+        defer.notify(currentCoords);
+        ready.resolve(currentCoords);
         socket.emit('player:change:location', { name: Player.get().name, coords: { latitude: currentCoords.latitude, longitude: currentCoords.longitude } });
     };
 
@@ -17,17 +20,8 @@ angular.module('retro').service('LocationWatcher', (socket, Player, $q) => {
     const watcher = {
         current: () => currentCoords,
         start: () => {
-            navigator.geolocation.getCurrentPosition((position) => {
-                currentCoords = position.coords;
-                defer.notify(currentCoords);
-                ready.resolve(currentCoords);
-                updateLocation();
-            }, error, { timeout: 10000 });
-
-            navigator.geolocation.watchPosition((position) => {
-                currentCoords = position.coords;
-                updateLocation();
-            }, error, { timeout: 10000 });
+            navigator.geolocation.getCurrentPosition(updateLocation, error, { timeout: 10000 });
+            navigator.geolocation.watchPosition(updateLocation, error, { timeout: 10000 });
         },
 
         ready: ready.promise,
