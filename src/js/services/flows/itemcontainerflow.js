@@ -1,4 +1,4 @@
-angular.module('retro').service('ItemContainerFlow', ($stateWrapper, BlockState, Player, Toaster, socket) => {
+angular.module('retro').service('ItemContainerFlow', ($stateWrapper, BlockState, Player, DistanceCalculator, Settings, Toaster, socket) => {
 
     const getNotYetActivatedItems = (place) => {
         const player = Player.get();
@@ -26,7 +26,12 @@ angular.module('retro').service('ItemContainerFlow', ($stateWrapper, BlockState,
 
         getNotYetActivatedItems,
 
-        canEnter: (data) => {
+        canEnterDistance: (place) => {
+            const { lat, lon } = Player.get().location;
+            return (1000 * DistanceCalculator.gps(lat, lon, place.location.lat, place.location.lon)).toFixed(0) < Settings.INTERACT_RADIUS + 1;
+        },
+
+        canEnterMonsters: (data) => {
             const requirements = data.requirements;
             const killed = Player.get().actionsTaken.dungeonMonster;
             const intersectionLength = _.intersection(killed, requirements).length;

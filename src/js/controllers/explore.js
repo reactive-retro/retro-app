@@ -47,9 +47,12 @@ angular.module('retro').controller('ExploreController',
         };
 
         $scope.shop = () => {
-            const monstersNeeded = ItemContainerFlow.canEnter($scope.currentlySelected.place);
+            const monstersNeeded = ItemContainerFlow.canEnterMonsters($scope.currentlySelected.place);
             if(monstersNeeded !== 0) {
                 return Toaster.show(`You need to kill ${monstersNeeded} more monster${monstersNeeded > 1 ? 's' : ''} to open this chest!`);
+            }
+            if(Settings.isProd() && !ItemContainerFlow.canEnterDistance($scope.currentlySelected.place)) {
+                return Toaster.show('You are too far away to enter that shop!');
             }
             ItemContainerFlow.enter($scope.currentlySelected.place);
             $scope.reset();
