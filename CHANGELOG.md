@@ -1,3 +1,18 @@
+<a name="0.3.2"></a>
+## [0.3.2](https://github.com/reactive-retro/retro-app/compare/0.3.1...0.3.2) (2016-03-17)
+
+
+### Bug Fixes
+
+* **combat:** do not hide monsters if combat was fled ([4878577](https://github.com/reactive-retro/retro-app/commit/4878577)), closes [#106](https://github.com/reactive-retro/retro-app/issues/106)
+
+### Features
+
+* **battle:** fleeing from combat is now possible ([27dfbda](https://github.com/reactive-retro/retro-app/commit/27dfbda)), closes [#35](https://github.com/reactive-retro/retro-app/issues/35)
+* **game:** items now exist in the game ([475852a](https://github.com/reactive-retro/retro-app/commit/475852a)), closes [#69](https://github.com/reactive-retro/retro-app/issues/69)
+
+
+
 <a name="0.3.1"></a>
 ## [0.3.1](https://github.com/reactive-retro/retro-app/compare/0.3.0...0.3.1) (2016-03-13)
 
