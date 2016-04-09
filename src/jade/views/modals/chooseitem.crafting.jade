@@ -1,0 +1,18 @@
+
+script(type="text/ng-template", id="chooseitem.crafting")
+    ion-modal-view(ng-controller="CraftingItemChooseController")
+        ion-header-bar.bar-balanced
+            .buttons
+                button.button(ng-click="close()")
+                    i.icon.ion-close
+            h1.title Choose {{activeType}} item
+
+        ion-content
+            h3.subdued.header-bar-margin.text-center.vertical-center(ng-if="allItems.length === 0") You have no valid items.
+            item-display(
+                ng-repeat="item in allItems = (player.inventory | filter:isValidItem | orderBy:'name')",
+                header-icon-button="{ iconClass: 'game-icon game-icon-gear-swap', click: choose(item) }"
+                item="item",
+                show-tagline="true"
+            )
+

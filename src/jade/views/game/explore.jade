@@ -12,8 +12,15 @@ script(type="text/ng-template", id="explore")
                 | &nbsp;Find Me
 
             button.above-gmaps.fight-button.button(
+                blocked-by="Craft",
+                ng-if="currentlySelected.isCraft",
+                ng-click="craft()")
+                i.icon.game-icon.game-icon-global-money
+                | Open {{currentlySelected.place.derivedType}}
+
+            button.above-gmaps.fight-button.button(
                 blocked-by="Shop",
-                ng-if="currentlySelected.place",
+                ng-if="currentlySelected.isShop",
                 ng-click="shop()")
                 i.icon.game-icon.game-icon-global-money
                 | Open {{currentlySelected.place.derivedType}}

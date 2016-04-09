@@ -1,5 +1,5 @@
 angular.module('retro').controller('ExploreController',
-    ($scope, $timeout, $filter, $ionicPopup, Player, DistanceCalculator, LocationWatcher, Google, MapDrawing, Places, Monsters, Settings, ExploreFlow, BattleFlow, ItemContainerFlow, Toaster) => {
+    ($scope, $timeout, $filter, $ionicPopup, Player, DistanceCalculator, LocationWatcher, Google, MapDrawing, Places, Monsters, Settings, ExploreFlow, BattleFlow, ItemContainerFlow, CraftingFlow, Toaster) => {
 
         $scope.currentlySelected = null;
         $scope.centered = true;
@@ -44,6 +44,14 @@ angular.module('retro').controller('ExploreController',
                 if(!res) return;
                 ExploreFlow.moveHomepoint($scope.coords);
             });
+        };
+
+        $scope.craft = () => {
+            if(Settings.isProd() && !ItemContainerFlow.canEnterDistance($scope.currentlySelected.place)) {
+                return Toaster.show('You are too far away to enter that crafting station!');
+            }
+            CraftingFlow.enter($scope.currentlySelected.place);
+            $scope.reset();
         };
 
         $scope.shop = () => {
@@ -92,6 +100,14 @@ angular.module('retro').controller('ExploreController',
             $timeout(() => {
                 $scope.currentlySelected = opts;
                 if(opts && opts.infoWindowContent) {
+
+                    if(opts.place) {
+                        if(opts.place.derivedType === 'Crafting Station') {
+                            $scope.currentlySelected.isCraft = true;
+                        } else {
+                            $scope.currentlySelected.isShop = true;
+                        }
+                    }
 
                     $scope.currentInfoContent = opts.infoWindowContent;
 

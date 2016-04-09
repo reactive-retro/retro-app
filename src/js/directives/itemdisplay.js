@@ -49,7 +49,8 @@ angular.module('retro').directive('itemDisplay', () => {
                     <p ng-if="showTagline" class="icon-container">
                         <i class="icon game-icon {{qualityColor}}" ng-if="item.quality > 1"></i>
                         <span ng-class="{ assertive: playerLevel < item.levelRequirement }">
-                            Level {{item.levelRequirement || 1}} {{item.type}}
+                            <span>Level {{item.levelRequirement || 1}} {{item.type}}</span>
+                            <span ng-if="item.maxMods > 0"> ({{item.numMods}}/{{item.maxMods}})</span>
                         </span>
                     </p>
                 </div>

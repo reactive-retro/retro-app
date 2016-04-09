@@ -1,0 +1,57 @@
+script(type="text/ng-template", id="crafting")
+    ion-view(view-title="Crafting Station")
+        ion-content
+            .row
+                .col
+                    .row
+                        .col
+                            h3.text-center Primary Item
+                    .row
+                        .col.col-center.text-center
+                            button.button.button-block.padding-0(ng-click="setPrimaryFrom('armor')") My Armor
+                        .col.col-center.text-center
+                            button.button.button-block.padding-0(ng-click="setPrimaryFrom('weapon')") My Weapon
+                        .col.col-center.text-center
+                            button.button.button-block.padding-0(ng-click="chooseItem('primary')") Choose...
+
+                    .row
+                        .col(ng-if="items.primary")
+                            item-display(item="items.primary", show-tagline="true")
+
+            .row(ng-if="items.primary && items.secondary && isMod() && !isValidMod()")
+                .col.col-center.text-center
+                    .assertive(ng-if="items.primary.numMods >= items.primary.maxMods") Item can not be modified further.
+                    .assertive(ng-if="items.primary.levelRequirement < items.secondary.levelRequirement") Material is too high level for item.
+                    .assertive(ng-if="player.stats.gold < modCost()") Not enough gold.
+
+            .row(ng-if="items.primary")
+                .col
+                    .row
+                        .col
+                            h3.text-center Secondary Item
+                    .row
+                        .col.col-center.text-center
+                            button.button.button-block.padding-0(ng-click="chooseItem('secondary')") Choose...
+
+                    .row
+                        .col(ng-if="items.secondary")
+                            item-display(item="items.secondary", show-tagline="true")
+
+            .row(ng-if="items.primary && items.secondary && isValidOperation()")
+                .col
+                    .row
+                        .col.col-40 Gold:
+                        .col.col-60
+                            gold-display(value="player.stats.gold", align-gold-right="true")
+                    .row
+                        .col.col-40 Cost:
+                        .col.col-60
+                            gold-display(value="cost()", align-gold-right="true")
+                    .row
+                        .col.col-40 Result:
+                        .col.col-60
+                            gold-display(value="player.stats.gold - cost()", align-gold-right="true")
+
+                .col.col-center.text-center
+                    button.button.button-positive(ng-disabled="!isValidCraft()", ng-click="doCraft()", blocked-by="Craft") Craft!
+

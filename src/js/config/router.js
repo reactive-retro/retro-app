@@ -157,5 +157,14 @@ angular.module('retro').config(($ionicConfigProvider, $urlRouterProvider, $state
                 containerData: null
             }
         })
+        .state('crafting', {
+            url: '/crafting',
+            controller: 'CraftingController',
+            templateUrl: 'crafting',
+            data: { requiresLogin: true },
+            params: {
+                place: null
+            }
+        })
     ;
 });

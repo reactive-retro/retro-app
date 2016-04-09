@@ -2,7 +2,7 @@ script(type="text/ng-template", id="item-container")
     ion-view(view-title="{{pageTitle}}")
         ion-content
             h3.margin-top-10.text-center {{name}}
-            h5.margin-top-10.text-center.italic(ng-if="showGold") You have {{player.stats.gold}} gold left.
+            h5.margin-top-10.text-center.italic(ng-if="showGold") You have {{player.stats.gold | number:0}} gold left.
             h3.subdued.header-bar-margin.text-center.vertical-center(ng-if="contents.length === 0") This place is empty.
             item-display(
                 ng-repeat="item in contents",
