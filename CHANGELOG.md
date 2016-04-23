@@ -1,3 +1,26 @@
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/reactive-retro/retro-app/compare/0.3.2...0.4.0) (2016-03-31)
+
+
+### Bug Fixes
+
+* **android:** the back button should perform as expected in most situations ([7fb26eb](https://github.com/reactive-retro/retro-app/commit/7fb26eb)), closes [#41](https://github.com/reactive-retro/retro-app/issues/41)
+* **combat:** multiplier scaling has been drawn back heavily for damage ([058896d](https://github.com/reactive-retro/retro-app/commit/058896d)), closes [#109](https://github.com/reactive-retro/retro-app/issues/109)
+* **explore:** battling a monster then opening a treasure chest works as expected ([f841138](https://github.com/reactive-retro/retro-app/commit/f841138)), closes [#115](https://github.com/reactive-retro/retro-app/issues/115)
+* **item:** item display should not show nan, empty areas, and should now be overall correct ([8ceed0d](https://github.com/reactive-retro/retro-app/commit/8ceed0d)), closes [#113](https://github.com/reactive-retro/retro-app/issues/113)
+
+### Features
+
+* **app:** the app now has nicer icons for everything ([2ae0c0e](https://github.com/reactive-retro/retro-app/commit/2ae0c0e))
+* **art:** added splash screen ([24df412](https://github.com/reactive-retro/retro-app/commit/24df412))
+* **battle:** there is now a buff bar showing buffs and durations ([a672fac](https://github.com/reactive-retro/retro-app/commit/a672fac)), closes [#29](https://github.com/reactive-retro/retro-app/issues/29)
+* **explore:** dungeons can now spawn multi-monster encounters ([21c740d](https://github.com/reactive-retro/retro-app/commit/21c740d)), closes [#119](https://github.com/reactive-retro/retro-app/issues/119)
+* **gps:** increase reliability of gps locking ([3259f7d](https://github.com/reactive-retro/retro-app/commit/3259f7d))
+* **items:** items now have a description ([f4123ff](https://github.com/reactive-retro/retro-app/commit/f4123ff)), closes [#121](https://github.com/reactive-retro/retro-app/issues/121)
+* **options:** its possible to skip round results now ([ada9a81](https://github.com/reactive-retro/retro-app/commit/ada9a81)), closes [#111](https://github.com/reactive-retro/retro-app/issues/111)
+
+
+
 <a name="0.3.2"></a>
 ## [0.3.2](https://github.com/reactive-retro/retro-app/compare/0.3.1...0.3.2) (2016-03-17)
 
